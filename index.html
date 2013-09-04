@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="http://jr.glo.lan:8000/socket.io/socket.io.js"></script>
+        <script src="/client.js"></script>
+        
+        <script type="text/javascript">
+            $(document).ready(function() {
+                
+ /*               obj = {
+                    x:400,
+                    y:300,
+                    size: 24
+                    
+                }
+                
+                var canvas = $('#canvas')[0];
+                canvas.width = 800;
+                canvas.height = 600;
+                ctx = canvas.getContext('2d');
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(obj.x+obj.size/2, obj.y + obj.size/6);
+                ctx.lineTo(obj.x-obj.size/3, obj.y - obj.size/2);
+                ctx.lineTo(obj.x, obj.y + obj.size/2);
+                ctx.lineTo(obj.x+obj.size/3, obj.y - obj.size/2);
+                ctx.lineTo(obj.x-obj.size/2, obj.y + obj.size/6);
+                ctx.lineTo(obj.x+obj.size/2, obj.y + obj.size/6);
+                
+                ctx.fillStyle ='rgb(0,0,0)';
+                ctx.fill();
+ */           });
+        </script>
+        
+    </head>
+
+
+    <body>
+        <div style="width: 1200; position: relative;">
+            <div id="left" style="border: 1px solid gray; position: absolute; top: 0; left: 0; overflow: hidden; display: inline-block;">
+                <canvas id="canvas" style="width: 800px; height: 600px;"></canvas>
+            </div>
+            <div id="right" style="width: 400px; position: absolute; top:0; right: 0">
+                <div id="scores" style="padding: 1em; width: 90%; height: 28%; border: 1px solid gray;"></div>
+                <div id="messages"  style="padding: 1em; width: 90%; height: 78%; border: 1px solid gray;"></div>
+            </div>
+        </div>
+        
+        
+    </body>
+</html>
