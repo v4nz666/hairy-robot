@@ -186,7 +186,7 @@ function Client() {
         },
         init: function() {
             
-            this.socket = io.connect('http://jr.glo.lan:8000', { 'reconnect': false} );
+            this.socket = io.connect('http://jr.glo.lan:8000', { 'reconnect': false } );
             
             // Register event handlers
             this.socket.on('setParams',     $.proxy(this.setParams, this));

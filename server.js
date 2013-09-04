@@ -24,7 +24,6 @@ function Server(io) {
         interval: 16,
         clientSampleRate: 100,
         
-        
         width: 800,
         height: 600,
         
@@ -70,17 +69,19 @@ function Server(io) {
             
             
             $.proxy(io.sockets.on('connection', $.proxy(function (socket) {
-                //console.log('Connection received[', socket,']');
+                
                 // Register user upon connection
                 this.addUser(socket);
-                
                 
                 console.log("New User added[" + socket.id + "]" + 
                     "at [" + this.width/2 + this.height/2  + "]" +
                     "Total[" + this.userCount + "]");
                 
                 socket.emit('msg', { id: this.id, msg: 'Welcome!!' });
+                
+                // Register event handlers for this sockeet
                 socket.on('cmd', $.proxy(this.queueCmd, this));
+                
                 socket.on('msg', $.proxy(function(msg) {
                     console.log("Got Message!", msg);
                 }, this));
@@ -89,8 +90,8 @@ function Server(io) {
                     this.disconnect(id);
                 }, this));
                 
+                // Send User game info
                 socket.emit('powerups', this.powerups);
-                
                 io.sockets.emit('userScores', this.userScores);
             }, this)), this);
         },
