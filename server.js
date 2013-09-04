@@ -82,12 +82,10 @@ function Server(io) {
                 // Register event handlers for this sockeet
                 socket.on('cmd', $.proxy(this.queueCmd, this));
                 
-                socket.on('msg', $.proxy(function(msg) {
-                    console.log("Got Message!", msg);
-                }, this));
+                socket.on('msg', $.proxy(this.chatReceived, this));
                 
                 socket.on('disconnect', $.proxy(function(){
-                    this.disconnect(id);
+                    this.disconnect(socket.id);
                 }, this));
                 
                 // Send User game info
@@ -126,7 +124,11 @@ function Server(io) {
     //                 'UTotal[', this.commandQueue[input.src].length, ']');
             }
         },
-        
+        chatReceived: function(msg) {
+            if ( msg.msg ) {
+                io.sockets.emit('msg', {id: this.users[msg.id].name, msg: msg.msg})
+            }
+        },
         spin: function() {
             console.log('Spinning');
             setInterval($.proxy(this.tick, this), this.interval);

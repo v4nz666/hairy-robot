@@ -199,6 +199,9 @@ function Client() {
             $(document).keydown($.proxy(function(ev) {this.addInput(ev, true)}, this));
             $(document).keyup($.proxy(function(ev) {this.addInput(ev,false)}, this));
             
+            this.textInput = $('#textInput');
+            console.log(this.textInput);
+            this.textInput.keypress($.proxy(function(ev) {this.chatInput(ev)}, this));
             
             this.canvas = $('#canvas')[0];
             this.canvas.width = 800;
@@ -275,6 +278,14 @@ function Client() {
                     this.commands[16] = down;
                 break;
 
+            }
+        },
+        
+        chatInput: function(ev) {
+            
+            if ( ev.which == 13 ) {
+                this.socket.emit('msg', {id: this.id, msg: this.textInput.val()} );
+                this.textInput.val('');
             }
         },
         update: function(up) {
