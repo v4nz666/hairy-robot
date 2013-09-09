@@ -1,8 +1,6 @@
 package main;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import http.HTTPServer;
+import util.LoggerFactory;
 
 public class Main {
   public static void main(String[] args) throws InterruptedException {
@@ -50,37 +48,8 @@ public class Main {
 
     server.stop();*/
     
-    Server server = new Server();
-    server.start();
+    LoggerFactory.getLogger().enableInfo = false;
+    LoggerFactory.getLogger().enableTrace = false;
+    Server.instance().start();
   }
-  
-  public static class ChatObject {
-
-    private String userName;
-    private String message;
-
-    public ChatObject() {
-    }
-
-    public ChatObject(String userName, String message) {
-        super();
-        this.userName = userName;
-        this.message = message;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-}
 }
