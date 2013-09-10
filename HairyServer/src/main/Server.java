@@ -54,13 +54,6 @@ public class Server {
     config.setPort(9092);
     
     _server = new SocketIOServer(config);
-    /*_server.addConnectListener(new ConnectListener() {
-      @Override
-      public void onConnect(SocketIOClient client) {
-        addUser(client);
-      }
-    });*/
-    
     _server.addDisconnectListener(new DisconnectListener() {
       @Override
       public void onDisconnect(SocketIOClient client) {
@@ -145,6 +138,7 @@ public class Server {
     System.out.println("Disconnecting " + user.id);
     _user.remove(user);
     _userMap.remove(socket);
+    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " has left!"));
   }
   
   private void killUser(User victim, User attacker) {
@@ -158,11 +152,11 @@ public class Server {
     victim.angle = 0;
     victim.deaths++;
     
-    System.out.println("User " + victim.id + " killed by user " + attacker.id);
+    System.out.println("User " + victim.name + " killed by user " + attacker.name);
     
     attacker.kills++;
     
-    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", victim.id + " got killed by " + attacker.id));
+    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", victim.name + " got killed by " + attacker.name));
     //TODO: User scores
   }
   
@@ -178,7 +172,7 @@ public class Server {
   private void addCommand(SocketIOClient socket, User.Cmd cmd) {
     User user = _userMap.get(socket);
     user.addCommand(cmd);
-    System.out.println("User " + user.id + " command " + cmd.getCommands());
+    System.out.println("User " + user.name + " command " + cmd.getCommands());
   }
   
   private String getColor() {
@@ -194,7 +188,6 @@ public class Server {
          bullet.y < -bulletSize || bullet.y > H + bulletSize) {
         bullet._user.bullets--;
         _bullet.remove(bullet);
-        System.out.println("Removing");
       }
     }
     
