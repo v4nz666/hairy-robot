@@ -5,20 +5,17 @@ import java.util.LinkedList;
 
 import com.corundumstudio.socketio.SocketIOClient;
 
-public class User {
+public class User extends Entity {
   private Server _server = Server.instance();
   
-  public final int id;
   public final SocketIOClient socket;
   
   private final LinkedList<Cmd> _cmd = new LinkedList<>();
   
-  public double x, y;
   public double vx, vy;
   public double acc, angle;
   public double velMax = 6;
   public double turnSpeed = 15;
-  public int size = 32;
   public int guns = 1;
   public int maxBullets = 3;
   public int life;
@@ -29,11 +26,9 @@ public class User {
   public long lastReported = new Date().getTime();
   
   public User(int id, SocketIOClient socket, double x, double y, int life, int shields) {
-    this.id = id;
+    super(id, x, y, 32);
     this.socket = socket;
     
-    this.x = x;
-    this.y = y;
     this.life = life;
     this.shields = shields;
   }
