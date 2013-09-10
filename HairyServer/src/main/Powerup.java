@@ -2,36 +2,64 @@ package main;
 
 import java.util.Random;
 
-public abstract class Powerup {
+public abstract class Powerup extends Entity {
   private static Random _rand = new Random();
   
-  public static Powerup random() {
+  public static Powerup random(double x, double y) {
     switch(_rand.nextInt(3)) {
-      case 0: return new Shields();
-      case 1: return new Life();
-      case 2: return new Guns();
+      case 0: return new Shields(x, y);
+      case 1: return new Life(x, y);
+      case 2: return new Guns(x, y);
     }
     
     return null;
   }
   
-  public int x, y;
-  public int vx, vy;
-  public int color;
-  public int size = 16;
+  public final int vx, vy;
+  public final String color;
+  
+  private Powerup(double x, double y, int size, String color) {
+    super(-1, x, y, size);
+    vx = 1;
+    vy = 1;
+    this.color = color;
+  }
+  
+  public abstract void use(User user);
   
   public static class Shields extends Powerup {
-    public int shields = 50;
-    public Shields() { color = 0x00FFFF; }
+    public int properties = 50;
+    private Shields(double x, double y) {
+      super(x, y, 16, "#00FFFF");
+    }
+    
+    @Override
+    public void use(User user) {
+      user.shields = Math.min(user.shields + properties, Server.shields);
+    }
   }
   
   public static class Life extends Powerup {
-    public int life = 50;
-    public Life() { color = 0x00FF00; }
+    public int properties = 50;
+    private Life(double x, double y) {
+      super(x, y, 16, "#00FF00");
+    }
+    
+    @Override
+    public void use(User user) {
+      user.life = Math.min(user.life + properties, Server.life);
+    }
   }
   
   public static class Guns extends Powerup {
-    public int guns = 1;
-    public Guns() { color = 0xFF0000; }
+    public int properties = 1;
+    private Guns(double x, double y) {
+      super(x, y, 16, "#FF0000");
+    }
+    
+    @Override
+    public void use(User user) {
+      user.guns = Math.min(user.guns + properties, Server.guns);
+    }
   }
 }
