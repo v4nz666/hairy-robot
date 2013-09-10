@@ -24,6 +24,7 @@ public class User extends Entity {
   public int kills;
   public int deaths;
   public int bullets;
+  public String color;
   public long lastReported = new Date().getTime();
   
   public User(String name, int id, SocketIOClient socket, double x, double y, int life, int shields) {
@@ -35,12 +36,20 @@ public class User extends Entity {
     this.shields = shields;
   }
   
+  public Params serializeParams() {
+    return new Params();
+  }
+  
   public Stats serializeStats() {
     return new Stats();
   }
   
   public Update serializeUpdate() {
     return new Update();
+  }
+  
+  public Remove serializeRemove() {
+    return new Remove();
   }
   
   public void addCommand(Cmd cmd) {
@@ -132,11 +141,6 @@ public class User extends Entity {
   
   public static class Login {
     public String name;
-    
-    public Login() { }
-    public Login(String name) {
-      this.name = name;
-    }
   }
   
   public static class Cmd {
@@ -155,20 +159,8 @@ public class User extends Entity {
     public void setCommands(int commands) { _commands = commands; }
   }
   
-  public static class Params {
-    private String _id;
-    private String _color;
-    
-    public Params() { }
-    public Params(String id, String color) {
-      _id = id;
-      _color = color;
-    }
-    
-    public String getId()    { return _id; }
-    public String getColor() { return _color; }
-    public void setId   (String id)    { _id = id; }
-    public void setColor(String color) { _color = color; }
+  public class Params {
+    public int getId() { return id; }
   }
   
   public class Stats {
@@ -180,9 +172,14 @@ public class User extends Entity {
   public class Update {
     public int getId() { return id; }
     public String getName() { return name; }
+    public String getColor() { return color; }
     public int getX() { return (int)x; }
     public int getY() { return (int)y; }
     public double getAngle() { return angle; }
     public int getShields() { return shields; }
+  }
+  
+  public class Remove {
+    public int getId() { return id; }
   }
 }

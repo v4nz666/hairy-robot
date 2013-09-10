@@ -4,6 +4,8 @@ function Client() {
         socket: null,
         color: 'white',
         
+        user: [],
+        
         x: null,
         y: null,
         angle: null,
@@ -224,6 +226,18 @@ function Client() {
           this.socket.emit('login', {name: name} );
         },
         
+        addUser: function(data) {
+          console.log('Adding user [' + data + ']');
+          this.addMsg({id: 'Server', msg: data.name + ' has joined the game!'});
+          this.user[data.id] = data;
+        },
+        
+        remUser: function(data) {
+          console.log('Removing user [' + data.id + ']');
+          this.addMsg({id: 'Server', msg: this.user[data.id].name + ' has left the game!'});
+          this.user.splice(data.id, 1);
+        },
+        
         initGame: function() {
             $('#login').hide();
             $('#game').show();
@@ -239,6 +253,8 @@ function Client() {
             this.socket.on('update',     $.proxy(this.update, this));
             this.socket.on('explosion',  $.proxy(this.explosion, this));
             this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
+            this.socket.on('adduser',    $.proxy(this.addUser, this));
+            this.socket.on('remuser',    $.proxy(this.remUser, this));
             
             // Hook our keyboard events
             $(document).keydown($.proxy(function(ev) {this.addInput(ev, true)}, this));
@@ -459,6 +475,16 @@ function Particle(x, y, mV) {
         y: y
     }
 }
+
+function User(name, x, y, shields) {
+  return {
+    name: name,
+    x: x,
+    y: y,
+    shields: shields
+  }
+}
+
 $(document).ready(function() {
     var client = Client();
     client.init();

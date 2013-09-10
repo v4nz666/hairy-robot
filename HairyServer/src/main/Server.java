@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import main.User.Login;
 
 import com.corundumstudio.socketio.AckRequest;
+import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
@@ -122,14 +123,17 @@ public class Server {
   private void addUser(SocketIOClient socket, String name) {
     int id = _user.size();
     User user = new User(name, id, socket, x, y, life, shields);
+    user.color = getColor();
     _user.add(user);
     _userMap.put(socket, user);
     
     System.out.println("New user added");
-    socket.sendEvent("setParams", new User.Params(String.valueOf(id), getColor()));
+    socket.sendEvent("setParams", user.serializeParams());
+    
+    _server.getBroadcastOperations().sendEvent("adduser", user.serializeUpdate());
+    
     socket.sendEvent("stats", user.serializeStats());
     socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
-    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " has joined!"));
     //TODO: Need to send scores here?
   }
   
@@ -139,7 +143,7 @@ public class Server {
     System.out.println("Disconnecting " + user.id);
     _user.remove(user);
     _userMap.remove(socket);
-    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " has left!"));
+    _server.getBroadcastOperations().sendEvent("remuser", user.serializeRemove());
   }
   
   private void killUser(User victim, User attacker) {
