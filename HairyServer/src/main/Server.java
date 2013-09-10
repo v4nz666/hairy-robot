@@ -10,6 +10,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
+import com.corundumstudio.socketio.listener.DisconnectListener;
 
 public class Server {
   private static Server _instance = new Server();
@@ -17,6 +18,13 @@ public class Server {
   
   public static final int W = 800, H = 600;
   public static final int spread = 15;
+  public static final int x = W / 2;
+  public static final int y = H / 2;
+  public static final int life = 100;
+  public static final int shields = 100;
+  public static final int guns = 5;
+  public static final int bulletSize = 2;
+  public static final int maxPowerups = 3;
   public final double acc = 1 * 0.0625;
   public final double dec = 0.75 * 0.0625;
   
@@ -25,22 +33,18 @@ public class Server {
   private ConcurrentLinkedDeque<User> _user = new ConcurrentLinkedDeque<>();
   private HashMap<SocketIOClient, User> _userMap = new HashMap<>();
   private ConcurrentLinkedDeque<Bullet> _bullet = new ConcurrentLinkedDeque<>();
+  private ConcurrentLinkedDeque<Powerup> _powerup = new ConcurrentLinkedDeque<>();
+  private Powerup[] _powerupConv = new Powerup[0];
   
   private SocketIOServer _server;
-  
-  private final int x = W / 2;
-  private final int y = H / 2;
-  private final int life = 100;
-  private final int shields = 100;
-  private final int _bulletSize = 2;
-  
-  private Powerup[] _powerups;
   
   private boolean _running;
   private long _interval;
   private int _ticksPerSecond = 60;
   private long _ticksTotal;
   private int _tps = 60;
+  
+  private long _powerupTimer;
   
   private Server() { }
   
@@ -53,6 +57,13 @@ public class Server {
       @Override
       public void onConnect(SocketIOClient client) {
         addUser(client);
+      }
+    });
+    
+    _server.addDisconnectListener(new DisconnectListener() {
+      @Override
+      public void onDisconnect(SocketIOClient client) {
+        removeUser(client);
       }
     });
     
@@ -116,12 +127,44 @@ public class Server {
     System.out.println("New user added");
     socket.sendEvent("msg", new Msg("Server", "Welcome!!"));
     socket.sendEvent("setParams", new User.Params(String.valueOf(id), getColor()));
-    socket.sendEvent("powerups", _powerups);
+    socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
     //TODO: Need to send scores here?
+  }
+  
+  private void removeUser(SocketIOClient socket) {
+    User user = _userMap.get(socket);
+    
+    System.out.println("Disconnecting " + user.id);
+    _user.remove(user);
+    _userMap.remove(socket);
+  }
+  
+  private void killUser(User victim, User attacker) {
+    victim.life = life;
+    victim.shields = shields;
+    victim.guns = 1;
+    victim.x = W / 2;
+    victim.y = H / 2;
+    victim.vx = 0;
+    victim.vy = 0;
+    victim.angle = 0;
+    victim.deaths++;
+    
+    System.out.println("User " + victim.id + " killed by user " + attacker.id);
+    
+    attacker.kills++;
+    
+    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", victim.id + " got killed by " + attacker.id));
+    //TODO: User scores
   }
   
   public void addBullet(Bullet bullet) {
     _bullet.push(bullet);
+  }
+  
+  public void addPowerup() {
+    _powerup.push(Powerup.random(_rand.nextInt(W), _rand.nextInt(H)));
+    _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
   }
   
   private void addCommand(SocketIOClient socket, User.Cmd cmd) {
@@ -131,7 +174,7 @@ public class Server {
   }
   
   private String getColor() {
-    return "#" + Integer.toString(_rand.nextInt(0x1000000), 0x10);
+    return String.format("#%06x", _rand.nextInt(0x1000000));
   }
   
   private void tick(double deltaT) {
@@ -139,8 +182,8 @@ public class Server {
       bullet.x += bullet.vx;
       bullet.y += bullet.vy;
       
-      if(bullet.x < -_bulletSize || bullet.x > W + _bulletSize ||
-         bullet.y < -_bulletSize || bullet.y > H + _bulletSize) {
+      if(bullet.x < -bulletSize || bullet.x > W + bulletSize ||
+         bullet.y < -bulletSize || bullet.y > H + bulletSize) {
         bullet._user.bullets--;
         _bullet.remove(bullet);
         System.out.println("Removing");
@@ -153,21 +196,73 @@ public class Server {
     for(User user : _user) {
       user.processCommands();
       user.update(deltaT);
+      
+      for(Bullet bullet : _bullet) {
+        if(checkCollisions(user, bullet)) {
+          String size;
+          
+          if(user.shields > 0) {
+            size = "small";
+            user.shields = Math.max(0,  user.shields - bullet.damage);
+          } else {
+            size = "medium";
+            user.life -= bullet.damage;
+          }
+          
+          if(user.life <= 0) {
+            killUser(user, bullet._user);
+            _server.getBroadcastOperations().sendEvent("explosion", new Bullet.Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
+          }
+          
+          _bullet.remove(bullet);
+          bullet._user.bullets--;
+          
+          user.socket.sendEvent("msg", new Msg("Server", "Shields: " + user.shields + ", Life: " + user.life + ", Guns: " + user.guns));
+          _server.getBroadcastOperations().sendEvent("explosion", new Bullet.Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
+        }
+      }
+      
+      for(Powerup powerup : _powerup) {
+        if(checkCollisions(user, powerup)) {
+          powerup.use(user);
+          _powerup.remove(powerup);
+          user.socket.sendEvent("msg", new Msg("Server", "Shields: " + user.shields + ", Life: " + user.life + ", Guns: " + user.guns));
+          _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
+        }
+      }
+      
       update[i++] = user.serializeForUpdate();
     }
     
-    _server.getBroadcastOperations().sendEvent("update", new Update(_ticksTotal, update, _bullet.toArray()));
+    if(_powerupTimer <= System.nanoTime()) {
+      _powerupTimer = System.nanoTime() + (_rand.nextInt(5) + 10) * 1000000000l; // 5-15 seconds
+      if(_powerup.size() < maxPowerups) {
+        addPowerup();
+      }
+    }
+    
+    _server.getBroadcastOperations().sendEvent("update", new Update(_ticksTotal, update, _bullet));
+  }
+  
+  private boolean checkCollisions(Entity a, Entity b) {
+    // Can't collide with yourself, or bullets you've fired
+    if(a.id == b.id) return false;
+    
+    double dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+    return (dist < a.size / 2 + b.size / 2);
   }
   
   public static class Update {
+    private static Bullet[] _conv = new Bullet[0];
+    
     public final long ticks;
     public final User.Update[] usersOnScreen;
-    public final Object[] bullets; // Temporary
+    public final Bullet[] bullets;
     
-    public Update(long ticks, User.Update[] usersOnScreen, Object[] bullets) {
+    public Update(long ticks, User.Update[] usersOnScreen, ConcurrentLinkedDeque<Bullet> bullets) {
       this.ticks = ticks;
       this.usersOnScreen = usersOnScreen;
-      this.bullets = bullets;
+      this.bullets = bullets.toArray(_conv);
     }
   }
 }
