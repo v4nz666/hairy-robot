@@ -2,6 +2,7 @@
 
 <html>
   <head>
+    <meta charset="utf-8" />
     <title>Hairy Robot</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="socket.io.js"></script>
@@ -9,15 +10,20 @@
   </head>
   
   <body>
-    <div>
+    <div id="login">
+      <p>Name: <input id="username" type="text" autofocus style="width: 200px;" /></p>
+    </div>
+    
+    <div id="game" style="display: none;">
       <div id="main" style="border: 1px solid gray; display: inline-block;">
         <canvas id="canvas" style="width: 800px; height: 600px;"></canvas>
       </div>
       <div id="right" style="width: 400px; display: inline-block; vertical-align: top;">
         <div id="scores" style="padding: 1em; width: 90%; height: 28%; border: 1px solid gray;"></div>
         <div id="messages" style="padding: 1em; width: 90%; height: 78%; border: 1px solid gray;"></div>
-        <div id="input" style="padding: 1em; width: 90%; heigh: 1.5em;">
-          <input id="textInput" type="text" style="width: 100%;" />
+        <div id="chat" style="padding: 1em; width: 90%; heigh: 1.5em;">
+          <input id="textInput" type="text" style="width: 100%; display: none;" />
+          <p>Press &quot;t&quot; to chat</p>
         </div>
       </div>
     </div>

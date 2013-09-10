@@ -1,7 +1,5 @@
 function Client() {
-    
     return {
-        
         id: null,
         socket: null,
         color: 'white',
@@ -20,6 +18,8 @@ function Client() {
         
         messages: [],
         maxMessages: 10,
+        
+        inChat: false,
         
         commands: {
             1:  false, //turnLeft
@@ -58,6 +58,7 @@ function Client() {
             this.ctx.fillRect(0,0, this.ctx.canvas.width, this.ctx.canvas.height);
             this.ctx.restore();
         },
+        
         render: function() {
             
             this.clear();
@@ -66,6 +67,7 @@ function Client() {
             this.renderExplosions();
             this.renderPowerups();
         },
+        
         renderBullets: function() {
             for (i = 0; i < this.bullets.length; i++ ) {
                     var bullet = this.bullets[i];
@@ -78,6 +80,7 @@ function Client() {
                     this.ctx.restore();
             }
         },
+        
         renderUsers: function() {
             for (key in this.users ) {
                 user = this.users[key];
@@ -91,6 +94,10 @@ function Client() {
                     color = 'white';
                 }
                 this.ctx.save();
+                
+                this.ctx.textAlign = 'center';
+                this.ctx.fillStyle = 'white';
+                this.ctx.fillText(user.name, user.x, user.y - this.size / 2);
                 
                 this.ctx.translate(user.x, user.y);
                 this.ctx.rotate(user.angle*Math.PI/180);
@@ -115,6 +122,7 @@ function Client() {
                 }
             }
         },
+        
         renderExplosions: function() {
             for (i = 0; i < this.explosions.length; i++ ) {
                 this.renderExplosion(this.explosions[i]);
@@ -127,6 +135,7 @@ function Client() {
                 }   
             }
         },
+        
         renderExplosion: function(expl) {
             var ctx = this.ctx;
             
@@ -155,9 +164,10 @@ function Client() {
                 ctx.fill();
                 ctx.restore();
             }
-            expl.ttl--;
             
+            expl.ttl--;
         },
+        
         renderPowerups: function() {
             for ( i in this.powerups ) {
                 if ( i === 'length' ) { continue; }
@@ -184,29 +194,64 @@ function Client() {
                 
             }
         },
+        
         init: function() {
+          this.socket = io.connect('http://home.monoxidedesign.com:9092', { 'reconnect': false } );
+          this.initMenu();
+        },
+        
+        initMenu: function() {
+          username = $('#username');
+          username.keyup($.proxy(function(e) {
+            if(e.keyCode == 13) {
+              this.login(username.val());
+            }
+          }, this));
+        },
+        
+        login: function(name) {
+          $('#login :input').attr('disabled', true);
+          
+          // Register setParams handler and send login
+          this.socket.on('setParams', $.proxy(function(data) {
+            this.setParams(data);
+            this.initGame();
+          }, this));
+          
+          this.socket.emit('login', {name: name} );
+        },
+        
+        initGame: function() {
+            $('#login').hide();
+            $('#game').show();
             
-            this.socket = io.connect('http://jr.glo.lan:8000', { 'reconnect': false } );
+            var sampleRate = 100; // Client input sample rate in milliseconds
+            var frameRate = 60;
+            var tickRate = 1000 / frameRate;
             
             // Register event handlers
-            this.socket.on('setParams',     $.proxy(this.setParams, this));
-            this.socket.on('userScores',    $.proxy(this.userScore, this));
-            this.socket.on('msg',           $.proxy(this.addMsg, this));
-            this.socket.on('update',        $.proxy(this.update, this));
-            this.socket.on('explosion',     $.proxy(this.explosion, this));
-            this.socket.on('powerups',      $.proxy(this.powerupUpdate, this));
+            this.socket.on('userScores', $.proxy(this.userScore, this));
+            this.socket.on('msg',        $.proxy(this.addMsg, this));
+            this.socket.on('update',     $.proxy(this.update, this));
+            this.socket.on('explosion',  $.proxy(this.explosion, this));
+            this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
+            
             // Hook our keyboard events
             $(document).keydown($.proxy(function(ev) {this.addInput(ev, true)}, this));
-            $(document).keyup($.proxy(function(ev) {this.addInput(ev,false)}, this));
+            $(document).keyup($.proxy(function(ev) {this.addInput(ev, false)}, this));
             
             this.textInput = $('#textInput');
             console.log(this.textInput);
-            this.textInput.keypress($.proxy(function(ev) {this.chatInput(ev)}, this));
+            this.textInput.keydown($.proxy(function(ev) {this.chatInput(ev)}, this));
             
             this.canvas = $('#canvas')[0];
             this.canvas.width = 800;
             this.canvas.height = 600;
             this.ctx = canvas.getContext('2d');
+            
+            console.log(this);
+            setInterval($.proxy(this.sample, this), sampleRate);
+            setInterval($.proxy(this.render, this), frameRate);
         },
         
         setParams: function(data){
@@ -215,11 +260,13 @@ function Client() {
             this.color = data.color;
             console.log('Set id[', this.id, ']');
         },
+        
         powerupUpdate: function(powerups) {
             this.powerups = powerups;
             console.log('Got Powerups[', this.powerups, ']');
             
         },
+        
         addMsg: function(msg) {
             while (this.messages.length >= this.maxMessages) {
                 this.messages.shift();
@@ -228,6 +275,7 @@ function Client() {
             
             this.renderMessages();
         },
+        
         renderMessages: function() {
             html = '';
             for (i = 0; i < this.messages.length; i++){ 
@@ -237,6 +285,7 @@ function Client() {
             }
             $('#messages').html(html);
         },
+        
         userScore: function(userScores) {
             console.log('User Scores[', userScores, ']');
             html = '';
@@ -255,39 +304,52 @@ function Client() {
         },
         
         addInput: function(ev, down) {
+          if(this.textInput.is(':hidden')) {
             cmd = Cmd(this.id, ev);
             
             switch(ev.keyCode) {
-                case 37 :
+                case 37:
                     this.commands[1] = down;
                 break;
                 
-                case 39 :
+                case 39:
                     this.commands[2] = down;
                 break;
                 
-                case 38 :
+                case 38:
                     this.commands[4] = down;
                 break;
                 
-                case 40 :
+                case 40:
                     this.commands[8] = down;
                 break;
                 
-                case 32 :
+                case 32:
                     this.commands[16] = down;
                 break;
-
+                
+                case 84:
+                  if(down) {
+                    this.textInput.show();
+                    this.textInput.focus();
+                    ev.preventDefault();
+                  }
+                break;
             }
+          }
         },
         
         chatInput: function(ev) {
-            
-            if ( ev.which == 13 ) {
-                this.socket.emit('msg', {id: this.id, msg: this.textInput.val()} );
-                this.textInput.val('');
+          if(ev.which == 13) {
+            if(this.textInput.val().length != 0) {
+              this.socket.emit('msg', {id: this.id, msg: this.textInput.val()});
+              this.textInput.val('');
             }
+            
+            this.textInput.hide();
+          }
         },
+        
         update: function(up) {
             
             this.users = {}
@@ -306,11 +368,13 @@ function Client() {
                 
             }
         },
+        
         explosion: function(expl) {
             
             var expl = Explosion(expl.size, expl.x, expl.y, expl.tick);
             this.explosions.push(expl);
         },
+        
         isRegistered: function() {
             return typeof this.id != "undefined";
         }
@@ -383,24 +447,5 @@ function Particle(x, y, mV) {
 }
 $(document).ready(function() {
     var client = Client();
-    var sampleRate = 100; // Client input sample rate in milliseconds
-    var frameRate = 60;
-    var tickRate = 1000 / frameRate;
     client.init();
-    console.log(client);
-    setInterval($.proxy(client.sample, client), sampleRate);
-    setInterval($.proxy(client.render, client), frameRate);
-    
 });
-
-
-
-
-
-
-
-
-
-
-
-
