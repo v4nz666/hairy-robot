@@ -40,7 +40,7 @@ public class User extends Entity {
   }
   
   public Update serializeUpdate() {
-    return new Update(name, (int)x, (int)y, angle, shields);
+    return new Update();
   }
   
   public void addCommand(Cmd cmd) {
@@ -178,17 +178,11 @@ public class User extends Entity {
   }
   
   public class Update {
-    public final String name;
-    public final int x, y;
-    public final double angle;
-    public final int shields;
-    
-    public Update(String name, int x, int y, double angle, int shields) {
-      this.name = name;
-      this.x = x;
-      this.y = y;
-      this.angle = angle;
-      this.shields = shields;
-    }
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public int getX() { return (int)x; }
+    public int getY() { return (int)y; }
+    public double getAngle() { return angle; }
+    public int getShields() { return shields; }
   }
 }
