@@ -1,7 +1,6 @@
 package main;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -47,7 +46,6 @@ public class Server {
   
   public void start() throws InterruptedException {
     Configuration config = new Configuration();
-    //config.setHostname("localhost");
     config.setPort(9092);
     
     _server = new SocketIOServer(config);
