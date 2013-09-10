@@ -12,6 +12,7 @@ public class User extends Entity {
   
   private final LinkedList<Cmd> _cmd = new LinkedList<>();
   
+  public String name;
   public double vx, vy;
   public double acc, angle;
   public double velMax = 6;
@@ -25,8 +26,9 @@ public class User extends Entity {
   public int bullets;
   public long lastReported = new Date().getTime();
   
-  public User(int id, SocketIOClient socket, double x, double y, int life, int shields) {
+  public User(String name, int id, SocketIOClient socket, double x, double y, int life, int shields) {
     super(id, x, y, 32);
+    this.name = name;
     this.socket = socket;
     
     this.life = life;
@@ -34,7 +36,7 @@ public class User extends Entity {
   }
   
   public Update serializeForUpdate() {
-    return new Update((int)x, (int)y, angle, shields);
+    return new Update(name, (int)x, (int)y, angle, shields);
   }
   
   public void addCommand(Cmd cmd) {
@@ -124,6 +126,15 @@ public class User extends Entity {
     acc = 0;
   }
   
+  public static class Login {
+    public String name;
+    
+    public Login() { }
+    public Login(String name) {
+      this.name = name;
+    }
+  }
+  
   public static class Cmd {
     private int _src;
     private int _commands;
@@ -157,11 +168,13 @@ public class User extends Entity {
   }
   
   public class Update {
+    public final String name;
     public final int x, y;
     public final double angle;
     public final int shields;
     
-    public Update(int x, int y, double angle, int shields) {
+    public Update(String name, int x, int y, double angle, int shields) {
+      this.name = name;
       this.x = x;
       this.y = y;
       this.angle = angle;

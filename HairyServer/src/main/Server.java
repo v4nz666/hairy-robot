@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import main.User.Login;
+
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 
@@ -53,12 +54,12 @@ public class Server {
     config.setPort(9092);
     
     _server = new SocketIOServer(config);
-    _server.addConnectListener(new ConnectListener() {
+    /*_server.addConnectListener(new ConnectListener() {
       @Override
       public void onConnect(SocketIOClient client) {
         addUser(client);
       }
-    });
+    });*/
     
     _server.addDisconnectListener(new DisconnectListener() {
       @Override
@@ -67,10 +68,17 @@ public class Server {
       }
     });
     
+    _server.addEventListener("login", User.Login.class, new DataListener<User.Login>() {
+      @Override
+      public void onData(SocketIOClient client, Login data, AckRequest ackSender) {
+        addUser(client, data.name);
+      }
+    });
+    
     _server.addEventListener("msg", Msg.class, new DataListener<Msg>() {
       @Override
       public void onData(SocketIOClient client, Msg data, AckRequest ackSender) {
-        _server.getBroadcastOperations().sendEvent("msg", data);
+        _server.getBroadcastOperations().sendEvent("msg", new Msg(_userMap.get(client).name, data.getMsg()));
       }
     });
     
@@ -118,16 +126,16 @@ public class Server {
     _server.stop();
   }
   
-  private void addUser(SocketIOClient socket) {
+  private void addUser(SocketIOClient socket, String name) {
     int id = _user.size();
-    User user = new User(id, socket, x, y, life, shields);
+    User user = new User(name, id, socket, x, y, life, shields);
     _user.add(user);
     _userMap.put(socket, user);
     
     System.out.println("New user added");
-    socket.sendEvent("msg", new Msg("Server", "Welcome!!"));
     socket.sendEvent("setParams", new User.Params(String.valueOf(id), getColor()));
     socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
+    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " has joined!"));
     //TODO: Need to send scores here?
   }
   
