@@ -127,6 +127,7 @@ public class Server {
     
     System.out.println("New user added");
     socket.sendEvent("setParams", new User.Params(String.valueOf(id), getColor()));
+    socket.sendEvent("stats", user.serializeStats());
     socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
     _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " has joined!"));
     //TODO: Need to send scores here?
@@ -156,7 +157,7 @@ public class Server {
     
     attacker.kills++;
     
-    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", victim.name + " got killed by " + attacker.name));
+    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", victim.name + " was killed by " + attacker.name));
     //TODO: User scores
   }
   
@@ -218,7 +219,7 @@ public class Server {
           _bullet.remove(bullet);
           bullet._user.bullets--;
           
-          user.socket.sendEvent("msg", new Msg("Server", "Shields: " + user.shields + ", Life: " + user.life + ", Guns: " + user.guns));
+          user.socket.sendEvent("stats", user.serializeStats());
           _server.getBroadcastOperations().sendEvent("explosion", new Bullet.Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
         }
       }
@@ -227,12 +228,12 @@ public class Server {
         if(checkCollisions(user, powerup)) {
           powerup.use(user);
           _powerup.remove(powerup);
-          user.socket.sendEvent("msg", new Msg("Server", "Shields: " + user.shields + ", Life: " + user.life + ", Guns: " + user.guns));
+          user.socket.sendEvent("stats", user.serializeStats());
           _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
         }
       }
       
-      update[i++] = user.serializeForUpdate();
+      update[i++] = user.serializeUpdate();
     }
     
     if(_powerupTimer <= System.nanoTime()) {

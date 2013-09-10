@@ -35,7 +35,11 @@ public class User extends Entity {
     this.shields = shields;
   }
   
-  public Update serializeForUpdate() {
+  public Stats serializeStats() {
+    return new Stats();
+  }
+  
+  public Update serializeUpdate() {
     return new Update(name, (int)x, (int)y, angle, shields);
   }
   
@@ -165,6 +169,12 @@ public class User extends Entity {
     public String getColor() { return _color; }
     public void setId   (String id)    { _id = id; }
     public void setColor(String color) { _color = color; }
+  }
+  
+  public class Stats {
+    public int getLife() { return life; }
+    public int getShields() { return shields; }
+    public int getGuns() { return guns; }
   }
   
   public class Update {

@@ -18,8 +18,11 @@ function Client() {
         
         messages: [],
         maxMessages: 10,
-        
         inChat: false,
+        
+        lifeBar: null,
+        shieldBar: null,
+        guns: null,
         
         commands: {
             1:  false, //turnLeft
@@ -232,6 +235,7 @@ function Client() {
             // Register event handlers
             this.socket.on('userScores', $.proxy(this.userScore, this));
             this.socket.on('msg',        $.proxy(this.addMsg, this));
+            this.socket.on('stats',      $.proxy(this.stats, this));
             this.socket.on('update',     $.proxy(this.update, this));
             this.socket.on('explosion',  $.proxy(this.explosion, this));
             this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
@@ -243,6 +247,10 @@ function Client() {
             this.textInput = $('#textInput');
             console.log(this.textInput);
             this.textInput.keydown($.proxy(function(ev) {this.chatInput(ev)}, this));
+            
+            this.lifeBar = $('#life');
+            this.shieldBar = $('#shield');
+            this.guns = $('#guns');
             
             this.canvas = $('#canvas')[0];
             this.canvas.width = 800;
@@ -264,7 +272,6 @@ function Client() {
         powerupUpdate: function(powerups) {
             this.powerups = powerups;
             console.log('Got Powerups[', this.powerups, ']');
-            
         },
         
         addMsg: function(msg) {
@@ -274,6 +281,13 @@ function Client() {
             this.messages.push(msg);
             
             this.renderMessages();
+        },
+        
+        stats: function(stats) {
+          console.log(stats);
+          this.lifeBar.width((stats.life / 100) * 100 + "%");
+          this.shieldBar.width((stats.shields / 100) * 100 + "%");
+          this.guns.html(stats.guns);
         },
         
         renderMessages: function() {
