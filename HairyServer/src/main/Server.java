@@ -17,8 +17,8 @@ public class Server {
   
   public static final int W = 800, H = 600;
   public static final int spread = 15;
-  public final double acc = 1;
-  public final double dec = 0.75;
+  public final double acc = 1 * 0.0625;
+  public final double dec = 0.75 * 0.0625;
   
   private Random _rand = new Random();
   
