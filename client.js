@@ -175,7 +175,7 @@ function Client() {
         },
         
         init: function() {
-          this.socket = io.connect('http://127.0.0.1:9092', { 'reconnect': false } );
+          this.socket = io.connect('http://home.monoxidedesign.com:9092', { 'reconnect': false } );
           this.initMenu();
         },
         
