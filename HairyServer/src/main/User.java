@@ -58,8 +58,10 @@ public class User extends Entity {
       if((keys & 0x04) != 0) { turnRight(); }
       if((keys & 0x08) != 0) { reverse(); thrust = true; }
       if((keys & 0x10) != 0) { fire(); }
-      if(!thrust) { thrustersOff(); }
+      if(thrust) { return; }
     }
+    
+    thrustersOff();
   }
   
   public void update(double deltaT) {
