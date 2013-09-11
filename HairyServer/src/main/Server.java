@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import sql.MySQL;
+import sql.SQL;
 import main.User.Login;
 
 import com.corundumstudio.socketio.AckRequest;
@@ -47,9 +49,16 @@ public class Server {
   
   private long _powerupTimer;
   
+  private SQL _sql;
+  
   private Server() { }
   
-  public void start() throws InterruptedException {
+  public void start() throws InterruptedException, InstantiationException, IllegalAccessException {
+    System.out.println("Initialising...");
+    
+    _sql = SQL.create(MySQL.class);
+    _sql.connect("project1.monoxidedesign.com", "hairydata", "hairydata", "WaRcebYmnz4eSnGs");
+    
     Configuration config = new Configuration();
     config.setPort(9092);
     
@@ -82,7 +91,11 @@ public class Server {
       }
     });
     
+    System.out.println("Starting listening thread...");
+    
     _server.start();
+    
+    System.out.println("Server running.");
     
     _interval = 1000000000 / _ticksPerSecond;
     _running = true;
@@ -117,6 +130,7 @@ public class Server {
     }
     
     _server.stop();
+    _sql.close();
   }
   
   private void addUser(SocketIOClient socket, String name) {
