@@ -26,33 +26,7 @@ function Client() {
         shieldBar: null,
         guns: null,
         
-        commands: {
-            1:  false, //turnLeft
-            2:  false, //turnRight
-            4:  false, //thruster
-            8:  false, //reverse
-            16: false, //fire
-            32: false  //thrustersOff
-        },
-        
-        sample: function() {
-            cmds = 0;
-            this.commands[32] = ( ! this.commands[4] && ! this.commands[8] );
-            
-            for (key in this.commands) {
-                if ( this.commands[key] === true ) {
-                    cmds = cmds | key;
-                }
-            }
-            
-            if ( cmds ) {
-                var input = {
-                    src: this.id,
-                    commands: cmds
-                }
-                this.socket.emit('cmd', input);
-            }
-        },
+        keys: 0,
         
         clear: function(clr) {
             if ( typeof clr === 'undefined' ) {
@@ -201,7 +175,7 @@ function Client() {
         },
         
         init: function() {
-          this.socket = io.connect('http://home.monoxidedesign.com:9092', { 'reconnect': false } );
+          this.socket = io.connect('http://127.0.0.1:9092', { 'reconnect': false } );
           this.initMenu();
         },
         
@@ -242,7 +216,6 @@ function Client() {
             $('#login').hide();
             $('#game').show();
             
-            var sampleRate = 100; // Client input sample rate in milliseconds
             var frameRate = 60;
             var tickRate = 1000 / frameRate;
             
@@ -257,8 +230,8 @@ function Client() {
             this.socket.on('remuser',    $.proxy(this.remUser, this));
             
             // Hook our keyboard events
-            $(document).keydown($.proxy(function(ev) {this.addInput(ev, true)}, this));
-            $(document).keyup($.proxy(function(ev) {this.addInput(ev, false)}, this));
+            $(document).keydown($.proxy(this.keyDown, this));
+            $(document).keyup($.proxy(this.keyUp, this));
             
             this.textInput = $('#textInput');
             console.log(this.textInput);
@@ -274,7 +247,6 @@ function Client() {
             this.ctx = canvas.getContext('2d');
             
             console.log(this);
-            setInterval($.proxy(this.sample, this), sampleRate);
             setInterval($.proxy(this.render, this), frameRate);
         },
         
@@ -333,37 +305,49 @@ function Client() {
             $('#scores').html(html);
         },
         
-        addInput: function(ev, down) {
+        keyDown: function(ev) {
           if(this.textInput.is(':hidden')) {
-            cmd = Cmd(this.id, ev);
-            
             switch(ev.keyCode) {
-                case 37:
-                    this.commands[1] = down;
+              case 32:
+                if((this.keys & 0x10) == 0) {
+                  this.keys |= 0x10;
+                  this.socket.emit('keys', {keys: this.keys});
+                }
                 break;
-                
-                case 39:
-                    this.commands[2] = down;
+              
+              case 37: case 38: case 39: case 40:
+                code = Math.pow(2, ev.keyCode - 37);
+                if((this.keys & code) == 0) {
+                  this.keys |= code;
+                  this.socket.emit('keys', {keys: this.keys});
+                }
                 break;
-                
-                case 38:
-                    this.commands[4] = down;
+              
+              case 84:
+                this.textInput.show();
+                this.textInput.focus();
+                ev.preventDefault();
                 break;
-                
-                case 40:
-                    this.commands[8] = down;
+            }
+          }
+        },
+        
+        keyUp: function(ev) {
+          if(this.textInput.is(':hidden')) {
+            switch(ev.keyCode) {
+              case 32:
+                if((this.keys & 0x10) != 0) {
+                  this.keys &= ~0x10;
+                  this.socket.emit('keys', {keys: this.keys});
+                }
                 break;
-                
-                case 32:
-                    this.commands[16] = down;
-                break;
-                
-                case 84:
-                  if(down) {
-                    this.textInput.show();
-                    this.textInput.focus();
-                    ev.preventDefault();
-                  }
+              
+              case 37: case 38: case 39: case 40:
+                code = Math.pow(2, ev.keyCode - 37);
+                if((this.keys & code) != 0) {
+                  this.keys &= ~code;
+                  this.socket.emit('keys', {keys: this.keys});
+                }
                 break;
             }
           }
@@ -381,7 +365,6 @@ function Client() {
         },
         
         update: function(up) {
-            
             this.users = {}
             this.ticks = up.ticks;
             this.bullets = up.bullets;
@@ -408,15 +391,6 @@ function Client() {
         isRegistered: function() {
             return typeof this.id != "undefined";
         }
-    }
-}
-
-
-
-function Cmd(id, commands) {
-    return  {
-        src: id,
-        commands: commands
     }
 }
 

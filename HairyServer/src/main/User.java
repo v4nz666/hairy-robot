@@ -1,7 +1,6 @@
 package main;
 
 import java.util.Date;
-import java.util.LinkedList;
 
 import com.corundumstudio.socketio.SocketIOClient;
 
@@ -10,13 +9,11 @@ public class User extends Entity {
   
   public final SocketIOClient socket;
   
-  private final LinkedList<Cmd> _cmd = new LinkedList<>();
-  
   public String name;
   public double vx, vy;
   public double acc, angle;
   public double velMax = 6;
-  public double turnSpeed = 15;
+  public double turnSpeed = 5;
   public int guns = 1;
   public int maxBullets = 3;
   public int life;
@@ -26,6 +23,7 @@ public class User extends Entity {
   public int bullets;
   public String color;
   public long lastReported = new Date().getTime();
+  public int keys;
   
   public User(String name, int id, SocketIOClient socket, double x, double y, int life, int shields) {
     super(id, x, y, 32);
@@ -52,19 +50,15 @@ public class User extends Entity {
     return new Remove();
   }
   
-  public void addCommand(Cmd cmd) {
-    _cmd.add(cmd);
-  }
-  
   public void processCommands() {
-    Cmd cmd;
-    while((cmd = _cmd.poll()) != null) {
-      if((cmd._commands & 0x01) != 0) turnLeft();
-      if((cmd._commands & 0x02) != 0) turnRight();
-      if((cmd._commands & 0x04) != 0) thruster();
-      if((cmd._commands & 0x08) != 0) reverse();
-      if((cmd._commands & 0x10) != 0) fire();
-      if((cmd._commands & 0x20) != 0) thrustersOff();
+    if(keys != 0) {
+      boolean thrust = false;
+      if((keys & 0x01) != 0) { turnLeft(); }
+      if((keys & 0x02) != 0) { thruster(); thrust = true; }
+      if((keys & 0x04) != 0) { turnRight(); }
+      if((keys & 0x08) != 0) { reverse(); thrust = true; }
+      if((keys & 0x10) != 0) { fire(); }
+      if(!thrust) { thrustersOff(); }
     }
   }
   
@@ -143,20 +137,8 @@ public class User extends Entity {
     public String name;
   }
   
-  public static class Cmd {
-    private int _src;
-    private int _commands;
-    
-    public Cmd() { }
-    public Cmd(int src, int commands) {
-      _src      = src;
-      _commands = commands;
-    }
-    
-    public int getSrc()      { return _src; }
-    public int getCommands() { return _commands; }
-    public void setSrc     (int src)      { _src = src; }
-    public void setCommands(int commands) { _commands = commands; }
+  public static class Keys {
+    public int keys;
   }
   
   public class Params {

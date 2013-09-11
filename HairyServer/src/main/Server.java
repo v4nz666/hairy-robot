@@ -75,10 +75,10 @@ public class Server {
       }
     });
     
-    _server.addEventListener("cmd", User.Cmd.class, new DataListener<User.Cmd>() {
+    _server.addEventListener("keys", User.Keys.class, new DataListener<User.Keys>() {
       @Override
-      public void onData(SocketIOClient client, User.Cmd data, AckRequest ackSender) {
-        addCommand(client, data);
+      public void onData(SocketIOClient client, User.Keys data, AckRequest ackSender) {
+        _userMap.get(client).keys = data.keys;
       }
     });
     
@@ -171,12 +171,6 @@ public class Server {
   public void addPowerup() {
     _powerup.push(Powerup.random(_rand.nextInt(W), _rand.nextInt(H)));
     _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
-  }
-  
-  private void addCommand(SocketIOClient socket, User.Cmd cmd) {
-    User user = _userMap.get(socket);
-    user.addCommand(cmd);
-    System.out.println("User " + user.name + " command " + cmd.getCommands());
   }
   
   private String getColor() {
