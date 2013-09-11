@@ -308,15 +308,8 @@ function Client() {
         keyDown: function(ev) {
           if(this.textInput.is(':hidden')) {
             switch(ev.keyCode) {
-              case 32:
-                if((this.keys & 0x10) == 0) {
-                  this.keys |= 0x10;
-                  this.socket.emit('keys', {keys: this.keys});
-                }
-                break;
-              
-              case 37: case 38: case 39: case 40:
-                code = Math.pow(2, ev.keyCode - 37);
+              case 32: case 37: case 38: case 39: case 40:
+                code = (ev.keyCode == 32) ? 0x10 : Math.pow(2, ev.keyCode - 37);
                 if((this.keys & code) == 0) {
                   this.keys |= code;
                   this.socket.emit('keys', {keys: this.keys});
@@ -335,15 +328,8 @@ function Client() {
         keyUp: function(ev) {
           if(this.textInput.is(':hidden')) {
             switch(ev.keyCode) {
-              case 32:
-                if((this.keys & 0x10) != 0) {
-                  this.keys &= ~0x10;
-                  this.socket.emit('keys', {keys: this.keys});
-                }
-                break;
-              
-              case 37: case 38: case 39: case 40:
-                code = Math.pow(2, ev.keyCode - 37);
+              case 32: case 37: case 38: case 39: case 40:
+                code = (ev.keyCode == 32) ? 0x10 : Math.pow(2, ev.keyCode - 37);
                 if((this.keys & code) != 0) {
                   this.keys &= ~code;
                   this.socket.emit('keys', {keys: this.keys});
