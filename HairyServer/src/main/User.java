@@ -74,6 +74,8 @@ public class User extends Entity {
   public int bullets;
   public int keys;
   
+  public long lastBullet;
+  
   private User(SocketIOClient socket, String name, float x, float y) {
     super(Server.getID(), x, y, 32);
     this.name = name;
@@ -158,21 +160,25 @@ public class User extends Entity {
   }
   
   private void fire() {
-    int maxBullets = this.maxBullets * guns;
-    
-    if(bullets + guns <= maxBullets) {
-      float center = (guns - 1) / 2;
-      float offset = 0;
+    if(lastBullet <= System.nanoTime()) {
+      int maxBullets = this.maxBullets * guns;
       
-      for(int i = 0; i < guns; i++) {
-        if(i < center) {
-          offset = (center - i) * -Server.spread;
-        } else if(i > center) {
-          offset = (i - center) * Server.spread;
+      if(bullets + guns <= maxBullets) {
+        float center = (guns - 1) / 2;
+        float offset = 0;
+        
+        for(int i = 0; i < guns; i++) {
+          if(i < center) {
+            offset = (center - i) * -Server.spread;
+          } else if(i > center) {
+            offset = (i - center) * Server.spread;
+          }
+          
+          _server.addBullet(new Bullet(this, offset));
+          bullets++;
         }
         
-        _server.addBullet(new Bullet(this, offset));
-        bullets++;
+        lastBullet = System.nanoTime() + 100000000;
       }
     }
   }
