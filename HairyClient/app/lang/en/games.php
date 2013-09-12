@@ -1,0 +1,5 @@
+<?php
+
+return [
+  'space' => 'Space'
+];

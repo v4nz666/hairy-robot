@@ -3,5 +3,8 @@
 return [
   'username' => 'Username',
   'password' => 'Password',
-  'login'    => '=>'
+  'confirm'  => 'Confirm',
+  'login'    => '=>',
+  'logout'   => 'Log out',
+  'register' => '=>'
 ];
