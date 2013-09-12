@@ -4,8 +4,8 @@
   <head>
     <meta charset="UTF-8">
     <title>Hairy Robot</title>
-    {{ HTML::script('http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js') }}
-    {{ HTML::script('http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js') }}
+    {{ HTML::script('assets/js/jquery.min.js') }}
+    {{ HTML::script('assets/js/socket.io.min.js') }}
     {{ HTML::script('assets/js/client.js') }}
   </head>
   
