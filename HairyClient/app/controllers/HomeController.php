@@ -1,7 +1,7 @@
 <?php
 
 class HomeController extends Controller {
-  public function getHome() {
+  public function home() {
     return View::make('home');
   }
 }

@@ -1,4 +1,4 @@
 <?php
 
-Route::get('/', 'HomeController@getHome');
+Route::get('/', 'HomeController@home');
 Route::put('/login', 'AuthController@login');
