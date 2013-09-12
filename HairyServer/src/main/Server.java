@@ -194,10 +194,6 @@ public class Server {
     _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
   }
   
-  private String getColor() {
-    return String.format("#%06x", _rand.nextInt(0x1000000));
-  }
-  
   private void tick(double deltaT) {
     for(Bullet bullet : _bullet) {
       bullet.x += bullet.vx;
