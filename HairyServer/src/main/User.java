@@ -1,6 +1,8 @@
 package main;
 
-import java.util.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import sql.SQL;
 
@@ -8,8 +10,41 @@ import com.corundumstudio.socketio.SocketIOClient;
 
 public class User extends Entity {
   private static SQL sql = SQL.getInstance();
+  private static PreparedStatement isAuthed = sql.prepareStatement("SELECT `id`, `auth` FROM `users` WHERE `username`=?");
+  private static PreparedStatement select   = sql.prepareStatement("SELECT * FROM `space_users` WHERE `user_id`=?");
   
-  public static void createTable() {
+  public static User getUserIfAuthed(SocketIOClient socket, String name, String auth) throws SQLException {
+    isAuthed.setString(1, name);
+    
+    try(ResultSet r = isAuthed.executeQuery()) {
+      if(r.next()) {
+        if(auth.equals(r.getString("auth"))) {
+          select.setInt(1, r.getInt("id"));
+          
+          try(ResultSet r2 = select.executeQuery()) {
+            if(r2.next()) {
+              User user = new User(socket, name, r2.getFloat("x"), r2.getFloat("y"));
+              user.maxLife = r2.getInt("max_life");
+              user.maxShields = r2.getInt("max_shields");
+              user.maxGuns = r2.getInt("max_guns");
+              user.maxBullets = r2.getInt("max_bullets");
+              user.maxVel = r2.getFloat("max_vel");
+              user.life = Math.min(r2.getInt("life"), user.maxLife);
+              user.shields = Math.min(r2.getInt("shields"), user.maxShields);
+              user.guns = Math.min(r2.getInt("guns"), user.maxGuns);
+              user.turnSpeed = r2.getFloat("turn_speed");
+              user.size = r2.getInt("size");
+              user.color = r2.getString("colour");
+              user.kills = r2.getInt("kills");
+              user.deaths = r2.getInt("deaths");
+              return user;
+            }
+          }
+        }
+      }
+    }
+    
+    return null;
   }
   
   private Server _server = Server.instance();
@@ -19,26 +54,30 @@ public class User extends Entity {
   public String name;
   public double vx, vy;
   public double acc, angle;
-  public double velMax = 6;
-  public double turnSpeed = 5;
-  public int guns = 1;
-  public int maxBullets = 3;
+  
+  public int    maxLife;
+  public int    maxShields;
+  public int    maxGuns;
+  public int    maxBullets = 3;
+  public double maxVel = 6;
+  
   public int life;
   public int shields;
+  public int guns = 1;
+  
+  public double turnSpeed = 5;
+  public String color;
+  
   public int kills;
   public int deaths;
+  
   public int bullets;
-  public String color;
-  public long lastReported = new Date().getTime();
   public int keys;
   
-  public User(String name, int id, SocketIOClient socket, double x, double y, int life, int shields) {
-    super(id, x, y, 32);
+  private User(SocketIOClient socket, String name, float x, float y) {
+    super(Server.getID(), x, y, 32);
     this.name = name;
     this.socket = socket;
-    
-    this.life = life;
-    this.shields = shields;
   }
   
   public Params serializeParams() {
@@ -75,8 +114,8 @@ public class User extends Entity {
     double theta = Math.toRadians(angle);
     
     //TODO: work delta into here
-    vx = constrain(vx + Math.cos(theta) * acc, -velMax, velMax);
-    vy = constrain(vy + Math.sin(theta) * acc, -velMax, velMax);
+    vx = constrain(vx + Math.cos(theta) * acc, -maxVel, maxVel);
+    vy = constrain(vy + Math.sin(theta) * acc, -maxVel, maxVel);
     
     displace();
   }
@@ -144,6 +183,7 @@ public class User extends Entity {
   
   public static class Login {
     public String name;
+    public String auth;
   }
   
   public static class Keys {
@@ -152,6 +192,8 @@ public class User extends Entity {
   
   public class Params {
     public int getId() { return id; }
+    public int getMaxLife() { return maxLife; }
+    public int getMaxShields() { return maxShields; }
   }
   
   public class Stats {
