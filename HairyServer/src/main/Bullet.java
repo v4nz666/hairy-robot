@@ -11,8 +11,8 @@ public class Bullet extends Entity {
     _user = user;
     double offsetX = Math.cos(Math.toRadians(user.angle + offset));
     double offsetY = Math.sin(Math.toRadians(user.angle + offset));
-    vx = user.vx + offsetX + Math.cos(Math.toRadians(user.angle)) * (user.velMax * 2);
-    vy = user.vy + offsetY + Math.sin(Math.toRadians(user.angle)) * (user.velMax * 2);
+    vx = user.vx + offsetX + Math.cos(Math.toRadians(user.angle)) * (user.maxVel * 2);
+    vy = user.vy + offsetY + Math.sin(Math.toRadians(user.angle)) * (user.maxVel * 2);
   }
   
   public static class Explosion {
