@@ -11,8 +11,9 @@ class TableUserCreate extends Migration {
   public function up() {
     Schema::create('users', function($table) {
       $table->increments('id');
-      $table->string('name', 20)->unique();
-      $table->string('pass', 60);
+      $table->string('username', 20)->unique();
+      $table->string('password', 60);
+      $table->string('auth', 64);
       $table->timestamps();
     });
   }
