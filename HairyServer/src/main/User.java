@@ -2,9 +2,16 @@ package main;
 
 import java.util.Date;
 
+import sql.SQL;
+
 import com.corundumstudio.socketio.SocketIOClient;
 
 public class User extends Entity {
+  private static SQL sql = SQL.getInstance();
+  
+  public static void createTable() {
+  }
+  
   private Server _server = Server.instance();
   
   public final SocketIOClient socket;
