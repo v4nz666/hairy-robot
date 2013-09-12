@@ -35,7 +35,7 @@ public abstract class Powerup extends Entity {
     
     @Override
     public void use(User user) {
-      user.shields = Math.min(user.shields + properties, Server.shields);
+      user.shields = Math.min(user.shields + properties, user.maxShields);
     }
   }
   
@@ -47,7 +47,7 @@ public abstract class Powerup extends Entity {
     
     @Override
     public void use(User user) {
-      user.life = Math.min(user.life + properties, Server.life);
+      user.life = Math.min(user.life + properties, user.maxLife);
     }
   }
   
@@ -59,7 +59,7 @@ public abstract class Powerup extends Entity {
     
     @Override
     public void use(User user) {
-      user.guns = Math.min(user.guns + properties, Server.guns);
+      user.guns = Math.min(user.guns + properties, user.maxGuns);
     }
   }
 }
