@@ -34,11 +34,11 @@ App::after(function($request, $response)
 */
 
 Route::filter('auth', function() {
-  if(Auth::guest()) return Redirect::action('HomeController@getHome');
+  if(Auth::guest()) return Redirect::action('HomeController@home');
 });
 
 Route::filter('nauth', function() {
-  if(Auth::check()) return Redirect::action('HomeController@getHome');
+  if(Auth::check()) return Redirect::action('HomeController@home');
 });
 
 
