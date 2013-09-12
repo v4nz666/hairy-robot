@@ -8,7 +8,7 @@ class User extends Eloquent implements UserInterface {
    *
    * @var array
    */
-  protected $hidden = array('pass');
+  protected $hidden = array('password');
   
   /**
    * Get the unique identifier for the user.
@@ -25,6 +25,10 @@ class User extends Eloquent implements UserInterface {
    * @return string
    */
   public function getAuthPassword() {
-    return $this->pass;
+    return $this->password;
+  }
+  
+  public function spaceUser() {
+    return $this->hasOne('SpaceUser');
   }
 }
