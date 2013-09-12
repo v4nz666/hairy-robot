@@ -5,6 +5,7 @@ function Client() {
     color: 'white',
     
     user: [],
+    me: null,
     
     x: null,
     y: null,
@@ -63,16 +64,10 @@ function Client() {
     },
     
     renderUsers: function() {
-      for(key in this.users) {
-        user = this.users[key];
+      for(key in this.user) {
+        user = this.user[key];
         
         if(!user.x || !user.y) { continue; }
-        
-        if(key == this.id) { 
-          color = this.color; 
-        } else {
-          color = 'white';
-        }
         
         this.ctx.save();
         
@@ -88,7 +83,7 @@ function Client() {
         this.ctx.lineTo(-this.size / 2, 8);
         this.ctx.bezierCurveTo(0, 5, 0, -5, -this.size / 2, -8);
         this.ctx.lineTo(this.size / 2, 0);
-        this.ctx.fillStyle = color;
+        this.ctx.fillStyle = user.color;
         this.ctx.fill();
         this.ctx.restore();
         
@@ -175,7 +170,7 @@ function Client() {
     },
     
     init: function() {
-      this.socket = io.connect('http://home.monoxidedesign.com:9092', { 'reconnect': false } );
+      this.socket = io.connect('http://hairy.monoxidedesign.com:9092', {'reconnect': false});
       this.initMenu();
     },
     
@@ -193,6 +188,7 @@ function Client() {
     login: function(name, auth) {
       this.setStatus('Logging in...');
       // Register setParams handler and send login
+      this.socket.on('adduser',   $.proxy(this.addUser, this));
       this.socket.on('setParams', $.proxy(function(data) {
         this.setParams(data);
         this.initGame();
@@ -202,9 +198,18 @@ function Client() {
     },
     
     addUser: function(data) {
-      console.log('Adding user [' + data + ']');
-      this.addMsg({id: 'Server', msg: data.name + ' has joined the game!'});
-      this.user[data.id] = data;
+      console.log('Adding user[', data, ']');
+      var user = User();
+      user.id = data.id;
+      user.name = data.name;
+      user.color = data.color;
+      user.size = data.size;
+      user.maxLife = data.maxLife;
+      user.maxShields = data.maxShields;
+      user.life = data.life;
+      user.shields = data.shields;
+      this.user[user.id] = user;
+      this.addMsg({id: 'Server', msg: user.name + ' has joined the game!'});
     },
     
     remUser: function(data) {
@@ -227,7 +232,6 @@ function Client() {
       this.socket.on('update',     $.proxy(this.update, this));
       this.socket.on('explosion',  $.proxy(this.explosion, this));
       this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
-      this.socket.on('adduser',    $.proxy(this.addUser, this));
       this.socket.on('remuser',    $.proxy(this.remUser, this));
       
       // Hook our keyboard events
@@ -253,12 +257,8 @@ function Client() {
     
     setParams: function(data){
       console.log('setting client[', data, ']');
-      this.id = data.id;
-      this.color = data.color;
-      this.maxLife = data.maxLife;
-      this.maxShields = data.maxShields;
-      this.size = data.size;
-      console.log('Set id[', this.id, ']');
+      this.me = this.user[data.id];
+      console.log('Set id[', this.me.id, ']');
     },
     
     powerupUpdate: function(powerups) {
@@ -277,9 +277,18 @@ function Client() {
     
     stats: function(stats) {
       console.log(stats);
-      this.lifeBar.width((stats.life / this.maxLife) * 100 + "%");
-      this.shieldBar.width((stats.shields / this.maxShields) * 100 + "%");
-      this.guns.html(stats.guns);
+      var user = this.user[stats.id];
+      user.maxLife = stats.maxLife;
+      user.maxShields = stats.maxShields;
+      user.life = stats.life;
+      user.shields = stats.shields;
+      user.guns = stats.guns;
+      
+      if(user == this.me) {
+        this.lifeBar.width((user.life / user.maxLife) * 100 + "%");
+        this.shieldBar.width((user.shields / user.maxShields) * 100 + "%");
+        this.guns.html(user.guns);
+      }
     },
     
     renderMessages: function() {
@@ -356,30 +365,20 @@ function Client() {
     },
     
     update: function(up) {
-      this.users = {}
       this.ticks = up.ticks;
       this.bullets = up.bullets;
       
       for(key in up.usersOnScreen) {
         user = up.usersOnScreen[key];
-        this.users[key] = user;
-        
-        if(user.id == this.id) {
-          this.x = user.x;
-          this.y = user.y;
-          this.shields = user.shields;
-          this.angle = user.angle;
-        }
+        this.user[user.id].x = user.x;
+        this.user[user.id].y = user.y;
+        this.user[user.id].angle = user.angle;
       }
     },
     
     explosion: function(expl) {
       var expl = Explosion(expl.size, expl.x, expl.y, expl.tick);
       this.explosions.push(expl);
-    },
-    
-    isRegistered: function() {
-      return typeof this.id != "undefined";
     }
   }
 }
@@ -440,12 +439,14 @@ function Particle(x, y, mV) {
   }
 }
 
-function User(name, x, y, shields) {
+function User() {
   return {
-    name: name,
-    x: x,
-    y: y,
-    shields: shields
+    id: null,
+    name: null,
+    x: 0,
+    y: 0,
+    color: '#FF00FF',
+    size: 0
   }
 }
 

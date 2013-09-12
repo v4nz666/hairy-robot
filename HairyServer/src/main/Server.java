@@ -142,16 +142,17 @@ public class Server {
       return;
     }
     
-    user.color = getColor();
+    for(User u : _user) {
+      socket.sendEvent("adduser", u.serializeAdd());
+    }
+    
     _user.add(user);
     _userMap.put(socket, user);
     
+    _server.getBroadcastOperations().sendEvent("adduser", user.serializeAdd());
+    
     System.out.println("New user added");
     socket.sendEvent("setParams", user.serializeParams());
-    
-    _server.getBroadcastOperations().sendEvent("adduser", user.serializeUpdate());
-    
-    socket.sendEvent("stats", user.serializeStats());
     socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
     //TODO: Need to send scores here?
   }
@@ -236,7 +237,7 @@ public class Server {
           _bullet.remove(bullet);
           bullet._user.bullets--;
           
-          user.socket.sendEvent("stats", user.serializeStats());
+          _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
           _server.getBroadcastOperations().sendEvent("explosion", new Bullet.Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
         }
       }
@@ -245,7 +246,7 @@ public class Server {
         if(checkCollisions(user, powerup)) {
           powerup.use(user);
           _powerup.remove(powerup);
-          user.socket.sendEvent("stats", user.serializeStats());
+          _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
           _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
         }
       }

@@ -94,6 +94,10 @@ public class User extends Entity {
     return new Update();
   }
   
+  public Add serializeAdd() {
+    return new Add();
+  }
+  
   public Remove serializeRemove() {
     return new Remove();
   }
@@ -198,12 +202,12 @@ public class User extends Entity {
   
   public class Params {
     public int getId() { return id; }
-    public int getMaxLife() { return maxLife; }
-    public int getMaxShields() { return maxShields; }
-    public int getSize() { return size; }
   }
   
   public class Stats {
+    public int getId() { return id; }
+    public int getMaxLife() { return maxLife; }
+    public int getMaxShields() { return maxShields; }
     public int getLife() { return life; }
     public int getShields() { return shields; }
     public int getGuns() { return guns; }
@@ -211,11 +215,19 @@ public class User extends Entity {
   
   public class Update {
     public int getId() { return id; }
-    public String getName() { return name; }
-    public String getColor() { return color; }
     public int getX() { return (int)x; }
     public int getY() { return (int)y; }
     public double getAngle() { return angle; }
+  }
+  
+  public class Add {
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public String getColor() { return color; }
+    public int getSize() { return size; }
+    public int getMaxLife() { return maxLife; }
+    public int getMaxShields() { return maxShields; }
+    public int getLife() { return life; }
     public int getShields() { return shields; }
   }
   
