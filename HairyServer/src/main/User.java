@@ -200,6 +200,7 @@ public class User extends Entity {
     public int getId() { return id; }
     public int getMaxLife() { return maxLife; }
     public int getMaxShields() { return maxShields; }
+    public int getSize() { return size; }
   }
   
   public class Stats {

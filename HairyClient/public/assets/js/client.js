@@ -257,6 +257,7 @@ function Client() {
       this.color = data.color;
       this.maxLife = data.maxLife;
       this.maxShields = data.maxShields;
+      this.size = data.size;
       console.log('Set id[', this.id, ']');
     },
     
