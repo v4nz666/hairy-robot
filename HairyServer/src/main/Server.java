@@ -1,12 +1,12 @@
 package main;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import sql.MySQL;
 import sql.SQL;
-import main.User.Login;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
@@ -21,11 +21,6 @@ public class Server {
   
   public static final int W = 800, H = 600;
   public static final int spread = 15;
-  public static final int x = W / 2;
-  public static final int y = H / 2;
-  public static final int life = 100;
-  public static final int shields = 100;
-  public static final int guns = 5;
   public static final int bulletSize = 2;
   public static final int maxPowerups = 3;
   public final double acc = 1 * 0.0625;
@@ -53,6 +48,9 @@ public class Server {
   
   private Server() { }
   
+  private static int _id;
+  public static int getID() { return _id++; }
+  
   public void start() throws InterruptedException, InstantiationException, IllegalAccessException {
     System.out.println("Initialising...");
     
@@ -72,8 +70,8 @@ public class Server {
     
     _server.addEventListener("login", User.Login.class, new DataListener<User.Login>() {
       @Override
-      public void onData(SocketIOClient client, Login data, AckRequest ackSender) {
-        addUser(client, data.name);
+      public void onData(SocketIOClient client, User.Login data, AckRequest ackSender) {
+        addUser(client, data.name, data.auth);
       }
     });
     
@@ -133,9 +131,17 @@ public class Server {
     _sql.close();
   }
   
-  private void addUser(SocketIOClient socket, String name) {
-    int id = _user.size();
-    User user = new User(name, id, socket, x, y, life, shields);
+  private void addUser(SocketIOClient socket, String name, String auth) {
+    //User user = new User(name, id, socket, x, y, life, shields);
+    User user = null;
+    
+    try {
+      user = User.getUserIfAuthed(socket, name, auth);
+    } catch(SQLException e) {
+      e.printStackTrace();
+      return;
+    }
+    
     user.color = getColor();
     _user.add(user);
     _userMap.put(socket, user);
@@ -160,8 +166,8 @@ public class Server {
   }
   
   private void killUser(User victim, User attacker) {
-    victim.life = life;
-    victim.shields = shields;
+    victim.life = victim.maxLife;
+    victim.shields = victim.maxShields;
     victim.guns = 1;
     victim.x = W / 2;
     victim.y = H / 2;
