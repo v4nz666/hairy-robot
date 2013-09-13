@@ -78,7 +78,7 @@ public class Server {
     _server.addEventListener("msg", Msg.class, new DataListener<Msg>() {
       @Override
       public void onData(SocketIOClient client, Msg data, AckRequest ackSender) {
-        _server.getBroadcastOperations().sendEvent("msg", new Msg(_userMap.get(client).name, data.getMsg()));
+        _server.getBroadcastOperations().sendEvent("msg", new Msg(_userMap.get(client).name, data.msg));
       }
     });
     
