@@ -82,25 +82,11 @@ public class User extends Entity {
     this.socket = socket;
   }
   
-  public Params serializeParams() {
-    return new Params();
-  }
-  
-  public Stats serializeStats() {
-    return new Stats();
-  }
-  
-  public Update serializeUpdate() {
-    return new Update();
-  }
-  
-  public Add serializeAdd() {
-    return new Add();
-  }
-  
-  public Remove serializeRemove() {
-    return new Remove();
-  }
+  public Params serializeParams() { return new Params(); }
+  public Stats  serializeStats()  { return new Stats();  }
+  public Update serializeUpdate() { return new Update(); }
+  public Add    serializeAdd()    { return new Add();    }
+  public Remove serializeRemove() { return new Remove(); }
   
   public void processCommands() {
     if(keys != 0) {
