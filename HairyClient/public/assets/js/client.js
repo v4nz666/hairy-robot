@@ -1,18 +1,10 @@
 function Client() {
   return {
-    id: null,
     socket: null,
-    color: 'white',
     
     user: [],
     me: null,
     
-    x: null,
-    y: null,
-    angle: null,
-    shields: null,
-    
-    size: 32,
     bulletSize: 2,
     
     bullets: [],
@@ -23,8 +15,6 @@ function Client() {
     maxMessages: 10,
     inChat: false,
     
-    maxLife: 100,
-    maxShields: 100,
     lifeBar: null,
     shieldBar: null,
     guns: null,
@@ -73,16 +63,16 @@ function Client() {
         
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = 'white';
-        this.ctx.fillText(user.name, user.x, user.y - this.size / 2);
+        this.ctx.fillText(user.name, user.x, user.y - user.size / 2);
         
         this.ctx.translate(user.x, user.y);
         this.ctx.rotate(user.angle * Math.PI / 180);
         
         this.ctx.beginPath();
-        this.ctx.moveTo( this.size / 2, 0);
-        this.ctx.lineTo(-this.size / 2, 8);
-        this.ctx.bezierCurveTo(0, 5, 0, -5, -this.size / 2, -8);
-        this.ctx.lineTo(this.size / 2, 0);
+        this.ctx.moveTo( user.size / 2, 0);
+        this.ctx.lineTo(-user.size / 2, 8);
+        this.ctx.bezierCurveTo(0, 5, 0, -5, -user.size / 2, -8);
+        this.ctx.lineTo(user.size / 2, 0);
         this.ctx.fillStyle = user.color;
         this.ctx.fill();
         this.ctx.restore();
@@ -90,7 +80,7 @@ function Client() {
         if(user.shields > 0) {
           this.ctx.save();
           this.ctx.beginPath();
-          this.ctx.arc(user.x, user.y, this.size / 2, 0, Math.PI * 2);
+          this.ctx.arc(user.x, user.y, user.size / 2, 0, Math.PI * 2);
           this.ctx.closePath();
           this.ctx.fillStyle = 'rgba(0,255,255,' + user.shields / 500 + ')';
           this.ctx.fill();
@@ -356,7 +346,7 @@ function Client() {
     chatInput: function(ev) {
       if(ev.which == 13) {
         if(this.textInput.val().length != 0) {
-          this.socket.emit('msg', {id: this.id, msg: this.textInput.val()});
+          this.socket.emit('msg', {msg: this.textInput.val()});
           this.textInput.val('');
         }
         
