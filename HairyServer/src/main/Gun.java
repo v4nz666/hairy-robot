@@ -22,7 +22,6 @@ public abstract class Gun {
   }
   
   public static Gun getGunRandom() {
-    System.out.println(_registry.size());
     int i = 0, r = _rand.nextInt(_registry.size());
     for(Class<? extends Gun> c : _registry.values()) {
       if(i++ == r) return createGun(c);
