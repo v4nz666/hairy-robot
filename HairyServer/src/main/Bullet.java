@@ -5,11 +5,13 @@ public class Bullet extends Entity {
   
   public final int damage;
   
-  public Bullet(User user, double offset, int size, double vel, double maxVel, int damage) {
+  public Bullet(User user, double offset, int size, double acc, double vel, double maxVel, int damage) {
     super(user.id, user.x, user.y, size);
     _user = user;
     vx = minOrMax(Math.cos(Math.toRadians(user.angle + offset)) * vel, user.vx);
     vy = minOrMax(Math.sin(Math.toRadians(user.angle + offset)) * vel, user.vy);
+    this.angle = user.angle;
+    this.acc = acc;
     this.maxVel = maxVel;
     this.damage = damage;
   }
