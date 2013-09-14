@@ -27,7 +27,7 @@ public abstract class Gun {
       if(i++ == r) return createGun(c);
     }
     
-    return new PointDefenseTurret();
+    return getGunDefault();
   }
   
   private static Gun createGun(Class<? extends Gun> gun) {
@@ -39,7 +39,7 @@ public abstract class Gun {
       }
     }
     
-    return new PointDefenseTurret();
+    return getGunDefault();
   }
   
   protected Server _server = Server.instance();
@@ -85,7 +85,7 @@ public abstract class Gun {
     @Override public long  getRepeatTime()   { return 100000000; }
     @Override public long  getReloadTime()   { return 300000000; }
     @Override protected Bullet createBullet(User user, float offset) {
-      return new Bullet(user, offset, 2, 12, 12, 10);
+      return new Bullet(user, offset, 2, 0, 12, 12, 10);
     }
   }
   
@@ -97,7 +97,7 @@ public abstract class Gun {
     @Override public long  getRepeatTime()   { return 300000000; }
     @Override public long  getReloadTime()   { return 300000000; }
     @Override protected Bullet createBullet(User user, float offset) {
-      return new Bullet(user, offset, 5, 0, 20, 50);
+      return new Bullet(user, offset, 5, 0.2, 0, 20, 50);
     }
   }
 }
