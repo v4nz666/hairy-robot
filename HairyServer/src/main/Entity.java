@@ -16,11 +16,37 @@ public abstract class Entity {
   }
   
   public void update(double deltaT) {
-    double theta = Math.toRadians(angle);
-    
-    //TODO: work delta into here
-    vx = constrain(vx + Math.cos(theta) * acc, -maxVel, maxVel);
-    vy = constrain(vy + Math.sin(theta) * acc, -maxVel, maxVel);
+    if(acc != 0) {
+      double theta = Math.toRadians(angle);
+      
+      //TODO: work delta into here
+      vx += Math.cos(theta) * acc;
+      vy += Math.sin(theta) * acc;
+      
+      if(vx > maxVel) {
+        vy *= (maxVel / vx);
+        vx = maxVel;
+        acc = 0;
+      }
+      
+      if(vx < -maxVel) {
+        vy *= (-maxVel / vx);
+        vx = -maxVel;
+        acc = 0;
+      }
+      
+      if(vy > maxVel) {
+        vx *= (maxVel / vy);
+        vy = maxVel;
+        acc = 0;
+      }
+      
+      if(vy < -maxVel) {
+        vx *= (-maxVel / vy);
+        vy = -maxVel;
+        acc = 0;
+      }
+    }
     
     displace();
   }
@@ -28,9 +54,5 @@ public abstract class Entity {
   private void displace() {
     x += vx;
     y += vy;
-  }
-  
-  private double constrain(double val, double min, double max) {
-    return Math.max(min, Math.min(val, max));
   }
 }
