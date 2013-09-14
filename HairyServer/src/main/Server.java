@@ -91,6 +91,8 @@ public class Server {
     
     System.out.println("Starting listening thread...");
     
+    Gun.init();
+    
     _server.start();
     
     System.out.println("Server running.");
@@ -169,7 +171,7 @@ public class Server {
   private void killUser(User victim, User attacker) {
     victim.life = victim.maxLife;
     victim.shields = victim.maxShields;
-    victim.guns = 1;
+    victim.gun = Gun.getGunDefault();
     victim.x = W / 2;
     victim.y = H / 2;
     victim.vx = 0;
