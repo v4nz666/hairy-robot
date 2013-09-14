@@ -26,12 +26,11 @@ public class User extends Entity {
               User user = new User(socket, name, r2.getFloat("x"), r2.getFloat("y"));
               user.maxLife = r2.getInt("max_life");
               user.maxShields = r2.getInt("max_shields");
-              user.maxGuns = r2.getInt("max_guns");
               user.maxBullets = r2.getInt("max_bullets");
               user.maxVel = r2.getFloat("max_vel");
               user.life = Math.min(r2.getInt("life"), user.maxLife);
               user.shields = Math.min(r2.getInt("shields"), user.maxShields);
-              user.guns = Math.min(r2.getInt("guns"), user.maxGuns);
+              user.gun = Gun.getGunByName(r2.getString("gun"));
               user.turnSpeed = r2.getFloat("turn_speed");
               user.size = r2.getInt("size");
               user.color = r2.getString("colour");
@@ -55,12 +54,11 @@ public class User extends Entity {
   
   public int maxLife;
   public int maxShields;
-  public int maxGuns;
-  public int maxBullets = 3;
+  public int maxBullets;
   
   public int life;
   public int shields;
-  public int guns = 1;
+  public Gun gun;
   
   public double turnSpeed = 5;
   public String color;
@@ -118,27 +116,7 @@ public class User extends Entity {
   }
   
   private void fire() {
-    if(lastBullet <= System.nanoTime()) {
-      int maxBullets = this.maxBullets * guns;
-      
-      if(bullets + guns <= maxBullets) {
-        float center = (guns - 1) / 2;
-        float offset = 0;
-        
-        for(int i = 0; i < guns; i++) {
-          if(i < center) {
-            offset = (center - i) * -Server.spread;
-          } else if(i > center) {
-            offset = (i - center) * Server.spread;
-          }
-          
-          _server.addBullet(new Bullet(this, offset));
-          bullets++;
-        }
-        
-        lastBullet = System.nanoTime() + 100000000;
-      }
-    }
+    gun.fire(this);
   }
   
   private void thrustersOff() {
@@ -164,7 +142,6 @@ public class User extends Entity {
     public int getMaxShields() { return maxShields; }
     public int getLife() { return life; }
     public int getShields() { return shields; }
-    public int getGuns() { return guns; }
   }
   
   public class Update {
