@@ -59,7 +59,7 @@ public abstract class Powerup extends Entity {
     
     @Override
     public void use(User user) {
-      user.guns = Math.min(user.guns + properties, user.maxGuns);
+      user.gun = Gun.getGunRandom();
     }
   }
 }
