@@ -56,6 +56,7 @@ public abstract class Gun {
   public abstract int getBarrels();
   public abstract int getRepeatTime();
   public abstract int getReloadTime();
+  protected abstract Bullet createBullet(User user, float offset);
   public void fire(User user) {
     if(_lastBullet <= System.nanoTime()) {
       float center = (getBarrels() - 1) / 2;
@@ -68,7 +69,7 @@ public abstract class Gun {
           offset = (i - center) * Server.spread;
         }
         
-        _server.addBullet(new Bullet(user, offset));
+        _server.addBullet(createBullet(user, offset));
       }
       
       _bulletsLeft--;
@@ -87,6 +88,9 @@ public abstract class Gun {
     @Override public int getBarrels()    { return 3; }
     @Override public int getRepeatTime() { return 100000000; }
     @Override public int getReloadTime() { return 300000000; }
+    @Override protected Bullet createBullet(User user, float offset) {
+      return new Bullet(user, offset, 2, 12, 10);
+    }
   }
   
   public static class RocketTurret extends Gun {
@@ -95,5 +99,8 @@ public abstract class Gun {
     @Override public int getBarrels()    { return 1; }
     @Override public int getRepeatTime() { return 300000000; }
     @Override public int getReloadTime() { return 300000000; }
+    @Override protected Bullet createBullet(User user, float offset) {
+      return new Bullet(user, offset, 5, 20, 50);
+    }
   }
 }

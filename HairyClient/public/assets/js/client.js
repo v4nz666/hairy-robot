@@ -5,8 +5,6 @@ function Client() {
     user: [],
     me: null,
     
-    bulletSize: 2,
-    
     bullets: [],
     explosions: [],
     particleSize: 1,
@@ -17,7 +15,7 @@ function Client() {
     
     lifeBar: null,
     shieldBar: null,
-    guns: null,
+    gun: null,
     
     keys: 0,
     
@@ -45,7 +43,7 @@ function Client() {
         var bullet = this.bullets[i];
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.arc(bullet.x, bullet.y, this.bulletSize, 0, Math.PI * 2);
+        this.ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
         this.ctx.closePath();
         this.ctx.fillStyle = 'white';
         this.ctx.fill();
@@ -172,6 +170,11 @@ function Client() {
       this.setStatus('Initialising...');
       name = $('input[name=username]').val();
       auth = $('input[name=auth]').val();
+      
+      this.lifeBar = $('#life');
+      this.shieldBar = $('#shield');
+      this.gun = $('#guns');
+      
       this.login(name, auth);
     },
     
@@ -198,6 +201,7 @@ function Client() {
       user.maxShields = data.maxShields;
       user.life = data.life;
       user.shields = data.shields;
+      user.gun = data.gun;
       this.user[user.id] = user;
       this.addMsg({id: 'Server', msg: user.name + ' has joined the game!'});
     },
@@ -232,10 +236,6 @@ function Client() {
       console.log(this.textInput);
       this.textInput.keydown($.proxy(function(ev) {this.chatInput(ev)}, this));
       
-      this.lifeBar = $('#life');
-      this.shieldBar = $('#shield');
-      this.guns = $('#guns');
-      
       this.canvas = $('#canvas')[0];
       this.canvas.width = 800;
       this.canvas.height = 600;
@@ -249,6 +249,7 @@ function Client() {
       console.log('setting client[', data, ']');
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
+      this.renderStats();
     },
     
     powerupUpdate: function(powerups) {
@@ -272,13 +273,17 @@ function Client() {
       user.maxShields = stats.maxShields;
       user.life = stats.life;
       user.shields = stats.shields;
-      user.guns = stats.guns;
+      user.gun = stats.gun;
       
       if(user == this.me) {
-        this.lifeBar.width((user.life / user.maxLife) * 100 + "%");
-        this.shieldBar.width((user.shields / user.maxShields) * 100 + "%");
-        this.guns.html(user.guns);
+        this.renderStats();
       }
+    },
+    
+    renderStats: function() {
+      this.lifeBar.width((this.me.life / this.me.maxLife) * 100 + "%");
+      this.shieldBar.width((this.me.shields / this.me.maxShields) * 100 + "%");
+      this.gun.html(this.me.gun);
     },
     
     renderMessages: function() {

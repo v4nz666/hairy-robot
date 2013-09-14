@@ -142,6 +142,7 @@ public class User extends Entity {
     public int getMaxShields() { return maxShields; }
     public int getLife() { return life; }
     public int getShields() { return shields; }
+    public String getGun() { return gun.getName(); }
   }
   
   public class Update {
@@ -160,6 +161,7 @@ public class User extends Entity {
     public int getMaxShields() { return maxShields; }
     public int getLife() { return life; }
     public int getShields() { return shields; }
+    public String getGun() { return gun.getName(); }
   }
   
   public class Remove {

@@ -3,16 +3,17 @@ package main;
 public class Bullet extends Entity {
   protected User _user;
   
-  public int damage = 20;
+  public final int damage;
   
-  public Bullet(User user, double offset) {
-    super(user.id, user.x, user.y, 2);
+  public Bullet(User user, double offset, int size, int maxVel, int damage) {
+    super(user.id, user.x, user.y, size);
     _user = user;
     double offsetX = Math.cos(Math.toRadians(user.angle + offset));
     double offsetY = Math.sin(Math.toRadians(user.angle + offset));
     vx = user.vx + offsetX + Math.cos(Math.toRadians(user.angle)) * (user.maxVel * 2);
     vy = user.vy + offsetY + Math.sin(Math.toRadians(user.angle)) * (user.maxVel * 2);
-    maxVel = 12;
+    this.maxVel = maxVel;
+    this.damage = damage;
   }
   
   public static class Explosion {
