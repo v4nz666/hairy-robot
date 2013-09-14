@@ -166,6 +166,12 @@ public class Server {
     _user.remove(user);
     _userMap.remove(socket);
     _server.getBroadcastOperations().sendEvent("remuser", user.serializeRemove());
+    
+    try {
+      user.save();
+    } catch(SQLException e) {
+      e.printStackTrace();
+    }
   }
   
   private void killUser(User victim, User attacker) {

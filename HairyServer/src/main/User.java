@@ -12,6 +12,7 @@ public class User extends Entity {
   private static SQL sql = SQL.getInstance();
   private static PreparedStatement isAuthed = sql.prepareStatement("SELECT `id`, `auth` FROM `users` WHERE `username`=?");
   private static PreparedStatement select   = sql.prepareStatement("SELECT * FROM `space_users` WHERE `user_id`=?");
+  private static PreparedStatement update   = sql.prepareStatement("UPDATE `space_users` SET `max_life`=?, `max_shields`=?, `max_vel`=?, `life`=?, `shields`=?, `gun`=?, `turn_speed`=?, `size`=?, `colour`=?, `x`=?, `y`=?, `kills`=?, `deaths`=? WHERE id=?");
   
   public static User getUserIfAuthed(SocketIOClient socket, String name, String auth) throws SQLException {
     isAuthed.setString(1, name);
@@ -24,9 +25,9 @@ public class User extends Entity {
           try(ResultSet r2 = select.executeQuery()) {
             if(r2.next()) {
               User user = new User(socket, name, r2.getFloat("x"), r2.getFloat("y"));
+              user.dbID = r2.getInt("id");
               user.maxLife = r2.getInt("max_life");
               user.maxShields = r2.getInt("max_shields");
-              user.maxBullets = r2.getInt("max_bullets");
               user.maxVel = r2.getFloat("max_vel");
               user.life = Math.min(r2.getInt("life"), user.maxLife);
               user.shields = Math.min(r2.getInt("shields"), user.maxShields);
@@ -50,11 +51,11 @@ public class User extends Entity {
   
   public final SocketIOClient socket;
   
+  public int dbID;
   public String name;
   
   public int maxLife;
   public int maxShields;
-  public int maxBullets;
   
   public int life;
   public int shields;
@@ -121,6 +122,24 @@ public class User extends Entity {
   
   private void thrustersOff() {
     acc = 0;
+  }
+  
+  public void save() throws SQLException {
+    update.setInt(1, maxLife);
+    update.setInt(2, maxShields);
+    update.setDouble(3, maxVel);
+    update.setInt(4, life);
+    update.setInt(5, shields);
+    update.setString(6, gun.getClass().getName());
+    update.setDouble(7, turnSpeed);
+    update.setInt(8, size);
+    update.setString(9, color);
+    update.setDouble(10, x);
+    update.setDouble(11, y);
+    update.setInt(12, kills);
+    update.setInt(13, deaths);
+    update.setInt(14, dbID);
+    update.execute();
   }
   
   public static class Login {
