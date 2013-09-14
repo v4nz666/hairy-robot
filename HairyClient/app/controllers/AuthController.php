@@ -25,8 +25,8 @@ class AuthController extends Controller {
     
     if($validator->passes()) {
       $user = new User;
-      $user->name = Input::get('username');
-      $user->pass = Hash::make(Input::get('password'));
+      $user->username = Input::get('username');
+      $user->password = Hash::make(Input::get('password'));
       $user->auth = str_random(64);
       $user->save();
       Auth::login($user);
