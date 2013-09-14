@@ -14,11 +14,10 @@ class TableSpaceUserCreate extends Migration {
       $table->integer('user_id')->unsigned();
       $table->integer('max_life')->unsigned();
       $table->integer('max_shields')->unsigned();
-      $table->integer('max_bullets')->unsigned();
       $table->float  ('max_vel');
       $table->integer('life')->unsigned();
       $table->integer('shields')->unsigned();
-      $table->string('gun', 20);
+      $table->string('gun', 64);
       $table->float('turn_speed');
       $table->integer('size')->unsigned();
       $table->string('colour', 7);
