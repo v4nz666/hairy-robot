@@ -3,7 +3,6 @@ package main;
 public class Bullet extends Entity {
   protected User _user;
   
-  public double vx, vy;
   public int damage = 20;
   
   public Bullet(User user, double offset) {
@@ -13,6 +12,7 @@ public class Bullet extends Entity {
     double offsetY = Math.sin(Math.toRadians(user.angle + offset));
     vx = user.vx + offsetX + Math.cos(Math.toRadians(user.angle)) * (user.maxVel * 2);
     vy = user.vy + offsetY + Math.sin(Math.toRadians(user.angle)) * (user.maxVel * 2);
+    maxVel = 12;
   }
   
   public static class Explosion {
