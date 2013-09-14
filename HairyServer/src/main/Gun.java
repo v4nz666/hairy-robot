@@ -54,22 +54,18 @@ public abstract class Gun {
   public abstract String getName();
   public abstract int getClipSize();
   public abstract int getBarrels();
+  public abstract int getBarrelSpread();
   public abstract int getRepeatTime();
   public abstract int getReloadTime();
   protected abstract Bullet createBullet(User user, float offset);
   public void fire(User user) {
     if(_lastBullet <= System.nanoTime()) {
-      float center = (getBarrels() - 1) / 2;
-      float offset = 0;
+      float center = -getBarrels() / 2;
+      float offset = center * getBarrelSpread();
       
       for(int i = 0; i < getBarrels(); i++) {
-        if(i < center) {
-          offset = (center - i) * -Server.spread;
-        } else if(i > center) {
-          offset = (i - center) * Server.spread;
-        }
-        
         _server.addBullet(createBullet(user, offset));
+        offset += getBarrelSpread();
       }
       
       _bulletsLeft--;
@@ -83,24 +79,26 @@ public abstract class Gun {
   }
   
   public static class PointDefenseTurret extends Gun {
-    @Override public String getName()    { return "Point Defense Turret"; }
-    @Override public int getClipSize()   { return 3; }
-    @Override public int getBarrels()    { return 3; }
-    @Override public int getRepeatTime() { return 100000000; }
-    @Override public int getReloadTime() { return 300000000; }
+    @Override public String getName()      { return "Point Defense Turret"; }
+    @Override public int getClipSize()     { return 3; }
+    @Override public int getBarrels()      { return 3; }
+    @Override public int getBarrelSpread() { return 1; }
+    @Override public int getRepeatTime()   { return 100000000; }
+    @Override public int getReloadTime()   { return 300000000; }
     @Override protected Bullet createBullet(User user, float offset) {
-      return new Bullet(user, offset, 2, 12, 10);
+      return new Bullet(user, offset, 2, 12, 12, 10);
     }
   }
   
   public static class RocketTurret extends Gun {
-    @Override public String getName()    { return "Rocket Turret"; }
-    @Override public int getClipSize()   { return 1; }
-    @Override public int getBarrels()    { return 1; }
-    @Override public int getRepeatTime() { return 300000000; }
-    @Override public int getReloadTime() { return 300000000; }
+    @Override public String getName()      { return "Rocket Turret"; }
+    @Override public int getClipSize()     { return 1; }
+    @Override public int getBarrels()      { return 1; }
+    @Override public int getBarrelSpread() { return 0; }
+    @Override public int getRepeatTime()   { return 300000000; }
+    @Override public int getReloadTime()   { return 300000000; }
     @Override protected Bullet createBullet(User user, float offset) {
-      return new Bullet(user, offset, 5, 20, 50);
+      return new Bullet(user, offset, 5, 0, 20, 50);
     }
   }
 }

@@ -5,15 +5,19 @@ public class Bullet extends Entity {
   
   public final int damage;
   
-  public Bullet(User user, double offset, int size, int maxVel, int damage) {
+  public Bullet(User user, double offset, int size, int vel, int maxVel, int damage) {
     super(user.id, user.x, user.y, size);
     _user = user;
-    double offsetX = Math.cos(Math.toRadians(user.angle + offset));
-    double offsetY = Math.sin(Math.toRadians(user.angle + offset));
-    vx = user.vx + offsetX + Math.cos(Math.toRadians(user.angle)) * (user.maxVel * 2);
-    vy = user.vy + offsetY + Math.sin(Math.toRadians(user.angle)) * (user.maxVel * 2);
+    vx = minOrMax(Math.cos(Math.toRadians(user.angle + offset)) * vel, user.vx);
+    vy = minOrMax(Math.sin(Math.toRadians(user.angle + offset)) * vel, user.vy);
     this.maxVel = maxVel;
     this.damage = damage;
+  }
+  
+  private double minOrMax(double a, double b) {
+    if(a == 0) return b; else
+    if(a  < 0) return Math.min(a, b);
+               return Math.max(a, b);
   }
   
   public static class Explosion {
