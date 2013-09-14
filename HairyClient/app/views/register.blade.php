@@ -10,17 +10,17 @@
     {{ Form::open(['action' => 'AuthController@register', 'method' => 'put']) }}
     
     <div class="form-block">
-      {{ Form::text('name', Input::old('name'), ['placeholder' => Lang::get('auth.username'), 'autofocus' => 'autofocus']) }}
+      {{ Form::text('username', Input::old('username'), ['placeholder' => Lang::get('auth.username'), 'autofocus' => 'autofocus']) }}
       
-      @foreach($errors->get('name') as $error)
+      @foreach($errors->get('username') as $error)
         {{ $error }}
       @endforeach
     </div>
     
     <div class="form-block">
-      {{ Form::password('pass', ['placeholder' => Lang::get('auth.password')]) }}
+      {{ Form::password('password', ['placeholder' => Lang::get('auth.password')]) }}
       
-      @foreach($errors->get('pass') as $error)
+      @foreach($errors->get('password') as $error)
         {{ $error }}
       @endforeach
     </div>
