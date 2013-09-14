@@ -5,7 +5,7 @@ public class Bullet extends Entity {
   
   public final int damage;
   
-  public Bullet(User user, double offset, int size, int vel, int maxVel, int damage) {
+  public Bullet(User user, double offset, int size, double vel, double maxVel, int damage) {
     super(user.id, user.x, user.y, size);
     _user = user;
     vx = minOrMax(Math.cos(Math.toRadians(user.angle + offset)) * vel, user.vx);
