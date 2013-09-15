@@ -15,12 +15,10 @@ class SpaceController extends \Controller {
       $user->user_id = \Auth::user()->id;
       $user->max_life = 100;
       $user->max_shields = 100;
-      $user->max_guns = 5;
-      $user->max_bullets = 3;
       $user->max_vel = 6;
       $user->life = $user->max_life;
       $user->shields = $user->max_shields;
-      $user->guns = 1;
+      $user->gun = "main.Gun\$PointDefenseTurret";
       $user->turn_speed = 5;
       $user->size = 32;
       $user->colour = '#FF00FF';
