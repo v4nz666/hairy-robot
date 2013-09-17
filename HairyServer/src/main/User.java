@@ -100,6 +100,7 @@ public class User extends Entity {
     } else {
       _turnLeft  = false;
       _turnRight = false;
+      _isFiring  = false;
     }
     
     thrustersOff();
