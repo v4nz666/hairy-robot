@@ -24,14 +24,13 @@ public class User extends Entity {
           
           try(ResultSet r2 = select.executeQuery()) {
             if(r2.next()) {
-              User user = new User(socket, name, r2.getFloat("x"), r2.getFloat("y"));
-              user.dbID = r2.getInt("id");
+              User user = new User(socket, r2.getInt("id"), name, r2.getFloat("x"), r2.getFloat("y"));
               user.maxLife = r2.getInt("max_life");
               user.maxShields = r2.getInt("max_shields");
               user.maxVel = r2.getFloat("max_vel");
               user.life = Math.min(r2.getInt("life"), user.maxLife);
               user.shields = Math.min(r2.getInt("shields"), user.maxShields);
-              user.gun = Gun.getGunByName(r2.getString("gun"));
+              user._gun = new Gun(space.data.guns.Gun.getGunDefault(), space.data.guns.Gun.getGunDefault().getBullets()[0]); //Gun.getGunByName(r2.getString("gun"));
               user.turnSpeed = r2.getFloat("turn_speed");
               user.size = r2.getInt("size");
               user.color = r2.getString("colour");
@@ -50,16 +49,14 @@ public class User extends Entity {
   private Server _server = Server.instance();
   
   public final SocketIOClient socket;
-  
-  public int dbID;
-  public String name;
+  public final int dbID;
+  public final String name;
   
   public int maxLife;
   public int maxShields;
   
   public int life;
   public int shields;
-  public Gun gun;
   
   public double turnSpeed = 5;
   public String color;
@@ -67,7 +64,7 @@ public class User extends Entity {
   public int kills;
   public int deaths;
   
-  public long lastBullet;
+  private Gun _gun;
   
   private boolean _turnLeft;
   private boolean _turnRight;
@@ -79,8 +76,9 @@ public class User extends Entity {
   private Add    _add    = new Add();
   private Remove _remove = new Remove();
   
-  private User(SocketIOClient socket, String name, float x, float y) {
+  private User(SocketIOClient socket, int dbID, String name, float x, float y) {
     super(Server.getID(), x, y, 32);
+    this.dbID = dbID;
     this.name = name;
     this.socket = socket;
   }
@@ -90,6 +88,10 @@ public class User extends Entity {
   public Update serializeUpdate() { return _update; }
   public Add    serializeAdd()    { return _add;    }
   public Remove serializeRemove() { return _remove; }
+  
+  public void setGun(space.data.guns.Gun gun) {
+    _gun = new Gun(gun, gun.getBullets()[0]);
+  }
   
   public void handleInput(int keys) {
     if(keys != 0) {
@@ -119,7 +121,7 @@ public class User extends Entity {
   }
   
   private void fire() {
-    gun.fire(this);
+    _gun.fire(this);
   }
   
   private void thrustersOff() {
@@ -132,7 +134,7 @@ public class User extends Entity {
     update.setDouble(3, maxVel);
     update.setInt(4, life);
     update.setInt(5, shields);
-    update.setString(6, gun.getClass().getName());
+    update.setString(6, ""); //gun.getClass().getName());
     update.setDouble(7, turnSpeed);
     update.setInt(8, size);
     update.setString(9, color);
@@ -190,7 +192,7 @@ public class User extends Entity {
     public int getMaxShields() { return maxShields; }
     public int getLife() { return life; }
     public int getShields() { return shields; }
-    public String getGun() { return gun.getName(); }
+    public String getGun() { return _gun.gun.getName(); }
   }
   
   public class Update {
@@ -209,7 +211,7 @@ public class User extends Entity {
     public int getMaxShields() { return maxShields; }
     public int getLife() { return life; }
     public int getShields() { return shields; }
-    public String getGun() { return gun.getName(); }
+    public String getGun() { return _gun.gun.getName(); }
   }
   
   public class Remove {

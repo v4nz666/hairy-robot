@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import space.game.Bullet;
 import space.physics.Sandbox;
 import sql.MySQL;
 import sql.SQL;
@@ -93,7 +94,7 @@ public class Server {
     
     System.out.println("Starting listening thread...");
     
-    Gun.init();
+    space.data.guns.Gun.init();
     
     _server.start();
     _sandbox.startSandbox();
@@ -195,7 +196,7 @@ public class Server {
   private void killUser(User victim, User attacker) {
     victim.life = victim.maxLife;
     victim.shields = victim.maxShields;
-    victim.gun = Gun.getGunDefault();
+    victim.setGun(space.data.guns.Gun.getGunDefault());
     victim.x = W / 2;
     victim.y = H / 2;
     victim.vx = 0;
@@ -263,7 +264,7 @@ public class Server {
     }
     
     if(user.life <= 0) {
-      killUser(user, bullet._user);
+      killUser(user, bullet.user());
       _server.getBroadcastOperations().sendEvent("explosion", new Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
     }
     

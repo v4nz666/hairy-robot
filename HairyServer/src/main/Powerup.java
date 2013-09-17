@@ -2,6 +2,8 @@ package main;
 
 import java.util.Random;
 
+import space.data.guns.Gun;
+
 public abstract class Powerup extends Entity {
   private static Random _rand = new Random();
   
@@ -59,7 +61,7 @@ public abstract class Powerup extends Entity {
     
     @Override
     public void use(User user) {
-      user.gun = Gun.getGunRandom();
+      user.setGun(Gun.getGunRandom());
     }
   }
 }
