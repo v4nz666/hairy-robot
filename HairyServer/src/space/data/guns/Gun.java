@@ -44,7 +44,7 @@ public abstract class Gun {
   public void fire(User user, Bullet bullet) {
     Bullet.Ammo      ammo      = bullet instanceof Bullet.Ammo      ? (Bullet.Ammo)     bullet : null;
     Bullet.Ballistic ballistic = bullet instanceof Bullet.Ballistic ? (Bullet.Ballistic)bullet : null;
-    Bullet.Energy    energy    = bullet instanceof Bullet.Energy    ? (Bullet.Energy)   bullet : null;
+    //Bullet.Energy    energy    = bullet instanceof Bullet.Energy    ? (Bullet.Energy)   bullet : null;
     
     if(ballistic != null) {
       if(_lastBullet <= System.nanoTime()) {

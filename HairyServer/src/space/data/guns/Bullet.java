@@ -1,19 +1,10 @@
 package space.data.guns;
 
-import main.Server;
-import main.User;
-
 public abstract class Bullet {
-  private Server _server = Server.instance();
-  
   public abstract int getDamage();
   public abstract int getRange();
   public abstract int getSize();
   public abstract float getHeatGen();
-  
-  public void create(User user, float offset) {
-    _server.addBullet(new space.game.Bullet(user, this, offset));
-  }
   
   public static interface Ammo {
     public String getName();
@@ -49,8 +40,8 @@ public abstract class Bullet {
       @Override public int    getSize()       { return 1; }
       @Override public float  getHeatGen()    { return 2; }
       @Override public float  getAcc()        { return 0; }
-      @Override public float  getVel()        { return 3; }
-      @Override public float  getMaxVel()     { return 20; }
+      @Override public float  getVel()        { return 16; }
+      @Override public float  getMaxVel()     { return 16; }
       @Override public long   getROF()        { return 200000000l; }
       @Override public long   getReloadTime() { return 3000000000l; }
     }
