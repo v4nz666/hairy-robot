@@ -151,7 +151,6 @@ public class Server {
   }
   
   private void addUser(SocketIOClient socket, String name, String auth) {
-    //User user = new User(name, id, socket, x, y, life, shields);
     User user = null;
     
     try {
@@ -257,7 +256,7 @@ public class Server {
     
     if(user.shields > 0) {
       size = "small";
-      user.shields = Math.max(0,  user.shields - bullet.damage);
+      user.shields = Math.max(0, user.shields - bullet.damage);
     } else {
       size = "medium";
       user.life -= bullet.damage;
