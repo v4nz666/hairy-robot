@@ -85,7 +85,7 @@ public class Server {
     _server.addEventListener("keys", User.Keys.class, new DataListener<User.Keys>() {
       @Override
       public void onData(SocketIOClient client, User.Keys data, AckRequest ackSender) {
-        _userMap.get(client).keys = data.keys;
+        _userMap.get(client).handleInput(data.keys);
       }
     });
     
@@ -215,7 +215,6 @@ public class Server {
     
     int i = 0;
     for(User user : _user) {
-      user.processCommands();
       user.update(deltaT);
       
       for(Bullet bullet : _bullet) {

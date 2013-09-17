@@ -68,9 +68,12 @@ public class User extends Entity {
   public int deaths;
   
   public int bullets;
-  public int keys;
   
   public long lastBullet;
+  
+  private boolean _turnLeft;
+  private boolean _turnRight;
+  private boolean _isFiring;
   
   private User(SocketIOClient socket, String name, float x, float y) {
     super(Server.getID(), x, y, 32);
@@ -84,28 +87,22 @@ public class User extends Entity {
   public Add    serializeAdd()    { return new Add();    }
   public Remove serializeRemove() { return new Remove(); }
   
-  public void processCommands() {
+  public void handleInput(int keys) {
     if(keys != 0) {
       boolean thrust = false;
-      if((keys & 0x01) != 0) { turnLeft(); }
+      _turnLeft  = (keys & 0x01) != 0;
+      _turnRight = (keys & 0x04) != 0;
+      _isFiring  = (keys & 0x10) != 0;
+      
       if((keys & 0x02) != 0) { thruster(); thrust = true; }
-      if((keys & 0x04) != 0) { turnRight(); }
       if((keys & 0x08) != 0) { reverse(); thrust = true; }
-      if((keys & 0x10) != 0) { fire(); }
       if(thrust) { return; }
+    } else {
+      _turnLeft  = false;
+      _turnRight = false;
     }
     
     thrustersOff();
-  }
-  
-  private void turnLeft() {
-    angle -= turnSpeed;
-    angle %= 360;
-  }
-  
-  private void turnRight() {
-    angle += turnSpeed;
-    angle %= 360;
   }
   
   private void thruster() {
@@ -145,6 +142,18 @@ public class User extends Entity {
   @Override
   public void update(double deltaT) {
     super.update(deltaT);
+    
+    if(_turnLeft) {
+      angle -= turnSpeed;
+      angle %= 360;
+    }
+    
+    if(_turnRight) {
+      angle += turnSpeed;
+      angle %= 360;
+    }
+    
+    if(_isFiring) fire();
     
     int xmin = size / 2;
     int ymin = xmin;
