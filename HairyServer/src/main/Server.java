@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import space.physics.Sandbox;
 import sql.MySQL;
 import sql.SQL;
 
@@ -35,6 +36,7 @@ public class Server {
   private Powerup[] _powerupConv = new Powerup[0];
   
   private SocketIOServer _server;
+  private Sandbox _sandbox = new Sandbox();
   
   private boolean _running;
   private long _interval;
@@ -94,6 +96,7 @@ public class Server {
     Gun.init();
     
     _server.start();
+    _sandbox.startSandbox();
     
     System.out.println("Server running.");
     
@@ -129,6 +132,7 @@ public class Server {
       }
     }
     
+    _sandbox.stopSandbox();
     _server.stop();
     _sql.close();
   }
@@ -150,6 +154,7 @@ public class Server {
     
     _user.add(user);
     _userMap.put(socket, user);
+    _sandbox.addToSandbox(user);
     
     _server.getBroadcastOperations().sendEvent("adduser", user.serializeAdd());
     
@@ -163,6 +168,7 @@ public class Server {
     User user = _userMap.get(socket);
     
     System.out.println("Disconnecting " + user.id);
+    _sandbox.removeFromSandbox(user);
     _user.remove(user);
     _userMap.remove(socket);
     _server.getBroadcastOperations().sendEvent("remuser", user.serializeRemove());
@@ -195,9 +201,11 @@ public class Server {
   
   public void addBullet(Bullet bullet) {
     _bullet.push(bullet);
+    _sandbox.addToSandbox(bullet);
   }
   
   public void removeBullet(Bullet bullet) {
+    _sandbox.removeFromSandbox(bullet);
     _bullet.remove(bullet);
   }
   
@@ -207,16 +215,10 @@ public class Server {
   }
   
   private void tick(double deltaT) {
-    for(Bullet bullet : _bullet) {
-      bullet.update(deltaT);
-    }
-    
     User.Update[] update = new User.Update[_user.size()];
     
     int i = 0;
     for(User user : _user) {
-      user.update(deltaT);
-      
       for(Bullet bullet : _bullet) {
         if(checkCollisions(user, bullet)) {
           String size;
