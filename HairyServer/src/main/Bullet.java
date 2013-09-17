@@ -28,7 +28,6 @@ public class Bullet extends Entity {
     
     if(x < -size || x > Server.W + size ||
        y < -size || y > Server.H + size) {
-      _user.bullets--;
       remove();
     }
   }
