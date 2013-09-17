@@ -197,6 +197,10 @@ public class Server {
     _bullet.push(bullet);
   }
   
+  public void removeBullet(Bullet bullet) {
+    _bullet.remove(bullet);
+  }
+  
   public void addPowerup() {
     _powerup.push(Powerup.random(_rand.nextInt(W), _rand.nextInt(H)));
     _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
@@ -205,12 +209,6 @@ public class Server {
   private void tick(double deltaT) {
     for(Bullet bullet : _bullet) {
       bullet.update(deltaT);
-      
-      if(bullet.x < -bulletSize || bullet.x > W + bulletSize ||
-         bullet.y < -bulletSize || bullet.y > H + bulletSize) {
-        bullet._user.bullets--;
-        _bullet.remove(bullet);
-      }
     }
     
     User.Update[] update = new User.Update[_user.size()];
@@ -219,16 +217,6 @@ public class Server {
     for(User user : _user) {
       user.processCommands();
       user.update(deltaT);
-      
-      int xmin = user.size / 2;
-      int ymin = xmin;
-      int xmax = Server.W - xmin; //TODO: No more fixed size
-      int ymax = Server.H - ymin;
-      
-      if(user.x < xmin) { user.x = xmin; user.vx = 0; }
-      if(user.x > xmax) { user.x = xmax; user.vx = 0; }
-      if(user.y < ymin) { user.y = ymin; user.vy = 0; }
-      if(user.y > ymax) { user.y = ymax; user.vy = 0; }
       
       for(Bullet bullet : _bullet) {
         if(checkCollisions(user, bullet)) {

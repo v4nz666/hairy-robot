@@ -142,6 +142,21 @@ public class User extends Entity {
     update.execute();
   }
   
+  @Override
+  public void update(double deltaT) {
+    super.update(deltaT);
+    
+    int xmin = size / 2;
+    int ymin = xmin;
+    int xmax = Server.W - xmin; //TODO: No more fixed size
+    int ymax = Server.H - ymin;
+    
+    if(x < xmin) { x = xmin; vx = 0; }
+    if(x > xmax) { x = xmax; vx = 0; }
+    if(y < ymin) { y = ymin; vy = 0; }
+    if(y > ymax) { y = ymax; vy = 0; }
+  }
+  
   public static class Login {
     public String name;
     public String auth;

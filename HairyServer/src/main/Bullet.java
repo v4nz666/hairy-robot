@@ -21,4 +21,19 @@ public class Bullet extends Entity {
     if(a  < 0) return Math.min(a, b);
                return Math.max(a, b);
   }
+  
+  @Override
+  public void update(double deltaT) {
+    super.update(deltaT);
+    
+    if(x < -size || x > Server.W + size ||
+       y < -size || y > Server.H + size) {
+      _user.bullets--;
+      remove();
+    }
+  }
+  
+  public void remove() {
+    Server.instance().removeBullet(this);
+  }
 }
