@@ -267,8 +267,7 @@ public class Server {
       _server.getBroadcastOperations().sendEvent("explosion", new Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
     }
     
-    _bullet.remove(bullet);
-    bullet._user.bullets--;
+    removeBullet(bullet);
     
     _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
     _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));

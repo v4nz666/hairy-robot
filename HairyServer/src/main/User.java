@@ -67,8 +67,6 @@ public class User extends Entity {
   public int kills;
   public int deaths;
   
-  public int bullets;
-  
   public long lastBullet;
   
   private boolean _turnLeft;
