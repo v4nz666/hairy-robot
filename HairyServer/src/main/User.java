@@ -75,17 +75,23 @@ public class User extends Entity {
   private boolean _turnRight;
   private boolean _isFiring;
   
+  private Params _params = new Params();
+  private Stats  _stats  = new Stats();
+  private Update _update = new Update();
+  private Add    _add    = new Add();
+  private Remove _remove = new Remove();
+  
   private User(SocketIOClient socket, String name, float x, float y) {
     super(Server.getID(), x, y, 32);
     this.name = name;
     this.socket = socket;
   }
   
-  public Params serializeParams() { return new Params(); }
-  public Stats  serializeStats()  { return new Stats();  }
-  public Update serializeUpdate() { return new Update(); }
-  public Add    serializeAdd()    { return new Add();    }
-  public Remove serializeRemove() { return new Remove(); }
+  public Params serializeParams() { return _params; }
+  public Stats  serializeStats()  { return _stats;  }
+  public Update serializeUpdate() { return _update; }
+  public Add    serializeAdd()    { return _add;    }
+  public Remove serializeRemove() { return _remove; }
   
   public void handleInput(int keys) {
     if(keys != 0) {
