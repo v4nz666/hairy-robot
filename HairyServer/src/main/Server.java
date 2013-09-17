@@ -244,14 +244,14 @@ public class Server {
           
           if(user.life <= 0) {
             killUser(user, bullet._user);
-            _server.getBroadcastOperations().sendEvent("explosion", new Bullet.Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
+            _server.getBroadcastOperations().sendEvent("explosion", new Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
           }
           
           _bullet.remove(bullet);
           bullet._user.bullets--;
           
           _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
-          _server.getBroadcastOperations().sendEvent("explosion", new Bullet.Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
+          _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
         }
       }
       
