@@ -97,6 +97,19 @@ public class Server {
     
     _server.start();
     _sandbox.startSandbox();
+    _sandbox.trackCollision(User.class, Bullet.class, new Sandbox.CollisionCallback() {
+      @Override
+      public void hit(Entity entity, Entity hitBy) {
+        userHit((User)entity, (Bullet)hitBy);
+      }
+    });
+    
+    _sandbox.trackCollision(User.class, Powerup.class, new Sandbox.CollisionCallback() {
+      @Override
+      public void hit(Entity entity, Entity hitBy) {
+        userPowerup((User)entity, (Powerup)hitBy);
+      }
+    });
     
     System.out.println("Server running.");
     
@@ -210,8 +223,15 @@ public class Server {
   }
   
   public void addPowerup() {
-    _powerup.push(Powerup.random(_rand.nextInt(W), _rand.nextInt(H)));
+    Powerup p = Powerup.random(_rand.nextInt(W), _rand.nextInt(H));
+    _powerup.push(p);
+    _sandbox.addToSandbox(p);
     _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
+  }
+  
+  public void removePowerup(Powerup p) {
+    _sandbox.removeFromSandbox(p);
+    _powerup.remove(p);
   }
   
   private void tick(double deltaT) {
@@ -219,40 +239,6 @@ public class Server {
     
     int i = 0;
     for(User user : _user) {
-      for(Bullet bullet : _bullet) {
-        if(checkCollisions(user, bullet)) {
-          String size;
-          
-          if(user.shields > 0) {
-            size = "small";
-            user.shields = Math.max(0,  user.shields - bullet.damage);
-          } else {
-            size = "medium";
-            user.life -= bullet.damage;
-          }
-          
-          if(user.life <= 0) {
-            killUser(user, bullet._user);
-            _server.getBroadcastOperations().sendEvent("explosion", new Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
-          }
-          
-          _bullet.remove(bullet);
-          bullet._user.bullets--;
-          
-          _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
-          _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
-        }
-      }
-      
-      for(Powerup powerup : _powerup) {
-        if(checkCollisions(user, powerup)) {
-          powerup.use(user);
-          _powerup.remove(powerup);
-          _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
-          _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
-        }
-      }
-      
       update[i++] = user.serializeUpdate();
     }
     
@@ -266,13 +252,34 @@ public class Server {
     _server.getBroadcastOperations().sendEvent("update", new Update(_ticksTotal, update, _bullet));
   }
   
-  private boolean checkCollisions(Entity a, Entity b) {
-    // Can't collide with yourself, or bullets you've fired
-    if(a.id == b.id) return false;
+  private void userHit(User user, Bullet bullet) {
+    String size;
     
-    double dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
-    return (dist < a.size / 2 + b.size / 2);
+    if(user.shields > 0) {
+      size = "small";
+      user.shields = Math.max(0,  user.shields - bullet.damage);
+    } else {
+      size = "medium";
+      user.life -= bullet.damage;
+    }
+    
+    if(user.life <= 0) {
+      killUser(user, bullet._user);
+      _server.getBroadcastOperations().sendEvent("explosion", new Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
+    }
+    
+    _bullet.remove(bullet);
+    bullet._user.bullets--;
+    
+    _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
+    _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
   }
+  
+  private void userPowerup(User user, Powerup powerup) {
+    powerup.use(user);
+    removePowerup(powerup);
+    _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
+    _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));  }
   
   public static class Update {
     private static Bullet[] _conv = new Bullet[0];

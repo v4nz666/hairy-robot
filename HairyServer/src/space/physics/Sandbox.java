@@ -13,6 +13,7 @@ public class Sandbox implements Runnable {
   private int _tps = 60;
   
   private ConcurrentLinkedDeque<Entity> _obj = new ConcurrentLinkedDeque<>();
+  private ConcurrentLinkedDeque<CollisionTracker> _collision = new ConcurrentLinkedDeque<>();
   
   public void addToSandbox(Entity m) {
     _obj.add(m);
@@ -20,6 +21,10 @@ public class Sandbox implements Runnable {
   
   public void removeFromSandbox(Entity m) {
     _obj.remove(m);
+  }
+  
+  public void trackCollision(Class<? extends Entity> entity, Class<? extends Entity> hitBy, CollisionCallback callback) {
+    _collision.add(new CollisionTracker(entity, hitBy, callback));
   }
   
   public void run() {
@@ -35,6 +40,18 @@ public class Sandbox implements Runnable {
       
       for(Entity e : _obj) {
         e.update(timeDelta / _interval);
+        
+        for(CollisionTracker c : _collision) {
+          if(c.e1.isInstance(e)) {
+            for(Entity hitBy : _obj) {
+              if(c.e2.isInstance(hitBy)) {
+                if(checkCollisions(e, hitBy)) {
+                  c.cb.hit(e, hitBy);
+                }
+              }
+            }
+          }
+        }
       }
       
       if(tickTime <= System.nanoTime()) {
@@ -57,6 +74,14 @@ public class Sandbox implements Runnable {
     }
   }
   
+  private boolean checkCollisions(Entity a, Entity b) {
+    // Can't collide with yourself, or bullets you've fired
+    if(a.id == b.id) return false;
+    
+    double dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+    return dist < a.size / 2 + b.size / 2;
+  }
+  
   public void startSandbox() {
     if(_thread != null) return;
     _running = true;
@@ -66,5 +91,20 @@ public class Sandbox implements Runnable {
   
   public void stopSandbox() {
     _running = false;
+  }
+  
+  private class CollisionTracker {
+    public Class<? extends Entity> e1, e2;
+    public CollisionCallback cb;
+    
+    public CollisionTracker(Class<? extends Entity> e1, Class<? extends Entity> e2, CollisionCallback cb) {
+      this.e1 = e1;
+      this.e2 = e2;
+      this.cb = cb;
+    }
+  }
+  
+  public static interface CollisionCallback {
+    public void hit(Entity entity, Entity hitBy);
   }
 }
