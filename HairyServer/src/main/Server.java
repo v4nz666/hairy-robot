@@ -42,7 +42,6 @@ public class Server {
   private boolean _running;
   private long _interval;
   private int _ticksPerSecond = 60;
-  private long _ticksTotal;
   private int _tps = 60;
   
   private long _powerupTimer;
@@ -134,7 +133,6 @@ public class Server {
       }
       
       ticks++;
-      _ticksTotal++;
       
       // Sleep each loop if we have extra time
       timeDelta = System.nanoTime() - time;
@@ -244,11 +242,13 @@ public class Server {
       }
     }
     
-    _server.getBroadcastOperations().sendEvent("update", new Update(_ticksTotal, update, _bullet));
+    _server.getBroadcastOperations().sendEvent("update", new Update(update, _bullet));
   }
   
   private void userHit(User user, Bullet bullet) {
     int size;
+    
+    removeBullet(bullet);
     
     if(user.shields > 0) {
       size = 1;
@@ -257,8 +257,6 @@ public class Server {
       size = 2;
       user.life -= bullet.damage;
     }
-    
-    removeBullet(bullet);
     
     if(user.life > 0) {
       _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
@@ -273,7 +271,7 @@ public class Server {
       _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " was killed by " + attacker.name));
     }
     
-    _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
+    _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y));
   }
   
   private void userPowerup(User user, Powerup powerup) {
@@ -285,12 +283,10 @@ public class Server {
   public static class Update {
     private static Bullet[] _conv = new Bullet[0];
     
-    public final long ticks;
     public final User.Update[] usersOnScreen;
     public final Bullet[] bullets;
     
-    public Update(long ticks, User.Update[] usersOnScreen, ConcurrentLinkedDeque<Bullet> bullets) {
-      this.ticks = ticks;
+    public Update(User.Update[] usersOnScreen, ConcurrentLinkedDeque<Bullet> bullets) {
       this.usersOnScreen = usersOnScreen;
       this.bullets = bullets.toArray(_conv);
     }

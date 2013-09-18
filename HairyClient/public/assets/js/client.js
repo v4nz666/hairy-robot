@@ -19,6 +19,8 @@ function Client() {
     
     keys: 0,
     
+    ticks: 0,
+    
     clear: function(clr) {
       if(typeof clr === 'undefined') {
         clr = 'rgb(0,0,0)';
@@ -36,6 +38,7 @@ function Client() {
       this.renderUsers();
       this.renderExplosions();
       this.renderPowerups();
+      this.ticks++;
     },
     
     renderBullets: function() {
@@ -226,6 +229,7 @@ function Client() {
       this.socket.on('explosion',  $.proxy(this.explosion, this));
       this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
       this.socket.on('remuser',    $.proxy(this.remUser, this));
+      this.socket.on('hit',        $.proxy(this.hit, this));
       
       // Hook our keyboard events
       $(document).keydown($.proxy(this.keyDown, this));
@@ -359,7 +363,6 @@ function Client() {
     },
     
     update: function(up) {
-      this.ticks = up.ticks;
       this.bullets = up.bullets;
       
       for(key in up.usersOnScreen) {
@@ -371,13 +374,17 @@ function Client() {
     },
     
     explosion: function(expl) {
-      var expl = Explosion(expl.size, expl.x, expl.y, expl.tick);
+      var expl = Explosion(expl.size, expl.x, expl.y);
       this.explosions.push(expl);
+    },
+    
+    hit: function(hit) {
+      
     }
   }
 }
 
-function Explosion(size, x, y, tick) {
+function Explosion(size, x, y) {
   var numParticles = Math.pow(2, size + 2);
   var maxVelocity = size * 2;
   var ttl = size * 10;
@@ -391,8 +398,7 @@ function Explosion(size, x, y, tick) {
     x: x,
     y: y,
     particles: particles,
-    ttl: ttl,
-    born: tick
+    ttl: ttl
   }
 }
 
