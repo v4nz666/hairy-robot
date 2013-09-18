@@ -27,10 +27,8 @@ public class Bullet extends Entity {
       double a = Math.toRadians(user.angle);
       double a2 = Math.toRadians(offsetAngle);
       double a3 = Math.toRadians(offsetSpacing);
-      System.out.println(x + "\t" + y);
       x += Math.cos(a + a3) * user.size / 2;
       y += Math.sin(a + a3) * user.size / 2;
-      System.out.println(x + "\t" + y);
       
       space.data.guns.Bullet.Ballistic b = (space.data.guns.Bullet.Ballistic)bullet;
       vx = minOrMax(Math.cos(a + a2) * b.getVel(), user.vx);
