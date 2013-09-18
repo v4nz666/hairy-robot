@@ -98,17 +98,17 @@ public class Server {
     
     _server.start();
     _sandbox.startSandbox();
-    _sandbox.trackCollision(User.class, Bullet.class, new Sandbox.CollisionCallback() {
+    _sandbox.trackCollision(User.class, Bullet.class, new Sandbox.CollisionCallback<User, Bullet>() {
       @Override
-      public void hit(Entity entity, Entity hitBy) {
-        userHit((User)entity, (Bullet)hitBy);
+      public void hit(User entity, Bullet hitBy) {
+        userHit(entity, hitBy);
       }
     });
     
-    _sandbox.trackCollision(User.class, Powerup.class, new Sandbox.CollisionCallback() {
+    _sandbox.trackCollision(User.class, Powerup.class, new Sandbox.CollisionCallback<User, Powerup>() {
       @Override
-      public void hit(Entity entity, Entity hitBy) {
-        userPowerup((User)entity, (Powerup)hitBy);
+      public void hit(User entity, Powerup hitBy) {
+        userPowerup(entity, hitBy);
       }
     });
     
@@ -248,13 +248,13 @@ public class Server {
   }
   
   private void userHit(User user, Bullet bullet) {
-    String size;
+    int size;
     
     if(user.shields > 0) {
-      size = "small";
+      size = 1;
       user.shields = Math.max(0, user.shields - bullet.damage);
     } else {
-      size = "medium";
+      size = 2;
       user.life -= bullet.damage;
     }
     
@@ -267,7 +267,7 @@ public class Server {
       
       killUser(user);
       attacker.kills++;
-      size = "huge";
+      size = 4;
       //TODO: User scores
       
       _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " was killed by " + attacker.name));

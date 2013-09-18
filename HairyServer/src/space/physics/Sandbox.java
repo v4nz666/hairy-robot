@@ -13,7 +13,7 @@ public class Sandbox implements Runnable {
   private int _tps = 60;
   
   private ConcurrentLinkedDeque<Entity> _obj = new ConcurrentLinkedDeque<>();
-  private ConcurrentLinkedDeque<CollisionTracker> _collision = new ConcurrentLinkedDeque<>();
+  private ConcurrentLinkedDeque<CollisionTracker<? extends Entity, ? extends Entity>> _collision = new ConcurrentLinkedDeque<>();
   
   public void addToSandbox(Entity m) {
     _obj.add(m);
@@ -23,8 +23,8 @@ public class Sandbox implements Runnable {
     _obj.remove(m);
   }
   
-  public void trackCollision(Class<? extends Entity> entity, Class<? extends Entity> hitBy, CollisionCallback callback) {
-    _collision.add(new CollisionTracker(entity, hitBy, callback));
+  public <T extends Entity, U extends Entity> void trackCollision(Class<T> entity, Class<U> hitBy, CollisionCallback<T, U> callback) {
+    _collision.add(new CollisionTracker<T, U>(entity, hitBy, callback));
   }
   
   public void run() {
@@ -41,16 +41,8 @@ public class Sandbox implements Runnable {
       for(Entity e : _obj) {
         e.update(timeDelta / _interval);
         
-        for(CollisionTracker c : _collision) {
-          if(c.e1.isInstance(e)) {
-            for(Entity hitBy : _obj) {
-              if(c.e2.isInstance(hitBy)) {
-                if(checkCollisions(e, hitBy)) {
-                  c.cb.hit(e, hitBy);
-                }
-              }
-            }
-          }
+        for(CollisionTracker<? extends Entity, ? extends Entity> c : _collision) {
+          c.check(e);
         }
       }
       
@@ -93,18 +85,32 @@ public class Sandbox implements Runnable {
     _running = false;
   }
   
-  private class CollisionTracker {
-    public Class<? extends Entity> e1, e2;
-    public CollisionCallback cb;
+  private class CollisionTracker<T extends Entity, U extends Entity> {
+    public Class<T> e1;
+    public Class<U> e2;
+    public CollisionCallback<T, U> cb;
     
-    public CollisionTracker(Class<? extends Entity> e1, Class<? extends Entity> e2, CollisionCallback cb) {
+    public CollisionTracker(Class<T> e1, Class<U> e2, CollisionCallback<T, U> cb) {
       this.e1 = e1;
       this.e2 = e2;
       this.cb = cb;
     }
+    
+    @SuppressWarnings("unchecked")
+    public void check(Entity e) {
+      if(e1.isInstance(e)) {
+        for(Entity hitBy : _obj) {
+          if(e2.isInstance(hitBy)) {
+            if(checkCollisions(e, hitBy)) {
+              cb.hit((T)e, (U)hitBy);
+            }
+          }
+        }
+      }
+    }
   }
   
-  public static interface CollisionCallback {
-    public void hit(Entity entity, Entity hitBy);
+  public static interface CollisionCallback<T extends Entity, U extends Entity> {
+    public void hit(T entity, U hitBy);
   }
 }

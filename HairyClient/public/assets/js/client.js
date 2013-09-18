@@ -378,34 +378,9 @@ function Client() {
 }
 
 function Explosion(size, x, y, tick) {
-  switch(size) {
-    case 'small':
-      var numParticles = 8;
-      var maxVelocity = 3;
-      var ttl = 10;
-      break;
-    
-    case 'med':
-    case 'medium':
-      var numParticles = 16;
-      var maxVelocity = 4;
-      var ttl = 20;
-      break;
-    
-    case 'lg':
-    case 'large':
-      var numParticles = 32;
-      var maxVelocity = 6;
-      var ttl = 30;
-      break;
-    
-    case 'huge':
-      var numParticles = 64;
-      var maxVelocity = 8;
-      var ttl = 40;
-      break;
-  }
-  
+  var numParticles = Math.pow(2, size + 2);
+  var maxVelocity = size * 2;
+  var ttl = size * 10;
   var particles = [];
   
   for(var i = 0; i < numParticles; i++) {
