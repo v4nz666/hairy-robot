@@ -66,6 +66,14 @@ function Client() {
         this.ctx.translate(user.x, user.y);
         this.ctx.rotate(user.angle * Math.PI / 180);
         
+        if(user.shields > 0) {
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, user.size / 2, 0, Math.PI * 2);
+          this.ctx.closePath();
+          this.ctx.fillStyle = 'rgba(0,255,255,' + user.shields / 500 + ')';
+          this.ctx.fill();
+        }
+        
         this.ctx.beginPath();
         this.ctx.moveTo( user.size / 2, 0);
         this.ctx.lineTo(-user.size / 2, 8);
@@ -73,17 +81,8 @@ function Client() {
         this.ctx.lineTo(user.size / 2, 0);
         this.ctx.fillStyle = user.color;
         this.ctx.fill();
-        this.ctx.restore();
         
-        if(user.shields > 0) {
-          this.ctx.save();
-          this.ctx.beginPath();
-          this.ctx.arc(user.x, user.y, user.size / 2, 0, Math.PI * 2);
-          this.ctx.closePath();
-          this.ctx.fillStyle = 'rgba(0,255,255,' + user.shields / 500 + ')';
-          this.ctx.fill();
-          this.ctx.restore();
-        }
+        this.ctx.restore();
       }
     },
     
