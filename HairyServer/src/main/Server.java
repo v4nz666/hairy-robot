@@ -193,7 +193,7 @@ public class Server {
     }
   }
   
-  private void killUser(User victim, User attacker) {
+  private void killUser(User victim) {
     victim.life = victim.maxLife;
     victim.shields = victim.maxShields;
     victim.setGun(space.data.guns.Gun.getGunDefault());
@@ -204,12 +204,7 @@ public class Server {
     victim.angle = 0;
     victim.deaths++;
     
-    System.out.println("User " + victim.name + " killed by user " + attacker.name);
-    
-    attacker.kills++;
-    
-    _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", victim.name + " was killed by " + attacker.name));
-    //TODO: User scores
+    _server.getBroadcastOperations().sendEvent("stats", victim.serializeStats());
   }
   
   public void addBullet(Bullet bullet) {
@@ -263,14 +258,21 @@ public class Server {
       user.life -= bullet.damage;
     }
     
-    if(user.life <= 0) {
-      killUser(user, bullet.user());
-      _server.getBroadcastOperations().sendEvent("explosion", new Explosion("huge", (int)bullet.x, (int)bullet.y, _ticksTotal));
-    }
-    
     removeBullet(bullet);
     
-    _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
+    if(user.life > 0) {
+      _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
+    } else {
+      User attacker = bullet.user();
+      
+      killUser(user);
+      attacker.kills++;
+      size = "huge";
+      //TODO: User scores
+      
+      _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " was killed by " + attacker.name));
+    }
+    
     _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y, _ticksTotal));
   }
   
