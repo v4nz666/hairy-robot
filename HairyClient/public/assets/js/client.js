@@ -76,8 +76,8 @@ function Client() {
         
         this.ctx.beginPath();
         this.ctx.moveTo( user.size / 2, 0);
-        this.ctx.lineTo(-user.size / 2, 8);
-        this.ctx.bezierCurveTo(0, 5, 0, -5, -user.size / 2, -8);
+        this.ctx.lineTo(-user.size / 2, user.size / 4);
+        this.ctx.bezierCurveTo(0, 5, 0, -5, -user.size / 2, -user.size / 4);
         this.ctx.lineTo(user.size / 2, 0);
         this.ctx.fillStyle = user.color;
         this.ctx.fill();
