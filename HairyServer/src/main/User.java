@@ -24,7 +24,7 @@ public class User extends Entity {
           
           try(ResultSet r2 = select.executeQuery()) {
             if(r2.next()) {
-              User user = new User(socket, r2.getInt("id"), name, r2.getFloat("x"), r2.getFloat("y"));
+              User user = new User(socket, r2.getInt("id"), name, r2.getFloat("x"), r2.getFloat("y"), r2.getInt("size"));
               user.maxLife = r2.getInt("max_life");
               user.maxShields = r2.getInt("max_shields");
               user.maxVel = r2.getFloat("max_vel");
@@ -32,7 +32,6 @@ public class User extends Entity {
               user.shields = Math.min(r2.getInt("shields"), user.maxShields);
               user._gun = new Gun(space.data.guns.Gun.getGunDefault(), space.data.guns.Gun.getGunDefault().getBullets()[0]); //Gun.getGunByName(r2.getString("gun"));
               user.turnSpeed = r2.getFloat("turn_speed");
-              user.size = r2.getInt("size");
               user.color = r2.getString("colour");
               user.kills = r2.getInt("kills");
               user.deaths = r2.getInt("deaths");
@@ -76,8 +75,8 @@ public class User extends Entity {
   private Add    _add    = new Add();
   private Remove _remove = new Remove();
   
-  private User(SocketIOClient socket, int dbID, String name, float x, float y) {
-    super(Server.getID(), x, y, 32);
+  private User(SocketIOClient socket, int dbID, String name, float x, float y, int size) {
+    super(Server.getID(), x, y, size);
     this.dbID = dbID;
     this.name = name;
     this.socket = socket;
