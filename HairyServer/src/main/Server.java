@@ -278,7 +278,8 @@ public class Server {
     powerup.use(user);
     removePowerup(powerup);
     _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
-    _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));  }
+    _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
+  }
   
   public static class Update {
     private static Bullet[] _conv = new Bullet[0];
