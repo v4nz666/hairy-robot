@@ -22,6 +22,8 @@ function Client() {
     ticks: 0,
     fps: 0,
     
+    toRads: Math.pi / 180,
+    
     clear: function(clr) {
       if(typeof clr === 'undefined') {
         clr = 'rgb(0,0,0)';
@@ -405,7 +407,7 @@ function Client() {
         var e = this.bullets[i];
         
         if(e.acc != 0) {
-          theta = Math.toRadians(e.angle);
+          theta = e.angle * this.toRads;
           
           e.vx += Math.cos(theta) * e.acc;
           e.vy += Math.sin(theta) * e.acc;
