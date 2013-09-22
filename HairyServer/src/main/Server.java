@@ -207,12 +207,14 @@ public class Server {
   
   public void addBullet(Bullet bullet) {
     _bullet.push(bullet);
+    _server.getBroadcastOperations().sendEvent("badd", bullet.serializeForAdd());
     _sandbox.addToSandbox(bullet);
   }
   
   public void removeBullet(Bullet bullet) {
     _sandbox.removeFromSandbox(bullet);
     _bullet.remove(bullet);
+    _server.getBroadcastOperations().sendEvent("brem", bullet.serializeForRem());
   }
   
   public void addPowerup() {
@@ -242,7 +244,7 @@ public class Server {
       }
     }
     
-    _server.getBroadcastOperations().sendEvent("update", new Update(update, _bullet));
+    _server.getBroadcastOperations().sendEvent("update", new Update(update));
   }
   
   private void userHit(User user, Bullet bullet) {
@@ -282,14 +284,10 @@ public class Server {
   }
   
   public static class Update {
-    private static Bullet[] _conv = new Bullet[0];
-    
     public final User.Update[] usersOnScreen;
-    public final Bullet[] bullets;
     
-    public Update(User.Update[] usersOnScreen, ConcurrentLinkedDeque<Bullet> bullets) {
+    public Update(User.Update[] usersOnScreen) {
       this.usersOnScreen = usersOnScreen;
-      this.bullets = bullets.toArray(_conv);
     }
   }
 }

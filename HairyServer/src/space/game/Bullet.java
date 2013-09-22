@@ -5,19 +5,25 @@ import main.Server;
 import main.User;
 
 public class Bullet extends Entity {
+  private static int _id;
+  public static int nextID() { return _id++; }
+  
   private User _user;
   public final int damage;
   
-  public User user() {
-    return _user;
-  }
+  private Add _add = new Add();
+  private Rem _rem = new Rem();
+  
+  public User user() { return _user; }
+  public Add serializeForAdd() { return _add; }
+  public Rem serializeForRem() { return _rem; }
   
   public Bullet(User user, space.data.guns.Bullet bullet, float offsetAngle) {
     this(user, bullet, offsetAngle, 0);
   }
   
   public Bullet(User user, space.data.guns.Bullet bullet, float offsetAngle, float offsetSpacing) {
-    super(user.id, user.x, user.y, bullet.getSize());
+    super(nextID(), user.x, user.y, bullet.getSize(), user.id);
     
     _user = user;
     angle = user.angle;
@@ -56,5 +62,21 @@ public class Bullet extends Entity {
   
   public void remove() {
     Server.instance().removeBullet(this);
+  }
+  
+  public class Add {
+    public int getId() { return id; }
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public int getSize() { return size; }
+    public double getAngle() { return angle; }
+    public double getVx() { return vx; }
+    public double getVy() { return vy; }
+    public double getAcc() { return acc; }
+    public double getMaxVel() { return maxVel; }
+  }
+  
+  public class Rem {
+    public int getId() { return id; }
   }
 }

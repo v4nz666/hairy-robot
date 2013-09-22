@@ -20,6 +20,7 @@ function Client() {
     keys: 0,
     
     ticks: 0,
+    fps: 0,
     
     clear: function(clr) {
       if(typeof clr === 'undefined') {
@@ -33,16 +34,20 @@ function Client() {
     },
     
     render: function() {
+      this.physics();
       this.clear();
       this.renderBullets();
       this.renderUsers();
       this.renderExplosions();
       this.renderPowerups();
       this.ticks++;
+      this.fps++;
     },
     
     renderBullets: function() {
-      for(i = 0; i < this.bullets.length; i++) {
+      for(i in this.bullets) {
+        if(i === 'length') { continue; }
+        
         var bullet = this.bullets[i];
         this.ctx.save();
         this.ctx.beginPath();
@@ -230,6 +235,8 @@ function Client() {
       this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
       this.socket.on('remuser',    $.proxy(this.remUser, this));
       this.socket.on('hit',        $.proxy(this.hit, this));
+      this.socket.on('badd',       $.proxy(this.badd, this));
+      this.socket.on('brem',       $.proxy(this.brem, this));
       
       // Hook our keyboard events
       $(document).keydown($.proxy(this.keyDown, this));
@@ -245,7 +252,11 @@ function Client() {
       this.ctx = canvas.getContext('2d');
       
       console.log(this);
-      setInterval($.proxy(this.render, this), frameRate);
+      setInterval($.proxy(this.render, this), tickRate);
+      setInterval($.proxy(function() {
+        console.log(this.fps);
+        this.fps = 0;
+      }, this), 1000);
     },
     
     setParams: function(data){
@@ -363,8 +374,6 @@ function Client() {
     },
     
     update: function(up) {
-      this.bullets = up.bullets;
-      
       for(key in up.usersOnScreen) {
         user = up.usersOnScreen[key];
         this.user[user.id].x = user.x;
@@ -380,6 +389,55 @@ function Client() {
     
     hit: function(hit) {
       
+    },
+    
+    badd: function(bullet) {
+      this.bullets[bullet.id] = bullet;
+    },
+    
+    brem: function(bullet) {
+      delete this.bullets[bullet.id];
+    },
+    
+    physics: function() {
+      for(i in this.bullets) {
+        if(i === 'length') { continue; }
+        var e = this.bullets[i];
+        
+        if(e.acc != 0) {
+          theta = Math.toRadians(e.angle);
+          
+          e.vx += Math.cos(theta) * e.acc;
+          e.vy += Math.sin(theta) * e.acc;
+          
+          if(e.vx > e.maxVel) {
+            e.vy *= (e.maxVel / e.vx);
+            e.vx = e.maxVel;
+            e.acc = 0;
+          }
+          
+          if(e.vx < -e.maxVel) {
+            e.vy *= (-e.maxVel / e.vx);
+            e.vx = -e.maxVel;
+            e.acc = 0;
+          }
+          
+          if(e.vy > e.maxVel) {
+            e.vx *= (e.maxVel / e.vy);
+            e.vy = e.maxVel;
+            e.acc = 0;
+          }
+          
+          if(e.vy < -e.maxVel) {
+            e.vx *= (-e.maxVel / e.vy);
+            e.vy = -e.maxVel;
+            e.acc = 0;
+          }
+        }
+        
+        e.x += e.vx;
+        e.y += e.vy;
+      }
     }
   }
 }

@@ -74,6 +74,7 @@ public class User extends Entity {
   private Update _update = new Update();
   private Add    _add    = new Add();
   private Remove _remove = new Remove();
+  private Hit    _hit    = new Hit();
   
   private User(SocketIOClient socket, int dbID, String name, float x, float y, int size) {
     super(Server.getID(), x, y, size);
@@ -87,6 +88,7 @@ public class User extends Entity {
   public Update serializeUpdate() { return _update; }
   public Add    serializeAdd()    { return _add;    }
   public Remove serializeRemove() { return _remove; }
+  public Hit    serializeHit()    { return _hit;    }
   
   public void setGun(space.data.guns.Gun gun) {
     _gun = new Gun(gun, gun.getBullets()[0]);
@@ -214,6 +216,10 @@ public class User extends Entity {
   }
   
   public class Remove {
+    public int getId() { return id; }
+  }
+  
+  public class Hit {
     public int getId() { return id; }
   }
 }
