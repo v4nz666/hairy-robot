@@ -7,12 +7,18 @@ public abstract class Entity {
   public double acc, angle;
   public double maxVel;
   public int size;
+  public int spawnID;
   
   public Entity(int id, double x, double y, int size) {
+    this(id, x, y, size, id);
+  }
+  
+  public Entity(int id, double x, double y, int size, int spawnID) {
     this.id = id;
     this.x = x;
     this.y = y;
     this.size = size;
+    this.spawnID = spawnID;
   }
   
   public void update(double deltaT) {

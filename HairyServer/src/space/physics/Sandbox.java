@@ -68,7 +68,7 @@ public class Sandbox implements Runnable {
   
   private boolean checkCollisions(Entity a, Entity b) {
     // Can't collide with yourself, or bullets you've fired
-    if(a.id == b.id) return false;
+    if(a.spawnID == b.spawnID) return false;
     
     double dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
     return dist < a.size / 2 + b.size / 2;
