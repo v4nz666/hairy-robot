@@ -21,6 +21,7 @@ function Client() {
     
     ticks: 0,
     fps: 0,
+    fpsTicks: 0,
     
     toRads: Math.pi / 180,
     
@@ -37,13 +38,16 @@ function Client() {
     
     render: function() {
       this.physics();
+      
       this.clear();
       this.renderBullets();
       this.renderUsers();
       this.renderExplosions();
       this.renderPowerups();
+      this.renderGUI();
+      
       this.ticks++;
-      this.fps++;
+      this.fpsTicks++;
     },
     
     renderBullets: function() {
@@ -166,6 +170,13 @@ function Client() {
       }
     },
     
+    renderGUI: function() {
+      this.ctx.save();
+      this.ctx.fillStyle = 'white';
+      this.ctx.fillText(this.fps + " FPS", 4, 12);
+      this.ctx.restore();
+    },
+    
     init: function() {
       this.socket = io.connect('http://hairy.monoxidedesign.com:9092', {'reconnect': false});
       this.initMenu();
@@ -256,8 +267,8 @@ function Client() {
       console.log(this);
       setInterval($.proxy(this.render, this), tickRate);
       setInterval($.proxy(function() {
-        console.log(this.fps);
-        this.fps = 0;
+        this.fps = this.fpsTicks;
+        this.fpsTicks = 0;
       }, this), 1000);
     },
     
