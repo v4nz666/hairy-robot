@@ -95,7 +95,13 @@ function Client() {
           this.ctx.beginPath();
           this.ctx.arc(0, 0, user.size / 2, 0, Math.PI * 2);
           this.ctx.closePath();
-          this.ctx.fillStyle = 'rgba(0,255,255,' + user.shields / 500 + ')';
+          
+          if(user.shields / user.maxShields > 0.25 || this.ticks > user.lastHit) {
+            this.ctx.fillStyle = 'rgba(0,255,255,' + ((user.shields / user.maxShields) * 100) / 0x139 + ')';
+          } else if(this.ticks <= user.lastHit) {
+            this.ctx.fillStyle = 'rgba(0,255,255,' + (0.5 - (user.shields / user.maxShields)) + ')';
+          }
+          
           this.ctx.fill();
         }
         
@@ -415,11 +421,12 @@ function Client() {
     
     hit: function(hit) {
       user = this.user[hit.id];
+      user.lastHit = this.ticks + 3;
       
       var a = Math.atan2(hit.y - user.y, hit.x - user.x) * 180 / Math.PI;
       
       if(user.shields > 0 || user.life === user.maxLife) {
-        this.effects.push(Effect('shieldhit', hit.x, hit.y, {a: a}));
+        this.effects.push(Effect('shieldhit', hit.x, hit.y, {a: a, charge: user.shields / user.maxShields}));
       } else {
         this.effects.push(Effect('armourhit', hit.x, hit.y, {a: a}));
       }
@@ -510,10 +517,11 @@ function Effect(type, x, y, data) {
       break;
     
     case "shieldhit":
-      var numParticles = 20;
+      var mult = data.charge > 0 ? 1 / data.charge : 2;
+      var numParticles = Math.round(20 * mult);
       var maxVelocity = 1.5;
       var ttl = 15;
-      var size = 0.4;
+      var size = 0.4 * mult;
       
       for(var i = 0; i < numParticles; i++) {
         particles[i] = {
@@ -589,7 +597,8 @@ function User() {
     x: 0,
     y: 0,
     color: '#FF00FF',
-    size: 0
+    size: 0,
+    lastHit: 0
   }
 }
 
