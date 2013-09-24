@@ -41,7 +41,17 @@ public class Bullet extends Entity {
       vy = minOrMax(Math.sin(a + a2) * b.getVel(), user.vy);
       acc = b.getAcc();
       maxVel = b.getMaxVel();
+      
+      _add._vx = vx;
+      _add._vy = vy;
+      _add._acc = acc;
+      _add._mvel = maxVel;
     }
+    
+    _add._size = size;
+    _add._x = x;
+    _add._y = y;
+    _add._a = acc;
   }
   
   private double minOrMax(double a, double b) {
@@ -65,15 +75,18 @@ public class Bullet extends Entity {
   }
   
   public class Add {
+    private int _size;
+    private double _x, _y, _a, _vx, _vy, _acc, _mvel;
+    
     public int getId() { return id; }
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public int getSize() { return size; }
-    public double getAngle() { return angle; }
-    public double getVx() { return vx; }
-    public double getVy() { return vy; }
-    public double getAcc() { return acc; }
-    public double getMaxVel() { return maxVel; }
+    public double getX() { return _x; }
+    public double getY() { return _y; }
+    public int getSize() { return _size; }
+    public double getAngle() { return _a; }
+    public double getVx() { return _vx; }
+    public double getVy() { return _vy; }
+    public double getAcc() { return _acc; }
+    public double getMaxVel() { return _mvel; }
   }
   
   public class Rem {
