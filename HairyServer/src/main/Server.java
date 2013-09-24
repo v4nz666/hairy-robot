@@ -163,13 +163,13 @@ public class Server {
       socket.sendEvent("adduser", u.serializeAdd());
     }
     
+    _server.getBroadcastOperations().sendEvent("adduser", user.serializeAdd());
+    
     _user.add(user);
     _userMap.put(socket, user);
     _sandbox.addToSandbox(user);
     
-    _server.getBroadcastOperations().sendEvent("adduser", user.serializeAdd());
-    
-    System.out.println("New user added");
+    System.out.println("New user added " + user.id);
     socket.sendEvent("setParams", user.serializeParams());
     socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
     //TODO: Need to send scores here?
@@ -178,16 +178,20 @@ public class Server {
   private void removeUser(SocketIOClient socket) {
     User user = _userMap.get(socket);
     
-    System.out.println("Disconnecting " + user.id);
-    _sandbox.removeFromSandbox(user);
-    _user.remove(user);
     _userMap.remove(socket);
-    _server.getBroadcastOperations().sendEvent("remuser", user.serializeRemove());
     
-    try {
-      user.save();
-    } catch(SQLException e) {
-      e.printStackTrace();
+    if(user != null) {
+      System.out.println("Disconnecting " + user.id);
+      _server.getBroadcastOperations().sendEvent("remuser", user.serializeRemove());
+      
+      _sandbox.removeFromSandbox(user);
+      _user.remove(user);
+      
+      try {
+        user.save();
+      } catch(SQLException e) {
+        e.printStackTrace();
+      }
     }
   }
   
@@ -248,32 +252,28 @@ public class Server {
   }
   
   private void userHit(User user, Bullet bullet) {
-    int size;
-    
-    removeBullet(bullet);
-    
     if(user.shields > 0) {
-      size = 1;
       user.shields = Math.max(0, user.shields - bullet.damage);
     } else {
-      size = 2;
       user.life -= bullet.damage;
     }
     
     if(user.life > 0) {
       _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
+      _server.getBroadcastOperations().sendEvent("hit", user.serializeHit(bullet));
     } else {
+      _server.getBroadcastOperations().sendEvent("kill", user.serializeKill());
+      
       User attacker = bullet.user();
       
       killUser(user);
       attacker.kills++;
-      size = 4;
       //TODO: User scores
       
       _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " was killed by " + attacker.name));
     }
     
-    _server.getBroadcastOperations().sendEvent("explosion", new Explosion(size, (int)bullet.x, (int)bullet.y));
+    removeBullet(bullet);
   }
   
   private void userPowerup(User user, Powerup powerup) {
