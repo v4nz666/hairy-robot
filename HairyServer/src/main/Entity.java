@@ -29,35 +29,39 @@ public abstract class Entity {
       vx += Math.cos(theta) * acc;
       vy += Math.sin(theta) * acc;
       
-      if(vx > maxVel) {
-        vy *= (maxVel / vx);
-        vx = maxVel;
-        acc = 0;
-      }
-      
-      if(vx < -maxVel) {
-        vy *= (-maxVel / vx);
-        vx = -maxVel;
-        acc = 0;
-      }
-      
-      if(vy > maxVel) {
-        vx *= (maxVel / vy);
-        vy = maxVel;
-        acc = 0;
-      }
-      
-      if(vy < -maxVel) {
-        vx *= (-maxVel / vy);
-        vy = -maxVel;
-        acc = 0;
-      }
+      clampVels();
     }
     
     displace();
   }
   
-  private void displace() {
+  public void clampVels() {
+    if(vx > maxVel) {
+      vy *= (maxVel / vx);
+      vx = maxVel;
+      acc = 0;
+    }
+    
+    if(vx < -maxVel) {
+      vy *= (-maxVel / vx);
+      vx = -maxVel;
+      acc = 0;
+    }
+    
+    if(vy > maxVel) {
+      vx *= (maxVel / vy);
+      vy = maxVel;
+      acc = 0;
+    }
+    
+    if(vy < -maxVel) {
+      vx *= (-maxVel / vy);
+      vy = -maxVel;
+      acc = 0;
+    }
+  }
+  
+  public void displace() {
     x += vx;
     y += vy;
   }
