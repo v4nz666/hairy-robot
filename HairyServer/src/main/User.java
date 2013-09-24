@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import space.game.Bullet;
 import sql.SQL;
 
 import com.corundumstudio.socketio.SocketIOClient;
@@ -88,7 +89,7 @@ public class User extends Entity {
   public Update serializeUpdate() { return _update; }
   public Add    serializeAdd()    { return _add;    }
   public Remove serializeRemove() { return _remove; }
-  public Hit    serializeHit()    { return _hit;    }
+  public Hit    serializeHit(Bullet bullet) { _hit._bullet = bullet; return _hit;    }
   
   public void setGun(space.data.guns.Gun gun) {
     _gun = new Gun(gun, gun.getBullets()[0]);
@@ -220,6 +221,10 @@ public class User extends Entity {
   }
   
   public class Hit {
+    private Bullet _bullet;
     public int getId() { return id; }
+    public int getBullet() { return _bullet.id; }
+    public double getX() { return _bullet.x; }
+    public double getY() { return _bullet.y; }
   }
 }
