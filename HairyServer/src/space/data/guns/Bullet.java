@@ -61,7 +61,7 @@ public abstract class Bullet {
       @Override public int    getRange()      { return 200; }
       @Override public int    getSize()       { return 2; }
       @Override public float  getHeatGen()    { return 6; }
-      @Override public float  getAcc()        { return 0.25f; }
+      @Override public float  getAcc()        { return 0.2f; }
       @Override public float  getVel()        { return 0; }
       @Override public float  getMaxVel()     { return 20; }
       @Override public long   getROF()        { return 100000000l; }
