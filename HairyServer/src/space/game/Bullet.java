@@ -51,7 +51,7 @@ public class Bullet extends Entity {
     _add._size = size;
     _add._x = x;
     _add._y = y;
-    _add._a = acc;
+    _add._a = angle;
   }
   
   private double minOrMax(double a, double b) {
