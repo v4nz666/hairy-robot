@@ -517,7 +517,7 @@ function Effect(type, x, y, data) {
       break;
     
     case "shieldhit":
-      var mult = data.charge > 0 ? 1 / data.charge : 2;
+      var mult = Math.min(data.charge > 0 ? 1 / data.charge : 10, 10);
       var numParticles = Math.round(20 * mult);
       var maxVelocity = 1.5;
       var ttl = 15;
