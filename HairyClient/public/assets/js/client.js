@@ -23,7 +23,7 @@ function Client() {
     fps: 0,
     fpsTicks: 0,
     
-    toRads: Math.pi / 180,
+    toRads: Math.PI / 180,
     
     clear: function(clr) {
       if(typeof clr === 'undefined') {
