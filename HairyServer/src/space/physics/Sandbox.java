@@ -71,7 +71,20 @@ public class Sandbox implements Runnable {
     if(a.spawnID == b.spawnID) return false;
     
     double dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
-    return dist < a.size / 2 + b.size / 2;
+    if(dist < a.size / 2 + b.size / 2) {
+      b.x -= b.vx;
+      b.y -= b.vy;
+      
+      double mv = b.maxVel;
+      b.maxVel = dist - b.size / 2;
+      b.clampVels();
+      b.displace();
+      b.maxVel = mv;
+      
+      return true;
+    }
+    
+    return false;
   }
   
   public void startSandbox() {
