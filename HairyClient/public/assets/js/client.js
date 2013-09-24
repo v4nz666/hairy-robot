@@ -50,17 +50,29 @@ function Client() {
     },
     
     renderBullets: function() {
+      var ctx = this.ctx;
+      
       for(i in this.bullets) {
         if(i === 'length') { continue; }
         
         var bullet = this.bullets[i];
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
-        this.ctx.closePath();
-        this.ctx.fillStyle = 'white';
-        this.ctx.fill();
-        this.ctx.restore();
+        ctx.save();
+        ctx.beginPath();
+        
+        if(!bullet.lastX || !bullet.lastY) {
+          ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+        } else {
+          ctx.moveTo(bullet.x, bullet.y);
+          ctx.lineTo(bullet.lastX, bullet.lastY);
+          ctx.lineWidth = bullet.size * 2;
+          ctx.lineCap = 'round';
+          ctx.strokeStyle = 'white';
+          ctx.stroke();
+        }
+        
+        ctx.restore();
       }
     },
     
@@ -390,7 +402,6 @@ function Client() {
     update: function(up) {
       for(key in up.usersOnScreen) {
         user = up.usersOnScreen[key];
-        if(typeof user === 'undefined') continue;
         this.user[user.id].x = user.x;
         this.user[user.id].y = user.y;
         this.user[user.id].angle = user.angle;
@@ -407,7 +418,7 @@ function Client() {
       
       var a = Math.atan2(hit.y - user.y, hit.x - user.x) * 180 / Math.PI;
       
-      if(user.shields > 0) {
+      if(user.shields > 0 || user.life === user.maxLife) {
         this.effects.push(Effect('shieldhit', hit.x, hit.y, {a: a}));
       } else {
         this.effects.push(Effect('armourhit', hit.x, hit.y, {a: a}));
@@ -462,6 +473,9 @@ function Client() {
             e.acc = 0;
           }
         }
+        
+        e.lastX = e.x;
+        e.lastY = e.y;
         
         e.x += e.vx;
         e.y += e.vy;
