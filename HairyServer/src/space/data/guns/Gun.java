@@ -53,6 +53,6 @@ public abstract class Gun {
     @Override public Bullet[] getBullets() { return new Bullet[] { Bullet.RocketLauncher.Standard.instance() }; }
     @Override public int getBarrels() { return 6; }
     @Override public float getBarrelSpread() { return 6; }
-    @Override public float getBulletDeviation() { return 1; }
+    @Override public float getBulletDeviation() { return 0; }
   }
 }
