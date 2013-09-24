@@ -6,8 +6,7 @@ function Client() {
     me: null,
     
     bullets: [],
-    explosions: [],
-    particleSize: 1,
+    effects: [],
     
     messages: [],
     maxMessages: 10,
@@ -42,7 +41,7 @@ function Client() {
       this.clear();
       this.renderBullets();
       this.renderUsers();
-      this.renderExplosions();
+      this.renderEffects();
       this.renderPowerups();
       this.renderGUI();
       
@@ -100,48 +99,49 @@ function Client() {
       }
     },
     
-    renderExplosions: function() {
-      for(i = 0; i < this.explosions.length; i++) {
-        this.renderExplosion(this.explosions[i]);
-      }
-      
-      for(i = this.explosions.length - 1; i >= 0; i--) {
-        if(this.explosions[i].ttl <= 0) {
-          this.explosions.splice(i, 1);
-          continue;
-        }   
+    renderEffects: function() {
+      for(key in this.effects) {
+        effect = this.effects[key];
+        this.renderEffect(effect);
+        
+        if(effect.particles.length === 0) {
+          delete this.effects[key];
+        }
       }
     },
     
-    renderExplosion: function(expl) {
+    renderEffect: function(expl) {
       var ctx = this.ctx;
       
-      for(_i = expl.particles.length -1; _i >= 0; _i--) {
-        p = expl.particles[_i];
+      for(key in expl.particles) {
+        p = expl.particles[key];
         
-        var theta = p.angle * Math.PI / 180
+        var theta = p.angle * this.toRads;
         var vX = Math.cos(theta) * p.v;
         var vY = Math.sin(theta) * p.v;
         
         p.x = p.x + vX;
         p.y = p.y + vY;
         
-        if(p.x < -this.particleSize || p.x > this.width  + this.particleSize ||
-           p.y < -this.particleSize || p.y > this.height + this.particleSize) {
-          expl.particles.splice(i, 1);
+        if(p.x < -p.size || p.x > this.width  + p.size ||
+           p.y < -p.size || p.y > this.height + p.size) {
+          delete expl.particles[i];
         }
         
         ctx.save();
         
         ctx.beginPath();
-        ctx.arc(p.x, p.y, this.particleSize, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.closePath();
         ctx.fillStyle = 'rgb(' + p.r + ',' + p.g + ',' + p.b + ')';
         ctx.fill();
         ctx.restore();
+        
+        p.ttl--;
+        if(p.ttl == 0) {
+          delete expl.particles[key];
+        }
       }
-      
-      expl.ttl--;
     },
     
     renderPowerups: function() {
@@ -229,7 +229,7 @@ function Client() {
     remUser: function(data) {
       console.log('Removing user [' + data.id + ']');
       this.addMsg({id: 'Server', msg: this.user[data.id].name + ' has left the game!'});
-      this.user.splice(data.id, 1);
+      delete this.user[data.id];
     },
     
     initGame: function() {
@@ -244,10 +244,11 @@ function Client() {
       this.socket.on('msg',        $.proxy(this.addMsg, this));
       this.socket.on('stats',      $.proxy(this.stats, this));
       this.socket.on('update',     $.proxy(this.update, this));
-      this.socket.on('explosion',  $.proxy(this.explosion, this));
+      this.socket.on('effect',     $.proxy(this.effect, this));
       this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
       this.socket.on('remuser',    $.proxy(this.remUser, this));
       this.socket.on('hit',        $.proxy(this.hit, this));
+      this.socket.on('kill',       $.proxy(this.kill, this));
       this.socket.on('badd',       $.proxy(this.badd, this));
       this.socket.on('brem',       $.proxy(this.brem, this));
       
@@ -389,19 +390,33 @@ function Client() {
     update: function(up) {
       for(key in up.usersOnScreen) {
         user = up.usersOnScreen[key];
+        if(typeof user === 'undefined') continue;
         this.user[user.id].x = user.x;
         this.user[user.id].y = user.y;
         this.user[user.id].angle = user.angle;
       }
     },
     
-    explosion: function(expl) {
-      var expl = Explosion(expl.size, expl.x, expl.y);
-      this.explosions.push(expl);
+    effect: function(expl) {
+      var expl = Effect(0, expl.x, expl.y, {size: expl.size});
+      this.effects.push(expl);
     },
     
     hit: function(hit) {
+      user = this.user[hit.id];
       
+      var a = Math.atan2(hit.y - user.y, hit.x - user.x) * 180 / Math.PI;
+      
+      if(user.shields > 0) {
+        this.effects.push(Effect('shieldhit', hit.x, hit.y, {a: a}));
+      } else {
+        this.effects.push(Effect('armourhit', hit.x, hit.y, {a: a}));
+      }
+    },
+    
+    kill: function(kill) {
+      user = this.user[kill.id];
+      this.effects.push(Effect(0, user.x, user.y, {size: 4}));
     },
     
     badd: function(bullet) {
@@ -455,33 +470,100 @@ function Client() {
   }
 }
 
-function Explosion(size, x, y) {
-  var numParticles = Math.pow(2, size + 2);
-  var maxVelocity = size * 2;
-  var ttl = size * 10;
+function Effect(type, x, y, data) {
   var particles = [];
   
-  for(var i = 0; i < numParticles; i++) {
-    particles[i] = Particle(x, y, maxVelocity);
+  switch(type) {
+    case 0: // Regular explosion
+      var numParticles = Math.pow(2, data.size + 2);
+      var maxVelocity = data.size * 2;
+      var ttl = data.size * 20;
+      
+      for(var i = 0; i < numParticles; i++) {
+        particles[i] = {
+          v: maxVelocity * Math.random(),
+          angle: 360 * Math.random(),
+          r: Math.floor(0xFF * Math.random()),
+          g: Math.floor(0x40 * Math.random()),
+          b: Math.floor(0x40 * Math.random()),
+          x: x,
+          y: y,
+          size: 1,
+          ttl: ttl
+        }
+      }
+      
+      break;
+    
+    case "shieldhit":
+      var numParticles = 20;
+      var maxVelocity = 1.5;
+      var ttl = 10;
+      
+      for(var i = 0; i < numParticles; i++) {
+        particles[i] = {
+          v: maxVelocity * Math.random(),
+          angle: data.a + 40 * Math.random() - 20,
+          r: 0,
+          g: Math.floor(0x7F * Math.random()) + 0x80,
+          b: Math.floor(0x7F * Math.random()) + 0x80,
+          x: x,
+          y: y,
+          size: 0.4 * Math.random(),
+          ttl: ttl
+        }
+      }
+      break;
+    
+    case "armourhit":
+      var smokeCount = 30;
+      var smokeVel = 0.6;
+      var smokeTTL = 30;
+      var smokeSize = 2;
+      var fireCount = 30;
+      var fireVel = 0.6;
+      var fireTTL = 30;
+      var fireSize = 1;
+      
+      for(var i = 0; i < smokeCount; i++) {
+        var c = Math.floor(0x3F * Math.random()) + 0x20;
+        particles[i] = {
+          v: smokeVel * Math.random(),
+          angle: data.a + 60 * Math.random() - 30,
+          r: c,
+          g: c,
+          b: c,
+          x: x,
+          y: y,
+          size: smokeSize * Math.random(),
+          ttl: smokeTTL
+        }
+      }
+      
+      var n = i;
+      
+      for( ; i < fireCount + n; i++) {
+        var r = Math.floor(0x7F * Math.random()) + 0x60;
+        var g = Math.floor(r * Math.random());
+        particles[i] = {
+          v: fireVel * Math.random(),
+          angle: data.a + 30 * Math.random() - 15,
+          r: r,
+          g: g,
+          b: 0,
+          x: x,
+          y: y,
+          size: fireSize * Math.random(),
+          ttl: fireTTL
+        }
+      }
+      break;
   }
   
   return {
     x: x,
     y: y,
-    particles: particles,
-    ttl: ttl
-  }
-}
-
-function Particle(x, y, mV) {
-  return {
-    v: mV * Math.random(),
-    angle: 360 * Math.random(),
-    r: Math.floor(255 * Math.random()),
-    g: Math.floor( 64 * Math.random()),
-    b: Math.floor( 64 * Math.random()),
-    x: x,
-    y: y
+    particles: particles
   }
 }
 
