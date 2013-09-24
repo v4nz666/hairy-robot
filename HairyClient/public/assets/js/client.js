@@ -512,7 +512,8 @@ function Effect(type, x, y, data) {
     case "shieldhit":
       var numParticles = 20;
       var maxVelocity = 1.5;
-      var ttl = 10;
+      var ttl = 15;
+      var size = 0.4;
       
       for(var i = 0; i < numParticles; i++) {
         particles[i] = {
@@ -523,8 +524,8 @@ function Effect(type, x, y, data) {
           b: Math.floor(0x7F * Math.random()) + 0x80,
           x: x,
           y: y,
-          size: 0.4 * Math.random(),
-          ttl: ttl
+          size: size * Math.random(),
+          ttl: Math.round(ttl * Math.random() + ttl / 2)
         }
       }
       break;
@@ -550,7 +551,7 @@ function Effect(type, x, y, data) {
           x: x,
           y: y,
           size: smokeSize * Math.random(),
-          ttl: smokeTTL
+          ttl: Math.round(smokeTTL * Math.random() + smokeTTL / 2)
         }
       }
       
@@ -568,7 +569,7 @@ function Effect(type, x, y, data) {
           x: x,
           y: y,
           size: fireSize * Math.random(),
-          ttl: fireTTL
+          ttl: Math.round(fireTTL * Math.random() + fireTTL / 2)
         }
       }
       break;
