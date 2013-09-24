@@ -50,7 +50,7 @@ public class Sandbox implements Runnable {
         _tps = ticks;
         ticks = 0;
         tickTime = System.nanoTime() + 1000000000;
-        System.out.println(_tps + " ticks per second");
+        //System.out.println(_tps + " ticks per second");
       }
       
       ticks++;
