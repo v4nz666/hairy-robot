@@ -23,6 +23,8 @@ function Client() {
     fpsTicks: 0,
     
     toRads: Math.PI / 180,
+    toDegs: 180 / Math.PI,
+    PIx2: Math.PI * 2,
     
     clear: function(clr) {
       if(typeof clr === 'undefined') {
@@ -60,7 +62,7 @@ function Client() {
         ctx.beginPath();
         
         if(!bullet.lastX || !bullet.lastY) {
-          ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+          ctx.arc(bullet.x, bullet.y, bullet.size, 0, this.PIx2);
           ctx.fillStyle = 'white';
           ctx.fill();
         } else {
@@ -89,11 +91,11 @@ function Client() {
         this.ctx.fillText(user.name, user.x, user.y - user.size / 2);
         
         this.ctx.translate(user.x, user.y);
-        this.ctx.rotate(user.angle * Math.PI / 180);
+        this.ctx.rotate(user.angle * this.toRads);
         
         if(user.shields > 0) {
           this.ctx.beginPath();
-          this.ctx.arc(0, 0, user.size / 2, 0, Math.PI * 2);
+          this.ctx.arc(0, 0, user.size / 2, 0, this.PIx2);
           this.ctx.closePath();
           
           if(user.shields / user.maxShields > 0.25 || this.ticks > user.lastHit) {
@@ -149,7 +151,7 @@ function Client() {
         ctx.save();
         
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.size, 0, this.PIx2);
         ctx.closePath();
         ctx.fillStyle = 'rgb(' + p.r + ',' + p.g + ',' + p.b + ')';
         ctx.fill();
@@ -180,7 +182,7 @@ function Client() {
         this.ctx.fill();
         
         this.ctx.beginPath();
-        this.ctx.arc(obj.x, obj.y, obj.size / 2, 0, Math.PI * 2);
+        this.ctx.arc(obj.x, obj.y, obj.size / 2, 0, this.PIx2);
         
         this.ctx.strokeStyle = obj.color;
         this.ctx.stroke();
@@ -423,7 +425,7 @@ function Client() {
       user = this.user[hit.id];
       user.lastHit = this.ticks + 3;
       
-      var a = Math.atan2(hit.y - user.y, hit.x - user.x) * 180 / Math.PI;
+      var a = Math.atan2(hit.y - user.y, hit.x - user.x) * this.toDegs;
       
       if(user.shields > 0 || user.life === user.maxLife) {
         this.effects.push(Effect('shieldhit', hit.x, hit.y, {a: a, charge: user.shields / user.maxShields}));
