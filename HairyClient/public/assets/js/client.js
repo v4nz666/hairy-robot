@@ -33,7 +33,7 @@ function Client() {
       
       this.ctx.save();
       this.ctx.fillStyle = clr;
-      this.ctx.fillRect(0,0, this.ctx.canvas.width, this.ctx.canvas.height);
+      this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       this.ctx.restore();
     },
     
