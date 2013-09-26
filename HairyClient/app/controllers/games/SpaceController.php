@@ -31,4 +31,8 @@ class SpaceController extends \Controller {
     
     return \View::make('space.home');
   }
+  
+  public function build() {
+    return \View::make('space.build');
+  }
 }

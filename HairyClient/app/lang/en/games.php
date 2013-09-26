@@ -1,5 +1,6 @@
 <?php
 
 return [
-  'space' => 'Space'
+  'space' => 'Space',
+  'space_build' => 'Ship Build Proof-of-Concept'
 ];

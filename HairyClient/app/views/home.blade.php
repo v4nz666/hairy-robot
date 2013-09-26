@@ -32,6 +32,7 @@
     @else
       <p>{{ HTML::linkAction('AuthController@logout', Lang::get('auth.logout')) }}</p>
       <p>{{ HTML::linkAction('Games\SpaceController@home', Lang::get('games.space')) }}</p>
+      <p>{{ HTML::linkAction('Games\SpaceController@build', Lang::get('games.space_build')) }}</p>
     @endif
   </body>
 </html>
