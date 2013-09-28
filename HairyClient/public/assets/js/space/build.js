@@ -183,12 +183,18 @@ function Ship(x, y) {
     isValid: function(x, y) {
       if(this.parts.length === 0) { return true; }
       
+      // Gotta check if there's already a piece there BEFORE
+      // we check if it's close enough to another piece
       for(i = 0; i < this.parts.length; i++) {
         var part = this.parts[i];
         
         if(part.x === x && part.y === y) {
           return false;
         }
+      }
+      
+      for(i = 0; i < this.parts.length; i++) {
+        var part = this.parts[i];
         
         if(Math.sqrt(Math.pow(x - part.x, 2) + Math.pow(y - part.y, 2)) <= 1) {
           return true;
