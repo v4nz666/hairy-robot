@@ -266,7 +266,7 @@ function RenderPart(x, y, part) {
     right: null,
     
     draw: function(ctx) {
-      this.part.draw(ctx);
+      this.part.draw(ctx, this);
     }
   }
 }
@@ -277,7 +277,7 @@ function Part() {
     h: 1,
     mass: 1,
     
-    draw: function(ctx) {
+    draw: function(ctx, render) {
       ctx.fillStyle = 'magenta';
       ctx.fillRect(0, 0, this.w * 16, this.h * 16);
     }
@@ -286,13 +286,59 @@ function Part() {
 
 function Hull() { }
 Hull.prototype = new Part();
-Hull.prototype.draw = function(ctx) {
+Hull.prototype.draw = function(ctx, render) {
   var w = this.w * 16;
   var h = this.h * 16;
   ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, w, h);
   ctx.strokeStyle = 'grey';
-  ctx.strokeRect(1, 1, w - 2, h - 2);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  
+  var drawn = false;
+  if(typeof render !== 'undefined') {
+    if(render.left === null && render.right !== null) {
+      if(render.up === null) {
+        if(render.down !== null) {
+          ctx.moveTo(0, h);
+          ctx.lineTo(w, h);
+          ctx.lineTo(w, 0);
+          drawn = true;
+        }
+      } else {
+        if(render.down === null) {
+          ctx.lineTo(w, h);
+          ctx.lineTo(w, 0);
+          drawn = true;
+        }
+      }
+    }
+    
+    if(render.right === null && render.left !== null) {
+      if(render.up === null) {
+        if(render.down !== null) {
+          ctx.lineTo(0, h);
+          ctx.lineTo(w, h);
+          drawn = true;
+        }
+      } else {
+        if(render.down === null) {
+          ctx.lineTo(0, h);
+          ctx.lineTo(w, 0);
+          drawn = true;
+        }
+      }
+    }
+  }
+  
+  if(!drawn) {
+    ctx.lineTo(0, h);
+    ctx.lineTo(w, h);
+    ctx.lineTo(w, 0);
+  }
+  
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
 }
 
 $(document).ready(function() {
