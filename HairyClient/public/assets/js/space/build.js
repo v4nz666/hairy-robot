@@ -5,6 +5,7 @@ function Client() {
     fps: 0,
     fpsTicks: 0,
     
+    tab: null,
     mouseX: 0,
     mouseY: 0,
     gridX: 0,
@@ -13,11 +14,12 @@ function Client() {
     startY: 0,
     
     ship: null,
-    selectedPart: new Hull(),
+    selectedPart: null,
+    hoverPart: null,
     
     init: function() {
-      var frameRate = 60;
-      var tickRate = 1000 / frameRate;
+      this.frameRate = 60;
+      this.tickRate = 1000 / this.frameRate;
       
       this.canvas = $('#canvas')[0];
       this.canvas.width = 800;
@@ -29,14 +31,16 @@ function Client() {
       this.ship = new Ship(this.startX * 16, this.startY * 16);
       this.ship.addPart(0, 0, new Hull());
       
-      setInterval($.proxy(this.render, this), tickRate);
+      $('#canvas').mousemove($.proxy(this.mouseMove, this));
+      $('#canvas').click($.proxy(this.mouseClick, this));
+    },
+    
+    run: function() {
+      setInterval($.proxy(this.render, this), this.tickRate);
       setInterval($.proxy(function() {
         this.fps = this.fpsTicks;
         this.fpsTicks = 0;
       }, this), 1000);
-      
-      $('#canvas').mousemove($.proxy(this.mouseMove, this));
-      $('#canvas').click($.proxy(this.mouseClick, this));
     },
     
     render: function() {
@@ -70,18 +74,33 @@ function Client() {
       this.ctx.fillStyle = 'white';
       this.ctx.strokeStyle = 'grey';
       
-      this.ctx.save();
-      this.ctx.translate(this.gridX * 16, this.gridY * 16);
-      this.selectedPart.draw(this.ctx);
-      
-      if(this.ship.isValid(this.gridX - this.startX, this.gridY - this.startY)) {
-        this.ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
-      } else {
-        this.ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+      switch(this.tab) {
+        case 'tab-create':
+          this.ctx.save();
+          this.ctx.translate(this.gridX * 16, this.gridY * 16);
+          this.selectedPart.draw(this.ctx);
+          
+          if(this.ship.isValid(this.gridX - this.startX, this.gridY - this.startY)) {
+            this.ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+          } else {
+            this.ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+          }
+          
+          this.ctx.fillRect(0, 0, this.selectedPart.w * 16, this.selectedPart.h * 16);
+          this.ctx.restore();
+          break;
+        
+        case 'tab-edit':
+          if(this.hoverPart !== null) {
+            this.ctx.save();
+            this.ctx.translate(this.gridX * 16, this.gridY * 16);
+            this.ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+            this.ctx.fillRect(0, 0, this.selectedPart.w * 16, this.selectedPart.h * 16);
+            this.ctx.restore();
+          }
+          
+          break;
       }
-      
-      this.ctx.fillRect(0, 0, this.selectedPart.w * 16, this.selectedPart.h * 16);
-      this.ctx.restore();
       
       this.ctx.save();
       this.ctx.beginPath();
@@ -113,14 +132,28 @@ function Client() {
       this.mouseY = e.offsetY;
       this.gridX = Math.floor(e.offsetX / 16);
       this.gridY = Math.floor(e.offsetY / 16);
+      this.hoverPart = this.ship.partAt(this.gridX - this.startX, this.gridY - this.startY);
     },
     
     mouseClick: function(e) {
       var x = this.gridX - this.startX;
       var y = this.gridY - this.startY;
-      if(this.ship.addPart(x, y, this.selectedPart)) {
-        if(x < 0) { this.startX += x; }
-        if(y < 0) { this.startY += y; }
+      
+      switch(this.tab) {
+        case 'tab-create':
+          if(this.ship.addPart(x, y, this.selectedPart)) {
+            if(x < 0) { this.startX += x; }
+            if(y < 0) { this.startY += y; }
+          }
+          
+          break;
+        
+        case 'tab-edit':
+          if(this.hoverPart !== null) {
+            selectPart(this.hoverPart);
+          }
+          
+          break;
       }
     }
   }
@@ -205,6 +238,18 @@ function Ship(x, y) {
       return false;
     },
     
+    partAt: function(x, y) {
+      for(i = 0; i < this.parts.length; i++) {
+        var part = this.parts[i];
+        
+        if(part.x === x && part.y === y) {
+          return part;
+        }
+      }
+      
+      return null;
+    },
+    
     cacheCenterOfMass: function() {
       var sumMassTimesCoMX = 0;
       var sumMassTimesCoMY = 0;
@@ -256,7 +301,7 @@ function Ship(x, y) {
 }
 
 function RenderPart(x, y, part) {
-  return {
+  var me = {
     x: x,
     y: y,
     part: part,
@@ -269,6 +314,9 @@ function RenderPart(x, y, part) {
       this.part.draw(ctx, this);
     }
   }
+  
+  part.create(me);
+  return me;
 }
 
 function Part() {
@@ -277,10 +325,7 @@ function Part() {
     h: 1,
     mass: 1,
     
-    desc: function() {
-      return {name: 'Part', info: [{name: 'mass', desc: 'The weight of this part'}], attribs: null};
-    },
-    
+    create: function(render) { },
     draw: function(ctx, render) {
       ctx.fillStyle = 'magenta';
       ctx.fillRect(0, 0, this.w * 16, this.h * 16);
@@ -288,13 +333,48 @@ function Part() {
   }
 }
 
-function Hull() { }
-Hull.prototype = new Part();
-Hull.prototype.rendermode = 0;
-Hull.prototype.desc = function() {
-  return {name: 'Hull', info: [{name: 'mass', desc: 'The weight of this part'}], attribs: [{name: 'rendermode', desc: 'The way the part renders', type: 'opt', vals: ['Square', 'Corners']}]};
+Part.desc = {
+  name: 'Part',
+  desc: 'You shouldn\'t be able to get this part',
+  info: [
+    {
+      id: 'mass',
+      name: 'Mass',
+      desc: 'The weight of this part'
+    }
+  ],
+  attribs: null
 }
 
+function Hull() { }
+Hull.prototype = new Part();
+Hull.instance = new Hull();
+Hull.create = function(render) {
+  render.rendermode = 0;
+}
+
+Hull.desc = {
+  name: 'Hull',
+  desc: 'A 64x64m&sup2; section of hull',
+  info: [
+    {
+      id: 'mass',
+      name: 'Mass',
+      desc: 'The weight of this part'
+    }
+  ],
+  attribs: [
+    {
+      id: 'rendermode',
+      name: 'Render mode',
+      desc: 'The way the part renders',
+      type: 'opt',
+      vals: ['Square', 'Corners']
+    }
+  ]
+}
+
+Hull.prototype.desc = Hull.desc;
 Hull.prototype.draw = function(ctx, render) {
   var w = this.w * 16;
   var h = this.h * 16;
@@ -350,7 +430,44 @@ Hull.prototype.draw = function(ctx, render) {
   ctx.stroke();
 }
 
+function addPartToInterface(part) {
+  var desc = part.desc;
+  
+  $('#part').append('<option value="' + desc.name + '">' + desc.name + ' - ' + desc.desc + '</option>');
+}
+
+function selectPart(render) {
+  var html = '';
+  for(i in render.part.desc.info) {
+    if(i === 'length') { continue; }
+    info = render.part.desc.info[i];
+    
+    html += '<p>' + info.name + ': ' + render.part[info.id] + '<br />' + info.desc + '</p>';
+  }
+  
+  $('#info').html(html);
+}
+
 $(document).ready(function() {
-  var client = new Client();
+  addPartToInterface(Hull);
+  
+  $('a[name|=tab]').click(function(e) {
+    $('[id|=tab]').hide();
+    $('#' + this.name).show();
+    client.tab = this.name;
+    e.preventDefault();
+  });
+  
+  client = new Client();
   client.init();
+  
+  $('#part option:eq(0)').attr('selected', true);
+  $('#part').change(function(e) {
+    var selected = $('option', this).filter(':selected')[0];
+    client.selectedPart = window[selected.value].instance;
+  }).change();
+  
+  $('a[name|=tab]')[0].click();
+  
+  client.run();
 });
