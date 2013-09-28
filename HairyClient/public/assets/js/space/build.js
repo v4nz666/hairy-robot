@@ -173,7 +173,6 @@ function Ship(x, y) {
         
         this.cacheCenterOfMass();
         this.cacheRelativeParts();
-        console.log(this.parts);
         
         return true;
       } else {
