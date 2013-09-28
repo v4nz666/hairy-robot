@@ -2,5 +2,5 @@
 
 return [
   'space' => 'Space',
-  'space_build' => 'Ship Build Proof-of-Concept'
+  'space_build' => 'Ship Building Proof-of-Concept'
 ];
