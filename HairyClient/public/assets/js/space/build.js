@@ -171,7 +171,9 @@ function Ship(x, y) {
         this.w = (w + 1) * 16;
         this.h = (h + 1) * 16;
         
-        this.calcCenterOfMass();
+        this.cacheCenterOfMass();
+        this.cacheRelativeParts();
+        console.log(this.parts);
         
         return true;
       } else {
@@ -204,7 +206,7 @@ function Ship(x, y) {
       return false;
     },
     
-    calcCenterOfMass: function() {
+    cacheCenterOfMass: function() {
       var sumMassTimesCoMX = 0;
       var sumMassTimesCoMY = 0;
       var sumMass = 0;
@@ -218,6 +220,36 @@ function Ship(x, y) {
       
       this.comx = sumMassTimesCoMX / sumMass;
       this.comy = sumMassTimesCoMY / sumMass;
+    },
+    
+    cacheRelativeParts: function() {
+      for(i = 0; i < this.parts.length; i++) {
+        p1 = this.parts[i];
+        
+        for(n = 0; n < this.parts.length; n++) {
+          p2 = this.parts[n];
+          
+          if(p1.x == p2.x) {
+            if(p1.y == p2.y - 1) {
+              p1.down = p2;
+              p2.up   = p1;
+            } else if(p1.y == p2.y + 1) {
+              p1.up   = p2;
+              p2.down = p1;
+            }
+          }
+          
+          if(p1.y == p2.y) {
+            if(p1.x == p2.x - 1) {
+              p1.right = p2;
+              p2.left  = p1;
+            } else if(p1.x == p2.x + 1) {
+              p1.left  = p2;
+              p2.right = p1;
+            }
+          }
+        }
+      }
     }
   }
   
@@ -229,6 +261,10 @@ function RenderPart(x, y, part) {
     x: x,
     y: y,
     part: part,
+    up: null,
+    down: null,
+    left: null,
+    right: null,
     
     draw: function(ctx) {
       this.part.draw(ctx);
