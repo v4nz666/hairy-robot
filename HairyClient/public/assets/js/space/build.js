@@ -349,7 +349,7 @@ Part.desc = {
 function Hull() { }
 Hull.prototype = new Part();
 Hull.instance = new Hull();
-Hull.create = function(render) {
+Hull.prototype.create = function(render) {
   render.rendermode = 0;
 }
 
@@ -385,35 +385,37 @@ Hull.prototype.draw = function(ctx, render) {
   
   var drawn = false;
   if(typeof render !== 'undefined') {
-    if(render.left === null && render.right !== null) {
-      if(render.up === null) {
-        if(render.down !== null) {
-          ctx.moveTo(0, h);
-          ctx.lineTo(w, h);
-          ctx.lineTo(w, 0);
-          drawn = true;
-        }
-      } else {
-        if(render.down === null) {
-          ctx.lineTo(w, h);
-          ctx.lineTo(w, 0);
-          drawn = true;
+    if(render.rendermode == 1) {
+      if(render.left === null && render.right !== null) {
+        if(render.up === null) {
+          if(render.down !== null) {
+            ctx.moveTo(0, h);
+            ctx.lineTo(w, h);
+            ctx.lineTo(w, 0);
+            drawn = true;
+          }
+        } else {
+          if(render.down === null) {
+            ctx.lineTo(w, h);
+            ctx.lineTo(w, 0);
+            drawn = true;
+          }
         }
       }
-    }
-    
-    if(render.right === null && render.left !== null) {
-      if(render.up === null) {
-        if(render.down !== null) {
-          ctx.lineTo(0, h);
-          ctx.lineTo(w, h);
-          drawn = true;
-        }
-      } else {
-        if(render.down === null) {
-          ctx.lineTo(0, h);
-          ctx.lineTo(w, 0);
-          drawn = true;
+      
+      if(render.right === null && render.left !== null) {
+        if(render.up === null) {
+          if(render.down !== null) {
+            ctx.lineTo(0, h);
+            ctx.lineTo(w, h);
+            drawn = true;
+          }
+        } else {
+          if(render.down === null) {
+            ctx.lineTo(0, h);
+            ctx.lineTo(w, 0);
+            drawn = true;
+          }
         }
       }
     }
@@ -441,11 +443,35 @@ function selectPart(render) {
   for(i in render.part.desc.info) {
     if(i === 'length') { continue; }
     info = render.part.desc.info[i];
-    
     html += '<p>' + info.name + ': ' + render.part[info.id] + '<br />' + info.desc + '</p>';
   }
   
   $('#info').html(html);
+  
+  html = '';
+  for(i in render.part.desc.attribs) {
+    if(i === 'length') { continue; }
+    attrib = render.part.desc.attribs[i];
+    switch(attrib.type) {
+      case 'opt':
+        $('#options').html('<p>' + attrib.name + ': <select id="attribs"></select><br />' + attrib.desc + '</p>');
+        
+        for(n in attrib.vals) {
+          if(n === 'length') { continue; }
+          val = attrib.vals[n];
+          html += '<option value="' + n + '">' + val + '</option>';
+        }
+        
+        $('#attribs').html(html);
+        $('#attribs').val(render[attrib.id]);
+        $('#attribs').change(function(e) {
+          var selected = $('option', this).filter(':selected')[0];
+          render[attrib.id] = selected.value;
+        });
+        
+        break;
+    }
+  }
 }
 
 $(document).ready(function() {
