@@ -21,17 +21,17 @@
         </div>
         
         <div id="tab-create">
-          <div id="parts" style="display: inline-block;">
+          <div id="parts">
             <select id="part" size="6"></select>
           </div>
         </div>
         
         <div id="tab-edit">
-          <div id="info" style="display: inline-block;">
+          <div id="info">
             
           </div>
           
-          <div id="options" style="display: inline-block;">
+          <div id="options">
             
           </div>
         </div>
