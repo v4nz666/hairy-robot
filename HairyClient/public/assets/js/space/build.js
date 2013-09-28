@@ -192,7 +192,19 @@ function Ship(x, y) {
         if(x < 0) { this.x += x * 16; x = 0; }
         if(y < 0) { this.y += y * 16; y = 0; }
         
-        this.parts.push(new RenderPart(x, y, part));
+        var render = new RenderPart(x, y, part);
+        
+        for(i in render.part.desc.attribs) {
+          if(i === 'length') { continue; }
+          attrib = render.part.desc.attribs[i];
+          
+          var selected = $('#create-' + attrib.id + ' option').filter(':selected');
+          if(selected.length !== 0) {
+            render[attrib.id] = selected[0].value;
+          }
+        }
+        
+        this.parts.push(render);
         
         var w = 0, h = 0;
         for(i = 0; i < this.parts.length; i++) {
@@ -454,7 +466,7 @@ function selectPart(render) {
     attrib = render.part.desc.attribs[i];
     switch(attrib.type) {
       case 'opt':
-        $('#options').html('<p>' + attrib.name + ': <select id="attribs"></select><br />' + attrib.desc + '</p>');
+        $('#options').html('<p>' + attrib.name + ': <select id="' + attrib.id + '"></select><br />' + attrib.desc + '</p>');
         
         for(n in attrib.vals) {
           if(n === 'length') { continue; }
@@ -462,9 +474,9 @@ function selectPart(render) {
           html += '<option value="' + n + '">' + val + '</option>';
         }
         
-        $('#attribs').html(html);
-        $('#attribs').val(render[attrib.id]);
-        $('#attribs').change(function(e) {
+        $('#' + attrib.id).html(html);
+        $('#' + attrib.id).val(render[attrib.id]);
+        $('#' + attrib.id).change(function(e) {
           var selected = $('option', this).filter(':selected')[0];
           render[attrib.id] = selected.value;
         });
@@ -491,6 +503,26 @@ $(document).ready(function() {
   $('#part').change(function(e) {
     var selected = $('option', this).filter(':selected')[0];
     client.selectedPart = window[selected.value].instance;
+    
+    var html = '';
+    for(i in client.selectedPart.desc.attribs) {
+      if(i === 'length') { continue; }
+      attrib = client.selectedPart.desc.attribs[i];
+      switch(attrib.type) {
+        case 'opt':
+          $('#create-options').html('<p>' + attrib.name + ': <select id="create-' + attrib.id + '"></select><br />' + attrib.desc + '</p>');
+          
+          for(n in attrib.vals) {
+            if(n === 'length') { continue; }
+            val = attrib.vals[n];
+            html += '<option value="' + n + '">' + val + '</option>';
+          }
+          
+          $('#create-' + attrib.id).html(html);
+          
+          break;
+      }
+    }
   }).change();
   
   $('a[name|=tab]')[0].click();

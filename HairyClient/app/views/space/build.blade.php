@@ -24,6 +24,10 @@
           <div id="parts">
             <select id="part" size="6"></select>
           </div>
+          
+          <div id="create-options">
+            
+          </div>
         </div>
         
         <div id="tab-edit">
