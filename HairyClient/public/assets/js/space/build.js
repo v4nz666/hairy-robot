@@ -277,6 +277,10 @@ function Part() {
     h: 1,
     mass: 1,
     
+    desc: function() {
+      return {name: 'Part', info: [{name: 'mass', desc: 'The weight of this part'}], attribs: null};
+    },
+    
     draw: function(ctx, render) {
       ctx.fillStyle = 'magenta';
       ctx.fillRect(0, 0, this.w * 16, this.h * 16);
@@ -286,6 +290,11 @@ function Part() {
 
 function Hull() { }
 Hull.prototype = new Part();
+Hull.prototype.rendermode = 0;
+Hull.prototype.desc = function() {
+  return {name: 'Hull', info: [{name: 'mass', desc: 'The weight of this part'}], attribs: [{name: 'rendermode', desc: 'The way the part renders', type: 'opt', vals: ['Square', 'Corners']}]};
+}
+
 Hull.prototype.draw = function(ctx, render) {
   var w = this.w * 16;
   var h = this.h * 16;
