@@ -31,8 +31,8 @@
       {{ HTML::linkAction('HomeController@register', Lang::get('home.register')) }}
     @else
       <p>{{ HTML::linkAction('AuthController@logout', Lang::get('auth.logout')) }}</p>
-      <p>{{ HTML::linkAction('Games\SpaceController@home', Lang::get('games.space')) }}</p>
-      <p>{{ HTML::linkAction('Games\SpaceController@build', Lang::get('games.space_build')) }}</p>
+      <p>{{ HTML::linkAction('games\SpaceController@home', Lang::get('games.space')) }}</p>
+      <p>{{ HTML::linkAction('games\SpaceController@build', Lang::get('games.space_build')) }}</p>
     @endif
   </body>
 </html>
