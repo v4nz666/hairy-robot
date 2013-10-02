@@ -209,13 +209,15 @@ function Client() {
       this.setStatus('Initialising...');
       name = $('input[name=username]').val();
       auth = $('input[name=auth]').val();
+      ip   = $('input[name=ip]').val();
+      port = $('input[name=port').val();
       
       this.lifeBar = $('#life');
       this.shieldBar = $('#shield');
       this.gun = $('#guns');
       
       this.setStatus('Connecting...');
-      this.socket = io.connect('http://hairy.monoxidedesign.com:9092', {'reconnect': false});
+      this.socket = io.connect(ip + ':' + port, {'reconnect': false});
       this.socket.on('connect', $.proxy(function() {
         this.login(name, auth);
       }, this));
