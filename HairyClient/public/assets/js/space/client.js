@@ -198,7 +198,6 @@ function Client() {
     },
     
     init: function() {
-      this.socket = io.connect('http://hairy.monoxidedesign.com:9092', {'reconnect': false});
       this.initMenu();
     },
     
@@ -215,7 +214,11 @@ function Client() {
       this.shieldBar = $('#shield');
       this.gun = $('#guns');
       
-      this.login(name, auth);
+      this.setStatus('Connecting...');
+      this.socket = io.connect('http://hairy.monoxidedesign.com:9092', {'reconnect': false});
+      this.socket.on('connect', $.proxy(function() {
+        this.login(name, auth);
+      }, this));
     },
     
     login: function(name, auth) {
