@@ -210,7 +210,7 @@ function Client() {
       name = $('input[name=username]').val();
       auth = $('input[name=auth]').val();
       ip   = $('input[name=ip]').val();
-      port = $('input[name=port').val();
+      port = $('input[name=port]').val();
       
       this.lifeBar = $('#life');
       this.shieldBar = $('#shield');
