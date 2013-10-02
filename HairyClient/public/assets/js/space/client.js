@@ -193,7 +193,7 @@ function Client() {
     renderGUI: function() {
       this.ctx.save();
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(this.fps + " FPS", 4, 12);
+      this.ctx.fillText(this.fps + ' FPS', 4, 12);
       this.ctx.restore();
     },
     
@@ -332,8 +332,8 @@ function Client() {
     },
     
     renderStats: function() {
-      this.lifeBar.width((this.me.life / this.me.maxLife) * 100 + "%");
-      this.shieldBar.width((this.me.shields / this.me.maxShields) * 100 + "%");
+      this.lifeBar.width((this.me.life / this.me.maxLife) * 100 + '%');
+      this.shieldBar.width((this.me.shields / this.me.maxShields) * 100 + '%');
       this.gun.html(this.me.gun);
     },
     
@@ -521,7 +521,7 @@ function Effect(type, x, y, data) {
       
       break;
     
-    case "shieldhit":
+    case 'shieldhit':
       var mult = Math.min(data.charge > 0 ? 1 / data.charge : 10, 10);
       var numParticles = Math.round(20 * mult);
       var maxVelocity = 1.5;
@@ -543,7 +543,7 @@ function Effect(type, x, y, data) {
       }
       break;
     
-    case "armourhit":
+    case 'armourhit':
       var smokeCount = 30;
       var smokeVel = 0.6;
       var smokeTTL = 30;
