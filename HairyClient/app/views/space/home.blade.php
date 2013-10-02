@@ -12,6 +12,8 @@
   <body>
     {{ Form::hidden('username', Auth::user()->username) }}
     {{ Form::hidden('auth'    , Auth::user()->auth    ) }}
+    {{ Form::hidden('ip'      , $ip) }}
+    {{ Form::hidden('port'    , $port) }}
     
     <div id="status">
       Loading...

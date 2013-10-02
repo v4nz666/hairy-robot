@@ -33,6 +33,7 @@ function Client() {
       
       $('#canvas').mousemove($.proxy(this.mouseMove, this));
       $('#canvas').click($.proxy(this.mouseClick, this));
+      $('#canvas').on('contextmenu', null, function(e) { return false; });
     },
     
     run: function() {
