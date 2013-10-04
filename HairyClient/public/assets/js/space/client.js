@@ -29,6 +29,8 @@ function Client() {
     offsetX: 0,
     offsetY: 0,
     
+    gridSize: 128,
+    
     clear: function(clr) {
       if(typeof clr === 'undefined') {
         clr = 'rgb(0,0,0)';
@@ -85,11 +87,46 @@ function Client() {
             this.offsetY = this.me.y - this.ctx.canvas.height / 2;
             this.me.onscreenY = this.me.y - this.offsetY;
         }
+        
+        this.gridOffsetX = this.offsetX % this.gridSize;
+        this.gridOffsetY = this.offsetY % this.gridSize;
     },
     
     renderBackground: function() {
+      var ctx = this.ctx;
       
+      ctx.save();
       
+      var _x = 0;
+      var c = 1;
+      
+      while ( c * this.gridSize - this.gridOffsetX < ctx.canvas.width ) {
+        _x = (c * this.gridSize) - this.gridOffsetX;
+        ctx.beginPath();
+        ctx.moveTo(_x, 0);
+        ctx.lineTo(_x, ctx.canvas.height);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgb(16,16,16)';
+        ctx.stroke();
+        
+        c = c + 1;
+      }
+      
+      var _y = 0;
+      c = 1;
+      
+      while ( c * this.gridSize - this.gridOffsetY < ctx.canvas.height) {
+        _y = (c * this.gridSize) - this.gridOffsetY;
+        ctx.beginPath();
+        ctx.moveTo(0, _y);
+        ctx.lineTo(ctx.canvas.width, _y);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgb(16,16,16)';
+        ctx.stroke();
+        
+        c = c + 1;
+      }
+      ctx.restore();
     },
     renderBullets: function() {
       var ctx = this.ctx;
@@ -277,6 +314,8 @@ function Client() {
       this.ctx.save();
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.fps + ' FPS', 4, 12);
+      this.ctx.fillText('X:' + this.me.x + " Y:" + this.me.y, 4, 24);
+      this.ctx.fillText('Angle:' + this.me.angle, 4, 36);
       this.ctx.restore();
     },
     
