@@ -26,6 +26,7 @@ class SpaceController extends \Controller {
       $user->y = 300;
       $user->kills = 0;
       $user->deaths = 0;
+      $user->credits = 10000;
       $user->save();
     }
     
