@@ -26,6 +26,9 @@ function Client() {
     toDegs: 180 / Math.PI,
     PIx2: Math.PI * 2,
     
+    offsetX: 0,
+    offsetY: 0,
+    
     clear: function(clr) {
       if(typeof clr === 'undefined') {
         clr = 'rgb(0,0,0)';
@@ -40,7 +43,10 @@ function Client() {
     render: function() {
       this.physics();
       
+      this.calculateOffsets();
+      
       this.clear();
+      this.renderBackground();
       this.renderBullets();
       this.renderUsers();
       this.renderEffects();
@@ -51,23 +57,74 @@ function Client() {
       this.fpsTicks++;
     },
     
+    calculateOffsets: function() {
+        // Near the left edge of the map
+        if (this.me.x <= this.ctx.canvas.width / 2) {
+            this.offsetX = 0;
+            this.me.onscreenX = this.me.x;
+        // Near the right side of the map
+        } else if (this.me.x >= this.worldWidth - (this.ctx.canvas.width / 2)) {
+            this.offsetX = this.worldWidth - (this.ctx.canvas.width);
+            this.me.onscreenX = this.ctx.canvas.width - (this.worldWidth - this.me.x);
+        // In the middle
+        } else {
+            this.offsetX = Math.floor(this.me.x - this.ctx.canvas.width / 2);
+            this.me.onscreenX = this.me.x - this.offsetX;
+        }
+        
+        // Near the top of the map
+        if (this.me.y <= this.ctx.canvas.height/ 2) {
+            this.offsetY = 0;
+            this.me.onscreenY = this.me.y;
+        // Near the bottom of the map
+        } else if (this.me.y >= this.worldHeight - (this.ctx.canvas.height / 2)) {
+            this.offsetY = this.worldHeight - (this.ctx.canvas.height);
+            this.me.onscreenY = this.ctx.canvas.height- (this.worldHeight - this.me.y);
+        // In the middle of the map
+        } else {
+            this.offsetY = this.me.y - this.ctx.canvas.height / 2;
+            this.me.onscreenY = this.me.y - this.offsetY;
+        }
+    },
+    
+    renderBackground: function() {
+      
+      
+    },
     renderBullets: function() {
       var ctx = this.ctx;
+      var screenX;
+      var screenY;
+      var screenLastX;
+      var screenLastY;
       
       for(i in this.bullets) {
+        
         if(i === 'length') { continue; }
         
         var bullet = this.bullets[i];
+        
+        screenX = bullet.x - this.offsetX;
+        screenY = bullet.y - this.offsetY;
+        
+        if ( ! this.onscreen(bullet, screenX, screenY)) {
+          continue;
+        }
+        
+        screenLastX = bullet.lastX - this.offsetX;
+        screenLastY = bullet.lastY - this.offsetY;
+        
         ctx.save();
         ctx.beginPath();
         
-        if(!bullet.lastX || !bullet.lastY) {
-          ctx.arc(bullet.x, bullet.y, bullet.size, 0, this.PIx2);
+        if(!screenLastX || !screenLastY) {
+          
+          ctx.arc(screenX, screenY, bullet.size, 0, this.PIx2);
           ctx.fillStyle = 'white';
           ctx.fill();
         } else {
-          ctx.moveTo(bullet.x, bullet.y);
-          ctx.lineTo(bullet.lastX, bullet.lastY);
+          ctx.moveTo(screenX, screenY);
+          ctx.lineTo(screenLastX, screenLastY);
           ctx.lineWidth = bullet.size * 2;
           ctx.lineCap = 'round';
           ctx.strokeStyle = 'white';
@@ -79,18 +136,37 @@ function Client() {
     },
     
     renderUsers: function() {
+      var screenX = 0;
+      var screenY = 0;
+      
       for(key in this.user) {
         user = this.user[key];
         
         if(!user.x || !user.y) { continue; }
         
+        if(user.id == this.me.id) {
+          screenX = this.me.onscreenX;
+          screenY = this.me.onscreenY;
+          
+        } else {
+          
+          screenX = user.x - this.offsetX;
+          screenY = user.y - this.offsetY;
+          
+          if ( ! this.onscreen(user) ) {
+            
+            continue;
+          }
+          
+        }
+        
         this.ctx.save();
         
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = 'white';
-        this.ctx.fillText(user.name, user.x, user.y - user.size / 2);
+        this.ctx.fillText(user.name, screenX, screenY - user.size / 2);
         
-        this.ctx.translate(user.x, user.y);
+        this.ctx.translate(screenX, screenY);
         this.ctx.rotate(user.angle * this.toRads);
         
         if(user.shields > 0) {
@@ -132,7 +208,7 @@ function Client() {
     
     renderEffect: function(expl) {
       var ctx = this.ctx;
-      
+
       for(key in expl.particles) {
         p = expl.particles[key];
         
@@ -148,10 +224,17 @@ function Client() {
           delete expl.particles[i];
         }
         
+        screenX = p.x - this.offsetX;
+        screenY = p.y - this.offsetY;
+        
+        if ( ! this.onscreen(p, screenX, screenY)) {
+          continue;
+        }
+        
         ctx.save();
         
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, this.PIx2);
+        ctx.arc(screenX, screenY, p.size, 0, this.PIx2);
         ctx.closePath();
         ctx.fillStyle = 'rgb(' + p.r + ',' + p.g + ',' + p.b + ')';
         ctx.fill();
@@ -300,7 +383,9 @@ function Client() {
     },
     
     setParams: function(data){
-      console.log('setting client[', data, ']');
+      console.log('setting client/world[', data, ']');
+      this.worldWidth = data.w;
+      this.worldHeight = data.h;
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
       this.renderStats();
@@ -495,6 +580,15 @@ function Client() {
         e.x += e.vx;
         e.y += e.vy;
       }
+    },
+    
+    onscreen: function(entity, screenX, screenY) {
+      return ! (
+        screenX + entity.size / 2 < 0                     || // Right edge is left of canvas
+        screenX - entity.size / 2 > this.ctx.canvas.width || // Left edge is right of canvas
+        screenY + entity.size / 2 < 0                     || // Top edge is below canvas
+        screenY - entity.size / 2 > this.ctx.canvas.height   // Bottom edge is above canvas
+      );
     }
   }
 }
@@ -604,6 +698,8 @@ function User() {
     name: null,
     x: 0,
     y: 0,
+    onscreenX: 0,
+    onscreenY: 0,
     color: '#FF00FF',
     size: 0,
     lastHit: 0

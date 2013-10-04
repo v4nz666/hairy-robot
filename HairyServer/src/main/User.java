@@ -85,13 +85,13 @@ public class User extends Entity {
     this.socket = socket;
   }
   
-  public Params serializeParams() { return _params; }
-  public Stats  serializeStats()  { return _stats;  }
-  public Update serializeUpdate() { return _update; }
-  public Add    serializeAdd()    { return _add;    }
-  public Remove serializeRemove() { return _remove; }
-  public Hit    serializeHit(Bullet bullet) { _hit._bullet = bullet; return _hit; }
-  public Kill   serializeKill()   { return _kill;   }
+  public Params       serializeParams() { return _params; }
+  public Stats        serializeStats()  { return _stats;  }
+  public Update       serializeUpdate() { return _update; }
+  public Add          serializeAdd()    { return _add;    }
+  public Remove       serializeRemove() { return _remove; }
+  public Hit          serializeHit(Bullet bullet) { _hit._bullet = bullet; return _hit; }
+  public Kill         serializeKill()   { return _kill;   }
   
   public void setGun(space.data.guns.Gun gun) {
     _gun = new Gun(gun, gun.getBullets()[0]);
@@ -188,6 +188,9 @@ public class User extends Entity {
   
   public class Params {
     public int getId() { return id; }
+    // Let the user know the size of the world she'll be playing in
+    public int getW() { return Server.W; }
+    public int getH() { return Server.H; }
   }
   
   public class Stats {
@@ -232,4 +235,5 @@ public class User extends Entity {
   public class Kill {
     public int getId() { return id; }
   }
+
 }
