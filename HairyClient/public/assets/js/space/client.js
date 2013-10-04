@@ -106,7 +106,7 @@ function Client() {
         ctx.moveTo(_x, 0);
         ctx.lineTo(_x, ctx.canvas.height);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgb(16,16,16)';
+        ctx.strokeStyle = 'rgb(32,32,32)';
         ctx.stroke();
         
         c = c + 1;
@@ -121,7 +121,7 @@ function Client() {
         ctx.moveTo(0, _y);
         ctx.lineTo(ctx.canvas.width, _y);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgb(16,16,16)';
+        ctx.strokeStyle = 'rgb(32,32,32)';
         ctx.stroke();
         
         c = c + 1;
