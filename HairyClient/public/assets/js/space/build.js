@@ -131,9 +131,19 @@ function Client() {
     mouseMove: function(e) {
       this.mouseX = e.offsetX;
       this.mouseY = e.offsetY;
-      this.gridX = Math.floor(e.offsetX / 16);
-      this.gridY = Math.floor(e.offsetY / 16);
-      this.hoverPart = this.ship.partAt(this.gridX - this.startX, this.gridY - this.startY);
+      
+      var gridX = Math.floor(e.offsetX / 16);
+      var gridY = Math.floor(e.offsetY / 16);
+      
+      if(gridX != this.gridX || gridY != this.gridY) {
+        this.gridX = gridX;
+        this.gridY = gridY;
+        this.hoverPart = this.ship.partAt(this.gridX - this.startX, this.gridY - this.startY);
+        
+        if(e.which != 0) {
+          this.mouseClick(e);
+        }
+      }
     },
     
     mouseClick: function(e) {
