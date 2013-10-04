@@ -299,12 +299,11 @@ function Client() {
       this.shieldBar = $('#shield');
       this.gun = $('#guns');
       
+      this.setStatus('Connecting...');
+      this.socket = io.connect(ip + ':' + port, {'reconnect': false});
       this.socket.on('connect', $.proxy(function() {
         this.login(name, auth);
       }, this));
-      
-      this.setStatus('Connecting...');
-      this.socket = io.connect(ip + ':' + port, {'reconnect': false});
     },
     
     login: function(name, auth) {
