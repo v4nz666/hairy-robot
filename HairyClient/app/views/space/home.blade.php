@@ -7,6 +7,20 @@
     {{ HTML::script('assets/js/jquery.min.js') }}
     {{ HTML::script('assets/js/socket.io.min.js') }}
     {{ HTML::script('assets/js/space/client.js') }}
+    
+    <style>
+      * {
+        margin: 0; padding: 0;
+      }
+      
+      html, body {
+        width: 100%; height: 100%;
+      }
+      
+      canvas {
+        display: block;
+      }
+    </style>
   </head>
   
   <body>
@@ -15,7 +29,42 @@
     {{ Form::hidden('ip'      , $ip) }}
     {{ Form::hidden('port'    , $port) }}
     
-    <div id="status">
+    <canvas id="canvas">
+      <div id="status">
+        Loading...
+      </div>
+      
+      <div id="right" style="width: 400px; display: inline-block; vertical-align: top;">
+        <div style="display: inline-block;">
+          <p>
+            Life:<br>
+            Shields:<br>
+            Guns:
+          </p>
+        </div>
+        
+        <div id="stats" style="display: inline-block;">
+          <div id="life-outer" style="width: 100px; height: 1em; border: 1px solid black;">
+            <div id="life" style="height: 100%; background: lime;"></div>
+          </div>
+          <div id="shield-outer" style="width: 100px; height: 1em; border: 1px solid black;">
+            <div id="shield" style="height: 100%; background: turquoise;"></div>
+          </div>
+          <div id="guns-outer">
+            <span id="guns">1</span>
+          </div>
+        </div>
+        
+        <div id="scores" style="padding: 1em; width: 90%; height: 28%; border: 1px solid gray;"></div>
+        <div id="messages" style="padding: 1em; width: 90%; height: 78%; border: 1px solid gray;"></div>
+        <div id="chat" style="padding: 1em; width: 90%; heigh: 1.5em;">
+          <input id="textInput" type="text" style="width: 100%; display: none;">
+          <p>Press &quot;t&quot; to chat</p>
+        </div>
+      </div>
+    </canvas>
+    
+    <!--div id="status">
       Loading...
     </div>
     
@@ -52,6 +101,6 @@
           <p>Press &quot;t&quot; to chat</p>
         </div>
       </div>
-    </div>
+    </div-->
   </body>
 </html>

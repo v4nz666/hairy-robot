@@ -1,6 +1,7 @@
 function Client() {
   return {
     socket: null,
+    inGame: false,
     
     user: [],
     me: null,
@@ -43,17 +44,19 @@ function Client() {
     },
     
     render: function() {
-      this.physics();
-      
-      this.calculateOffsets();
-      
-      this.clear();
-      this.renderBackground();
-      this.renderBullets();
-      this.renderUsers();
-      this.renderEffects();
-      this.renderPowerups();
-      this.renderGUI();
+      if(this.inGame) {
+        this.physics();
+        
+        this.calculateOffsets();
+        
+        this.clear();
+        this.renderBackground();
+        this.renderBullets();
+        this.renderUsers();
+        this.renderEffects();
+        this.renderPowerups();
+        this.renderGUI();
+      }
       
       this.ticks++;
       this.fpsTicks++;
@@ -317,6 +320,28 @@ function Client() {
       this.ctx.fillText('X:' + this.me.x + " Y:" + this.me.y, 4, 24);
       this.ctx.fillText('Angle:' + this.me.angle, 4, 36);
       this.ctx.restore();
+      
+      this.ctx.save();
+      this.ctx.translate(this.canvas.width - 4 - 100, 4);
+      this.ctx.strokeStyle = 'white';
+      this.ctx.fillStyle = 'rgb(0, 255, 0)';
+      this.ctx.fillRect(0, 0, 100, 12);
+      this.ctx.strokeRect(0, 0, 100, 12);
+      this.ctx.fillStyle = 'rgb(0, 255, 255)';
+      this.ctx.fillRect(0, 14, 100, 12);
+      this.ctx.strokeRect(0, 14, 100, 12);
+      this.ctx.fillStyle = 'rgb(255, 255, 255)';
+      this.ctx.textAlign = 'right';
+      this.ctx.textBaseline = 'top';
+      this.ctx.fillText('Hull:', -2, 0);
+      this.ctx.fillText('Shields:', -2, 14);
+      this.ctx.restore();
+    },
+    
+    resize: function() {
+      this.canvas.width  = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+      this.render();
     },
     
     init: function() {
@@ -329,6 +354,10 @@ function Client() {
     
     initMenu: function() {
       this.setStatus('Initialising...');
+      
+      this.canvas = $('#canvas')[0];
+      this.ctx = canvas.getContext('2d');
+      
       name = $('input[name=username]').val();
       auth = $('input[name=auth]').val();
       ip   = $('input[name=ip]').val();
@@ -337,6 +366,9 @@ function Client() {
       this.lifeBar = $('#life');
       this.shieldBar = $('#shield');
       this.gun = $('#guns');
+      
+      window.addEventListener('resize', $.proxy(this.resize, this), false);
+      this.resize();
       
       this.setStatus('Connecting...');
       this.socket = io.connect(ip + ':' + port, {'reconnect': false});
@@ -381,7 +413,7 @@ function Client() {
     
     initGame: function() {
       $('#status').hide();
-      $('#game').show();
+      //$('#game').show();
       
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
@@ -407,10 +439,7 @@ function Client() {
       console.log(this.textInput);
       this.textInput.keydown($.proxy(function(ev) {this.chatInput(ev)}, this));
       
-      this.canvas = $('#canvas')[0];
-      this.canvas.width = 800;
-      this.canvas.height = 600;
-      this.ctx = canvas.getContext('2d');
+      this.inGame = true;
       
       console.log(this);
       setInterval($.proxy(this.render, this), tickRate);
