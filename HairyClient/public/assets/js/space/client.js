@@ -13,6 +13,7 @@ function Client() {
     maxMessages: 255,
     inChat: false,
     chatBuffer: '',
+    chatBufferW: 0,
     
     lifeBar: null,
     shieldBar: null,
@@ -356,7 +357,12 @@ function Client() {
       this.ctx.textBaseline = 'bottom';
       this.ctx.fillStyle = 'rgb(255, 255, 255)';
       
-      this.ctx.fillText(this.inChat ? this.chatBuffer : 'Press "T" to chat', x, y);
+      if(this.inChat) {
+        this.ctx.fillText(this.chatBuffer, x, y);
+        this.ctx.fillRect(x + this.chatBufferW, y - h, 1, h);
+      } else {
+        this.ctx.fillText('Press "T" to chat', x, y);
+      }
       
       for(var i = max; --i >= min;) {
         y -= h;
@@ -558,6 +564,7 @@ function Client() {
           case 8:
             if(this.chatBuffer.length != 0) {
               this.chatBuffer = this.chatBuffer.substr(0, this.chatBuffer.length - 1);
+              this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
             }
             
             break;
@@ -566,6 +573,7 @@ function Client() {
             if(this.chatBuffer.length != 0) {
               this.socket.emit('msg', {msg: this.chatBuffer});
               this.chatBuffer = '';
+              this.chatBufferW = 0;
             }
             
             this.inChat = false;
@@ -591,6 +599,7 @@ function Client() {
     keyPress: function(ev) {
       if(this.inChat) {
         this.chatBuffer += String.fromCharCode(ev.which);
+        this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
       }
     },
     
