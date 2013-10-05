@@ -321,14 +321,17 @@ function Client() {
       this.ctx.fillText('Angle:' + this.me.angle, 4, 36);
       this.ctx.restore();
       
+      var hull    = this.me.life / this.me.maxLife;
+      var shields = this.me.shields / this.me.maxShields;
+      
       this.ctx.save();
       this.ctx.translate(this.canvas.width - 4 - 100, 4);
       this.ctx.strokeStyle = 'white';
       this.ctx.fillStyle = 'rgb(0, 255, 0)';
-      this.ctx.fillRect(0, 0, 100, 12);
+      this.ctx.fillRect(0, 0, hull * 100, 12);
       this.ctx.strokeRect(0, 0, 100, 12);
       this.ctx.fillStyle = 'rgb(0, 255, 255)';
-      this.ctx.fillRect(0, 14, 100, 12);
+      this.ctx.fillRect(0, 14, shields * 100, 12);
       this.ctx.strokeRect(0, 14, 100, 12);
       this.ctx.fillStyle = 'rgb(255, 255, 255)';
       this.ctx.textAlign = 'right';
