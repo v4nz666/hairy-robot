@@ -524,7 +524,7 @@ function Client() {
     },
     
     keyDown: function(ev) {
-      if(this.textInput.is(':hidden')) {
+      if(!this.inChat) {
         switch(ev.keyCode) {
           case 32: case 37: case 38: case 39: case 40:
             code = (ev.keyCode == 32) ? 0x10 : Math.pow(2, ev.keyCode - 37);
@@ -535,6 +535,7 @@ function Client() {
             break;
           
           case 84:
+            this.inChat = true;
             this.textInput.show();
             this.textInput.focus();
             ev.preventDefault();
@@ -544,7 +545,7 @@ function Client() {
     },
     
     keyUp: function(ev) {
-      if(this.textInput.is(':hidden')) {
+      if(!this.inChat) {
         switch(ev.keyCode) {
           case 32: case 37: case 38: case 39: case 40:
             code = (ev.keyCode == 32) ? 0x10 : Math.pow(2, ev.keyCode - 37);
@@ -565,6 +566,7 @@ function Client() {
         }
         
         this.textInput.hide();
+        this.inChat = false;
       }
     },
     
