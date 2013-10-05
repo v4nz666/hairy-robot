@@ -536,6 +536,8 @@ function Client() {
     },
     
     keyDown: function(ev) {
+      if(ev.which == 8) { ev.preventDefault(); }
+      
       if(!this.inChat) {
         switch(ev.which) {
           case 32: case 37: case 38: case 39: case 40:
