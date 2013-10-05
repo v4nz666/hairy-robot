@@ -554,13 +554,22 @@ function Client() {
             break;
         }
       } else {
-        if(ev.which == 13) {
-          if(this.chatBuffer.length != 0) {
-            this.socket.emit('msg', {msg: this.chatBuffer});
-            this.chatBuffer = '';
-          }
+        switch(ev.which) {
+          case 8:
+            if(this.chatBuffer.length != 0) {
+              this.chatBuffer = this.chatBuffer.substr(0, this.chatBuffer.length - 1);
+            }
+            
+            break;
           
-          this.inChat = false;
+          case 13:
+            if(this.chatBuffer.length != 0) {
+              this.socket.emit('msg', {msg: this.chatBuffer});
+              this.chatBuffer = '';
+            }
+            
+            this.inChat = false;
+            break;
         }
       }
     },
