@@ -537,9 +537,9 @@ function Client() {
     
     keyDown: function(ev) {
       if(!this.inChat) {
-        switch(ev.keyCode) {
+        switch(ev.which) {
           case 32: case 37: case 38: case 39: case 40:
-            code = (ev.keyCode == 32) ? 0x10 : Math.pow(2, ev.keyCode - 37);
+            code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
             if((this.keys & code) == 0) {
               this.keys |= code;
               this.socket.emit('keys', {keys: this.keys});
@@ -565,9 +565,9 @@ function Client() {
     
     keyUp: function(ev) {
       if(!this.inChat) {
-        switch(ev.keyCode) {
+        switch(ev.which) {
           case 32: case 37: case 38: case 39: case 40:
-            code = (ev.keyCode == 32) ? 0x10 : Math.pow(2, ev.keyCode - 37);
+            code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
             if((this.keys & code) != 0) {
               this.keys &= ~code;
               this.socket.emit('keys', {keys: this.keys});
