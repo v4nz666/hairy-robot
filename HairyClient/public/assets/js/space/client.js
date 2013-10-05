@@ -10,8 +10,9 @@ function Client() {
     effects: [],
     
     messages: [],
-    maxMessages: 10,
+    maxMessages: 255,
     inChat: false,
+    chatBuffer: '',
     
     lifeBar: null,
     shieldBar: null,
@@ -314,6 +315,8 @@ function Client() {
     },
     
     renderGUI: function() {
+      this.renderMessages();
+      
       this.ctx.save();
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.fps + ' FPS', 4, 12);
@@ -338,6 +341,30 @@ function Client() {
       this.ctx.textBaseline = 'top';
       this.ctx.fillText('Hull:', -2, 0);
       this.ctx.fillText('Shields:', -2, 14);
+      this.ctx.restore();
+    },
+    
+    renderMessages: function() {
+      var max = Math.min(this.maxMessages, this.messages.length);
+      var min = this.inChat ? 0 : Math.max(max - 6, 0);
+      
+      var h = getTextHeight(this.ctx.font).ascent;
+      var x = 4;
+      var y = this.canvas.height - 2;
+      
+      this.ctx.save();
+      this.ctx.textBaseline = 'bottom';
+      this.ctx.fillStyle = 'rgb(255, 255, 255)';
+      
+      this.ctx.fillText(this.inChat ? this.chatBuffer : 'Press "T" to chat', x, y);
+      
+      for(var i = max; --i >= min;) {
+        y -= h;
+        id = this.messages[i].id;
+        msg = this.messages[i].msg;
+        this.ctx.fillText(id + ': ' + msg, x, y);
+      }
+      
       this.ctx.restore();
     },
     
@@ -437,10 +464,7 @@ function Client() {
       // Hook our keyboard events
       $(document).keydown($.proxy(this.keyDown, this));
       $(document).keyup($.proxy(this.keyUp, this));
-      
-      this.textInput = $('#textInput');
-      console.log(this.textInput);
-      this.textInput.keydown($.proxy(function(ev) {this.chatInput(ev)}, this));
+      $(document).keypress($.proxy(this.keyPress, this));
       
       this.inGame = true;
       
@@ -472,7 +496,6 @@ function Client() {
       }
       
       this.messages.push(msg);
-      this.renderMessages();
     },
     
     stats: function(stats) {
@@ -493,17 +516,6 @@ function Client() {
       this.lifeBar.width((this.me.life / this.me.maxLife) * 100 + '%');
       this.shieldBar.width((this.me.shields / this.me.maxShields) * 100 + '%');
       this.gun.html(this.me.gun);
-    },
-    
-    renderMessages: function() {
-      html = '';
-      for(i = 0; i < this.messages.length; i++){ 
-        id = this.messages[i].id;
-        msg = this.messages[i].msg;
-        html += id + ': ' + msg + '<br>';
-      }
-      
-      $('#messages').html(html);
     },
     
     userScore: function(userScores) {
@@ -536,10 +548,17 @@ function Client() {
           
           case 84:
             this.inChat = true;
-            this.textInput.show();
-            this.textInput.focus();
             ev.preventDefault();
             break;
+        }
+      } else {
+        if(ev.which == 13) {
+          if(this.chatBuffer.length != 0) {
+            this.socket.emit('msg', {msg: this.chatBuffer});
+            this.chatBuffer = '';
+          }
+          
+          this.inChat = false;
         }
       }
     },
@@ -558,15 +577,9 @@ function Client() {
       }
     },
     
-    chatInput: function(ev) {
-      if(ev.which == 13) {
-        if(this.textInput.val().length != 0) {
-          this.socket.emit('msg', {msg: this.textInput.val()});
-          this.textInput.val('');
-        }
-        
-        this.textInput.hide();
-        this.inChat = false;
+    keyPress: function(ev) {
+      if(this.inChat) {
+        this.chatBuffer += String.fromCharCode(ev.which);
       }
     },
     
@@ -777,6 +790,32 @@ function User() {
     lastHit: 0
   }
 }
+
+function getTextHeight(font) {
+  var text = $('<span>Hg</span>').css({ fontFamily: font });
+  var block = $('<div style="display: inline-block; width: 1px; height: 0px;"></div>');
+  var div = $('<div></div>');
+  var body = $('body');
+  
+  div.append(text, block);
+  body.append(div);
+  
+  try {
+    var result = {};
+    
+    block.css({ verticalAlign: 'baseline' });
+    result.ascent = block.offset().top - text.offset().top;
+    
+    block.css({ verticalAlign: 'bottom' });
+    result.height = block.offset().top - text.offset().top;
+    
+    result.descent = result.height - result.ascent;
+  } finally {
+    div.remove();
+  }
+  
+  return result;
+};
 
 $(document).ready(function() {
   var client = Client();
