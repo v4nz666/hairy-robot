@@ -9,6 +9,7 @@ function Client() {
     bullets: [],
     effects: [],
     
+    status: '',
     messages: [],
     maxMessages: 255,
     inChat: false,
@@ -42,19 +43,40 @@ function Client() {
     },
     
     render: function() {
-      if(this.inGame) {
-        this.physics();
-        
-        this.calculateOffsets();
-        
-        this.clear();
-        this.renderBackground();
-        this.renderBullets();
-        this.renderUsers();
-        this.renderEffects();
-        this.renderPowerups();
-        this.renderGUI();
+      if(!this.inGame) {
+        this.renderMenu();
+      } else {
+        this.renderGame();
       }
+    },
+    
+    renderMenu: function() {
+      this.clear();
+      
+      this.ctx.save();
+      this.ctx.fillStyle = 'white';
+      this.ctx.fontAlign = 'center';
+      this.ctx.fontBaseline = 'middle';
+      this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+      this.ctx.fillText(this.status, 0, 0);
+      this.ctx.restore();
+      
+      this.ticks++;
+      this.fpsTicks++;
+    },
+    
+    renderGame: function() {
+      this.physics();
+      
+      this.calculateOffsets();
+      
+      this.clear();
+      this.renderBackground();
+      this.renderBullets();
+      this.renderUsers();
+      this.renderEffects();
+      this.renderPowerups();
+      this.renderGUI();
       
       this.ticks++;
       this.fpsTicks++;
@@ -382,7 +404,7 @@ function Client() {
     },
     
     setStatus: function(status) {
-      $('#status').html(status);
+      this.status = status;
     },
     
     initMenu: function() {
@@ -398,6 +420,10 @@ function Client() {
       
       window.addEventListener('resize', $.proxy(this.resize, this), false);
       this.resize();
+      
+      var frameRate = 60;
+      var tickRate = 1000 / frameRate;
+      setInterval($.proxy(this.render, this), tickRate);
       
       this.setStatus('Connecting...');
       this.socket = io.connect(ip + ':' + port, {'reconnect': false});
@@ -444,9 +470,6 @@ function Client() {
       $('#status').hide();
       //$('#game').show();
       
-      var frameRate = 60;
-      var tickRate = 1000 / frameRate;
-      
       // Register event handlers
       this.socket.on('userScores', $.proxy(this.userScore, this));
       this.socket.on('msg',        $.proxy(this.addMsg, this));
@@ -468,7 +491,6 @@ function Client() {
       this.inGame = true;
       
       console.log(this);
-      setInterval($.proxy(this.render, this), tickRate);
       setInterval($.proxy(function() {
         this.fps = this.fpsTicks;
         this.fpsTicks = 0;

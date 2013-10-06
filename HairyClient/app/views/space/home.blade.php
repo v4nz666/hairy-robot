@@ -30,10 +30,6 @@
     {{ Form::hidden('port'    , $port) }}
     
     <canvas id="canvas">
-      <div id="status">
-        Loading...
-      </div>
-      
       <div id="right" style="width: 400px; display: inline-block; vertical-align: top;">
         <div id="scores" style="padding: 1em; width: 90%; height: 28%; border: 1px solid gray;"></div>
       </div>
