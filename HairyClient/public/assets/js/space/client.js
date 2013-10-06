@@ -468,7 +468,6 @@ function Client() {
     
     initGame: function() {
       // Register event handlers
-      this.socket.on('userScores', $.proxy(this.userScore, this));
       this.socket.on('msg',        $.proxy(this.addMsg, this));
       this.socket.on('stats',      $.proxy(this.stats, this));
       this.socket.on('update',     $.proxy(this.update, this));
@@ -523,23 +522,6 @@ function Client() {
       user.life = stats.life;
       user.shields = stats.shields;
       user.gun = stats.gun;
-    },
-    
-    userScore: function(userScores) {
-      console.log('User Scores[', userScores, ']');
-      html = '';
-      for(i in userScores) { 
-        if(i !== 'length') {
-          score = userScores[i];
-          console.log('Adding score[', score, ']');
-          name = score.name;
-          k = score.kills;
-          d = score.deaths;
-          html += name + ': ' + k + ' Kills - ' + d + 'Deaths<br>';
-        }
-      }
-      
-      $('#scores').html(html);
     },
     
     keyDown: function(ev) {

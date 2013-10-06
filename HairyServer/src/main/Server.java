@@ -172,7 +172,6 @@ public class Server {
     System.out.println("New user added " + user.id);
     socket.sendEvent("setParams", user.serializeParams());
     socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
-    //TODO: Need to send scores here?
   }
   
   private void removeUser(SocketIOClient socket) {
@@ -268,7 +267,6 @@ public class Server {
       
       killUser(user);
       attacker.kills++;
-      //TODO: User scores
       
       _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " was killed by " + attacker.name));
     }
