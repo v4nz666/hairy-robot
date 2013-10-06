@@ -6,6 +6,8 @@ function Client() {
     user: [],
     me: null,
     
+    menuButtons: [],
+    
     bullets: [],
     effects: [],
     
@@ -54,11 +56,21 @@ function Client() {
       this.clear();
       
       this.ctx.save();
-      this.ctx.fillStyle = 'white';
-      this.ctx.fontAlign = 'center';
-      this.ctx.fontBaseline = 'middle';
-      this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-      this.ctx.fillText(this.status, 0, 0);
+      
+      if(this.status.length == 0) {
+        for(var i in this.menuButtons) {
+          if(i === 'length') { continue; }
+          var button = this.menuButtons[i];
+          button.render(this.ctx);
+        }
+      } else {
+        this.ctx.fillStyle = 'white';
+        this.ctx.fontAlign = 'center';
+        this.ctx.fontBaseline = 'middle';
+        this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+        this.ctx.fillText(this.status, 0, 0);
+      }
+      
       this.ctx.restore();
       
       this.ticks++;
@@ -396,10 +408,24 @@ function Client() {
     resize: function() {
       this.canvas.width  = window.innerWidth;
       this.canvas.height = window.innerHeight;
+      
+      if(!this.inGame) {
+        this.menuPlay.x = this.canvas.width / 2;
+        this.menuPlay.y = this.canvas.height / 2;
+      }
+      
       this.render();
     },
     
     init: function() {
+      this.menuPlay = new Button;
+      this.menuPlay.text = 'Play';
+      this.menuPlay.onclick = $.proxy(function() {
+        this.initGame();
+      }, this);
+      
+      this.menuButtons.push(this.menuPlay);
+      
       this.initMenu();
     },
     
@@ -424,6 +450,7 @@ function Client() {
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
       setInterval($.proxy(this.render, this), tickRate);
+      $(document).click($.proxy(this.click, this));
       
       this.setStatus('Connecting...');
       this.socket = io.connect(ip + ':' + port, {'reconnect': false});
@@ -438,7 +465,7 @@ function Client() {
       this.socket.on('adduser',   $.proxy(this.addUser, this));
       this.socket.on('setParams', $.proxy(function(data) {
         this.setParams(data);
-        this.initGame();
+        this.setStatus('');
       }, this));
       
       this.socket.emit('login', {name: name, auth: auth});
@@ -522,6 +549,19 @@ function Client() {
       user.life = stats.life;
       user.shields = stats.shields;
       user.gun = stats.gun;
+    },
+    
+    click: function(ev) {
+      if(!this.inGame) {
+        for(var i in this.menuButtons) {
+          if(i === 'length') { continue; }
+          var button = this.menuButtons[i];
+          if(ev.offsetX >= button.x && ev.offsetX <= button.x + button.w &&
+             ev.offsetY >= button.y && ev.offsetY <= button.y + button.h) {
+            button.click();
+          }
+        }
+      }
     },
     
     keyDown: function(ev) {
@@ -791,6 +831,37 @@ function User() {
     color: '#FF00FF',
     size: 0,
     lastHit: 0
+  }
+}
+
+function Button() {
+  return {
+    text: '',
+    x: 0,
+    y: 0,
+    w: 100,
+    h: 20,
+    forecolour: 'white',
+    backcolour: 'gray',
+    onclick: null,
+    
+    render: function(ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.fillStyle = this.backcolour;
+      ctx.fillRect(0, 0, this.w, this.h);
+      ctx.fillStyle = this.forecolour;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(this.text, this.w / 2, this.h / 2);
+      ctx.restore();
+    },
+    
+    click: function() {
+      if(this.onclick !== null) {
+        this.onclick();
+      }
+    }
   }
 }
 
