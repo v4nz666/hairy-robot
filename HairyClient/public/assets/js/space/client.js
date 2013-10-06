@@ -329,8 +329,13 @@ function Client() {
       var shields = this.me.shields / this.me.maxShields;
       
       this.ctx.save();
-      this.ctx.translate(this.canvas.width - 4 - 100, 4);
+      this.ctx.translate(this.canvas.width - 4, 4);
+      this.ctx.textAlign = 'right';
+      this.ctx.textBaseline = 'top';
       this.ctx.strokeStyle = 'white';
+      this.ctx.fillStyle = 'rgb(255, 255, 255)';
+      this.ctx.save();
+      this.ctx.translate(-100, 0);
       this.ctx.fillStyle = 'rgb(0, 255, 0)';
       this.ctx.fillRect(0, 0, hull * 100, 12);
       this.ctx.strokeRect(0, 0, 100, 12);
@@ -338,10 +343,10 @@ function Client() {
       this.ctx.fillRect(0, 14, shields * 100, 12);
       this.ctx.strokeRect(0, 14, 100, 12);
       this.ctx.fillStyle = 'rgb(255, 255, 255)';
-      this.ctx.textAlign = 'right';
-      this.ctx.textBaseline = 'top';
       this.ctx.fillText('Hull:', -2, 0);
       this.ctx.fillText('Shields:', -2, 14);
+      this.ctx.restore();
+      this.ctx.fillText(this.me.gun, 0, 26);
       this.ctx.restore();
     },
     
