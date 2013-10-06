@@ -61,36 +61,36 @@ function Client() {
     },
     
     calculateOffsets: function() {
-        // Near the left edge of the map
-        if (this.me.x <= this.ctx.canvas.width / 2) {
-            this.offsetX = 0;
-            this.me.onscreenX = this.me.x;
-        // Near the right side of the map
-        } else if (this.me.x >= this.worldWidth - (this.ctx.canvas.width / 2)) {
-            this.offsetX = this.worldWidth - (this.ctx.canvas.width);
-            this.me.onscreenX = this.ctx.canvas.width - (this.worldWidth - this.me.x);
-        // In the middle
-        } else {
-            this.offsetX = Math.floor(this.me.x - this.ctx.canvas.width / 2);
-            this.me.onscreenX = this.me.x - this.offsetX;
-        }
-        
-        // Near the top of the map
-        if (this.me.y <= this.ctx.canvas.height/ 2) {
-            this.offsetY = 0;
-            this.me.onscreenY = this.me.y;
-        // Near the bottom of the map
-        } else if (this.me.y >= this.worldHeight - (this.ctx.canvas.height / 2)) {
-            this.offsetY = this.worldHeight - (this.ctx.canvas.height);
-            this.me.onscreenY = this.ctx.canvas.height- (this.worldHeight - this.me.y);
-        // In the middle of the map
-        } else {
-            this.offsetY = this.me.y - this.ctx.canvas.height / 2;
-            this.me.onscreenY = this.me.y - this.offsetY;
-        }
-        
-        this.gridOffsetX = this.offsetX % this.gridSize;
-        this.gridOffsetY = this.offsetY % this.gridSize;
+      // Near the left edge of the map
+      if(this.me.x <= this.ctx.canvas.width / 2) {
+        this.offsetX = 0;
+        this.me.onscreenX = this.me.x;
+      // Near the right side of the map
+      } else if(this.me.x >= this.worldWidth - (this.ctx.canvas.width / 2)) {
+        this.offsetX = this.worldWidth - (this.ctx.canvas.width);
+        this.me.onscreenX = this.ctx.canvas.width - (this.worldWidth - this.me.x);
+      // In the middle
+      } else {
+        this.offsetX = Math.floor(this.me.x - this.ctx.canvas.width / 2);
+        this.me.onscreenX = this.me.x - this.offsetX;
+      }
+      
+      // Near the top of the map
+      if(this.me.y <= this.ctx.canvas.height / 2) {
+        this.offsetY = 0;
+        this.me.onscreenY = this.me.y;
+      // Near the bottom of the map
+      } else if(this.me.y >= this.worldHeight - (this.ctx.canvas.height / 2)) {
+        this.offsetY = this.worldHeight - (this.ctx.canvas.height);
+        this.me.onscreenY = this.ctx.canvas.height- (this.worldHeight - this.me.y);
+      // In the middle of the map
+      } else {
+        this.offsetY = this.me.y - this.ctx.canvas.height / 2;
+        this.me.onscreenY = this.me.y - this.offsetY;
+      }
+      
+      this.gridOffsetX = this.offsetX % this.gridSize;
+      this.gridOffsetY = this.offsetY % this.gridSize;
     },
     
     renderBackground: function() {
@@ -101,7 +101,7 @@ function Client() {
       var _x = 0;
       var c = 1;
       
-      while ( c * this.gridSize - this.gridOffsetX < ctx.canvas.width ) {
+      while(c * this.gridSize - this.gridOffsetX < ctx.canvas.width) {
         _x = (c * this.gridSize) - this.gridOffsetX;
         ctx.beginPath();
         ctx.moveTo(_x, 0);
@@ -116,7 +116,7 @@ function Client() {
       var _y = 0;
       c = 1;
       
-      while ( c * this.gridSize - this.gridOffsetY < ctx.canvas.height) {
+      while(c * this.gridSize - this.gridOffsetY < ctx.canvas.height) {
         _y = (c * this.gridSize) - this.gridOffsetY;
         ctx.beginPath();
         ctx.moveTo(0, _y);
@@ -127,8 +127,10 @@ function Client() {
         
         c = c + 1;
       }
+      
       ctx.restore();
     },
+    
     renderBullets: function() {
       var ctx = this.ctx;
       var screenX;
@@ -137,7 +139,6 @@ function Client() {
       var screenLastY;
       
       for(i in this.bullets) {
-        
         if(i === 'length') { continue; }
         
         var bullet = this.bullets[i];
@@ -145,7 +146,7 @@ function Client() {
         screenX = bullet.x - this.offsetX;
         screenY = bullet.y - this.offsetY;
         
-        if ( ! this.onscreen(bullet, screenX, screenY)) {
+        if(!this.onscreen(bullet, screenX, screenY)) {
           continue;
         }
         
@@ -156,7 +157,6 @@ function Client() {
         ctx.beginPath();
         
         if(!screenLastX || !screenLastY) {
-          
           ctx.arc(screenX, screenY, bullet.size, 0, this.PIx2);
           ctx.fillStyle = 'white';
           ctx.fill();
@@ -185,17 +185,13 @@ function Client() {
         if(user.id == this.me.id) {
           screenX = this.me.onscreenX;
           screenY = this.me.onscreenY;
-          
         } else {
-          
           screenX = user.x - this.offsetX;
           screenY = user.y - this.offsetY;
           
-          if ( ! this.onscreen(user) ) {
-            
+          if(!this.onscreen(user)) {
             continue;
           }
-          
         }
         
         this.ctx.save();
@@ -265,7 +261,7 @@ function Client() {
         screenX = p.x - this.offsetX;
         screenY = p.y - this.offsetY;
         
-        if ( ! this.onscreen(p, screenX, screenY)) {
+        if(!this.onscreen(p, screenX, screenY)) {
           continue;
         }
         
@@ -674,7 +670,7 @@ function Client() {
     },
     
     onscreen: function(entity, screenX, screenY) {
-      return ! (
+      return !(
         screenX + entity.size / 2 < 0                     || // Right edge is left of canvas
         screenX - entity.size / 2 > this.ctx.canvas.width || // Left edge is right of canvas
         screenY + entity.size / 2 < 0                     || // Top edge is below canvas
