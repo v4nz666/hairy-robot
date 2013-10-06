@@ -15,10 +15,6 @@ function Client() {
     chatBuffer: '',
     chatBufferW: 0,
     
-    lifeBar: null,
-    shieldBar: null,
-    gun: null,
-    
     keys: 0,
     
     ticks: 0,
@@ -404,10 +400,6 @@ function Client() {
       ip   = $('input[name=ip]').val();
       port = $('input[name=port]').val();
       
-      this.lifeBar = $('#life');
-      this.shieldBar = $('#shield');
-      this.gun = $('#guns');
-      
       window.addEventListener('resize', $.proxy(this.resize, this), false);
       this.resize();
       
@@ -493,7 +485,6 @@ function Client() {
       this.worldHeight = data.h;
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
-      this.renderStats();
     },
     
     powerupUpdate: function(powerups) {
@@ -517,16 +508,6 @@ function Client() {
       user.life = stats.life;
       user.shields = stats.shields;
       user.gun = stats.gun;
-      
-      if(user == this.me) {
-        this.renderStats();
-      }
-    },
-    
-    renderStats: function() {
-      this.lifeBar.width((this.me.life / this.me.maxLife) * 100 + '%');
-      this.shieldBar.width((this.me.shields / this.me.maxShields) * 100 + '%');
-      this.gun.html(this.me.gun);
     },
     
     userScore: function(userScores) {
