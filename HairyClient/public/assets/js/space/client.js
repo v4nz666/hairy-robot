@@ -467,9 +467,6 @@ function Client() {
     },
     
     initGame: function() {
-      $('#status').hide();
-      //$('#game').show();
-      
       // Register event handlers
       this.socket.on('userScores', $.proxy(this.userScore, this));
       this.socket.on('msg',        $.proxy(this.addMsg, this));
