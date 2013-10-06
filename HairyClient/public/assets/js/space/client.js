@@ -391,10 +391,10 @@ function Client() {
       this.canvas = $('#canvas')[0];
       this.ctx = canvas.getContext('2d');
       
-      name = $('input[name=username]').val();
-      auth = $('input[name=auth]').val();
-      ip   = $('input[name=ip]').val();
-      port = $('input[name=port]').val();
+      var name = $('input[name=username]').val();
+      var auth = $('input[name=auth]').val();
+      var ip   = $('input[name=ip]').val();
+      var port = $('input[name=port]').val();
       
       window.addEventListener('resize', $.proxy(this.resize, this), false);
       this.resize();
