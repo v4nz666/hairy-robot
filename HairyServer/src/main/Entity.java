@@ -39,25 +39,21 @@ public abstract class Entity {
     if(vx > maxVel) {
       vy *= (maxVel / vx);
       vx = maxVel;
-      acc = 0;
     }
     
     if(vx < -maxVel) {
       vy *= (-maxVel / vx);
       vx = -maxVel;
-      acc = 0;
     }
     
     if(vy > maxVel) {
       vx *= (maxVel / vy);
       vy = maxVel;
-      acc = 0;
     }
     
     if(vy < -maxVel) {
       vx *= (-maxVel / vy);
       vy = -maxVel;
-      acc = 0;
     }
   }
   
