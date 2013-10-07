@@ -36,7 +36,7 @@ public abstract class Bullet {
       @Override public int    getLVL()        { return 0; }
       @Override public int    getClipSize()   { return 60; }
       @Override public int    getDamage()     { return 5; }
-      @Override public int    getRange()      { return 200; }
+      @Override public int    getRange()      { return 2000; }
       @Override public int    getSize()       { return 1; }
       @Override public float  getHeatGen()    { return 2; }
       @Override public float  getAcc()        { return 0; }
@@ -58,7 +58,7 @@ public abstract class Bullet {
       @Override public int    getLVL()        { return 0; }
       @Override public int    getClipSize()   { return 6; }
       @Override public int    getDamage()     { return 50; }
-      @Override public int    getRange()      { return 200; }
+      @Override public int    getRange()      { return 2000; }
       @Override public int    getSize()       { return 2; }
       @Override public float  getHeatGen()    { return 6; }
       @Override public float  getAcc()        { return 0.2f; }
@@ -76,7 +76,7 @@ public abstract class Bullet {
       private Standard() { }
       
       @Override public int   getDamage()    { return 50; }
-      @Override public int   getRange()     { return 300; }
+      @Override public int   getRange()     { return 1000; }
       @Override public int   getSize()      { return 5; }
       @Override public float getHeatGen()   { return 50; }
       @Override public float getAcc()       { return 0; }
