@@ -563,8 +563,8 @@ function Client() {
         for(var i in this.menuButtons) {
           if(i === 'length') { continue; }
           var button = this.menuButtons[i];
-          if(ev.offsetX >= button.x && ev.offsetX <= button.x + button.w &&
-             ev.offsetY >= button.y && ev.offsetY <= button.y + button.h) {
+          if(ev.pageX >= button.x && ev.pageX <= button.x + button.w &&
+             ev.pageY >= button.y && ev.pageY <= button.y + button.h) {
             button.click();
           }
         }
