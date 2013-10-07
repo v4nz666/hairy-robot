@@ -21,7 +21,7 @@ public class Server {
   private static Server _instance = new Server();
   public static Server instance() { return _instance; }
   
-  public static final int W = 8192, H = 6144;
+  public static final int W = 65536, H = 49152;
   public static final int spread = 15;
   public static final int bulletSize = 2;
   public static final int maxPowerups = 3;

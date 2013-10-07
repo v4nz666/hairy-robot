@@ -31,7 +31,9 @@ function Client() {
     offsetX: 0,
     offsetY: 0,
     
-    gridSize: 128,
+    gridSize: 512,
+    zoomLevel: 1,
+    maxZoom: 64,
     
     clear: function(clr) {
       if(typeof clr === 'undefined') {
@@ -96,35 +98,35 @@ function Client() {
     
     calculateOffsets: function() {
       // Near the left edge of the map
-      if(this.me.x <= this.ctx.canvas.width / 2) {
+      if(this.me.x <= (this.ctx.canvas.width / 2) * this.zoomLevel ) {
         this.offsetX = 0;
-        this.me.onscreenX = this.me.x;
-      // Near the right side of the map
-      } else if(this.me.x >= this.worldWidth - (this.ctx.canvas.width / 2)) {
-        this.offsetX = this.worldWidth - (this.ctx.canvas.width);
-        this.me.onscreenX = this.ctx.canvas.width - (this.worldWidth - this.me.x);
+        this.me.onscreenX = Math.floor(this.me.x / this.zoomLevel);
+        // Near the right side of the map
+      } else if(this.me.x >= this.worldWidth - (this.ctx.canvas.width / 2 * this.zoomLevel)) {
+        this.offsetX = Math.floor((this.worldWidth - (this.ctx.canvas.width)) / this.zoomLevel);
+        this.me.onscreenX = Math.floor(this.ctx.canvas.width - ((this.worldWidth - this.me.x) / this.zoomLevel));
       // In the middle
       } else {
-        this.offsetX = Math.floor(this.me.x - this.ctx.canvas.width / 2);
-        this.me.onscreenX = this.me.x - this.offsetX;
+        this.offsetX = Math.floor(this.me.x - (this.ctx.canvas.width / 2 * this.zoomLevel));
+        this.me.onscreenX = Math.floor(this.ctx.canvas.width / 2);
       }
       
       // Near the top of the map
-      if(this.me.y <= this.ctx.canvas.height / 2) {
+      if(this.me.y <= (this.ctx.canvas.height / 2) * this.zoomLevel ) {
         this.offsetY = 0;
-        this.me.onscreenY = this.me.y;
+        this.me.onscreenY = Math.floor(this.me.y / this.zoomLevel);
       // Near the bottom of the map
-      } else if(this.me.y >= this.worldHeight - (this.ctx.canvas.height / 2)) {
-        this.offsetY = this.worldHeight - (this.ctx.canvas.height);
-        this.me.onscreenY = this.ctx.canvas.height- (this.worldHeight - this.me.y);
+      } else if(this.me.y >= this.worldHeight - (this.ctx.canvas.height / 2 * this.zoomLevel)) {
+        this.offsetY = Math.floor((this.worldHeight - (this.ctx.canvas.height)) / this.zoomLevel);
+        this.me.onscreenY = Math.floor(this.ctx.canvas.height- ((this.worldHeight - this.me.y) / this.zoomLevel));
       // In the middle of the map
       } else {
-        this.offsetY = this.me.y - this.ctx.canvas.height / 2;
-        this.me.onscreenY = this.me.y - this.offsetY;
+        this.offsetY = Math.floor(this.me.y - (this.ctx.canvas.height / 2 * this.zoomLevel));
+        this.me.onscreenY = Math.floor(this.ctx.canvas.height / 2);
       }
       
-      this.gridOffsetX = this.offsetX % this.gridSize;
-      this.gridOffsetY = this.offsetY % this.gridSize;
+      this.gridOffsetX = (this.offsetX % this.gridSize) / this.zoomLevel;
+      this.gridOffsetY = (this.offsetY % this.gridSize) / this.zoomLevel;
     },
     
     renderBackground: function() {
@@ -135,8 +137,8 @@ function Client() {
       var _x = 0;
       var c = 1;
       
-      while(c * this.gridSize - this.gridOffsetX < ctx.canvas.width) {
-        _x = (c * this.gridSize) - this.gridOffsetX;
+      while(c * this.gridSize / this.zoomLevel - this.gridOffsetX < ctx.canvas.width) {
+        _x = (c * this.gridSize / this.zoomLevel) - this.gridOffsetX;
         ctx.beginPath();
         ctx.moveTo(_x, 0);
         ctx.lineTo(_x, ctx.canvas.height);
@@ -150,8 +152,8 @@ function Client() {
       var _y = 0;
       c = 1;
       
-      while(c * this.gridSize - this.gridOffsetY < ctx.canvas.height) {
-        _y = (c * this.gridSize) - this.gridOffsetY;
+      while( (c * this.gridSize / this.zoomLevel) - this.gridOffsetY < ctx.canvas.height ) {
+        _y = (c * this.gridSize / this.zoomLevel) - this.gridOffsetY;
         ctx.beginPath();
         ctx.moveTo(0, _y);
         ctx.lineTo(ctx.canvas.width, _y);
@@ -177,15 +179,15 @@ function Client() {
         
         var bullet = this.bullets[i];
         
-        screenX = bullet.x - this.offsetX;
-        screenY = bullet.y - this.offsetY;
+        screenX = (bullet.x - this.offsetX) / this.zoomLevel;
+        screenY = (bullet.y - this.offsetY) / this.zoomLevel;
         
         if(!this.onscreen(bullet, screenX, screenY)) {
           continue;
         }
         
-        screenLastX = bullet.lastX - this.offsetX;
-        screenLastY = bullet.lastY - this.offsetY;
+        screenLastX = (bullet.lastX - this.offsetX) / this.zoomLevel;
+        screenLastY = (bullet.lastY - this.offsetY) / this.zoomLevel;
         
         ctx.save();
         ctx.beginPath();
@@ -220,26 +222,27 @@ function Client() {
           screenX = this.me.onscreenX;
           screenY = this.me.onscreenY;
         } else {
-          screenX = user.x - this.offsetX;
-          screenY = user.y - this.offsetY;
+          screenX = (user.x - this.offsetX) / this.zoomLevel;
+          screenY = (user.y - this.offsetY) / this.zoomLevel;
           
-          if(!this.onscreen(user)) {
+          if(!this.onscreen(user, screenX, screenY)) {
             continue;
           }
         }
         
         this.ctx.save();
         
+        var size = user.size / this.zoomLevel;
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = 'white';
-        this.ctx.fillText(user.name, screenX, screenY - user.size / 2);
+        this.ctx.fillText(user.name, screenX, screenY - size / 2);
         
         this.ctx.translate(screenX, screenY);
         this.ctx.rotate(user.angle * this.toRads);
         
         if(user.shields > 0) {
           this.ctx.beginPath();
-          this.ctx.arc(0, 0, user.size / 2, 0, this.PIx2);
+          this.ctx.arc(0, 0, size / 2, 0, this.PIx2);
           this.ctx.closePath();
           
           if(user.shields / user.maxShields > 0.25 || this.ticks > user.lastHit) {
@@ -252,10 +255,10 @@ function Client() {
         }
         
         this.ctx.beginPath();
-        this.ctx.moveTo( user.size / 2, 0);
-        this.ctx.lineTo(-user.size / 2, user.size / 4);
-        this.ctx.bezierCurveTo(0, 5, 0, -5, -user.size / 2, -user.size / 4);
-        this.ctx.lineTo(user.size / 2, 0);
+        this.ctx.moveTo( size / 2, 0);
+        this.ctx.lineTo(-size / 2, size / 4);
+        this.ctx.bezierCurveTo(0, 5, 0, -5, -size / 2, -size / 4);
+        this.ctx.lineTo(size / 2, 0);
         this.ctx.fillStyle = user.color;
         this.ctx.fill();
         
@@ -347,8 +350,11 @@ function Client() {
       this.ctx.save();
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.fps + ' FPS', 4, 12);
-      this.ctx.fillText('X:' + this.me.x + " Y:" + this.me.y, 4, 24);
-      this.ctx.fillText('Angle:' + this.me.angle, 4, 36);
+      this.ctx.fillText('X: ' + this.me.x + " Y: " + this.me.y, 4, 24);
+      this.ctx.fillText('Angle: ' + this.me.angle, 4, 36);
+      this.ctx.fillText('X-Offset: ' + this.offsetX + ' Y-Offset: ' + this.offsetY, 4, 48);
+      this.ctx.fillText('X-Scr: ' + this.me.onscreenX + ' Y-Scr: ' + this.me.onscreenY, 4, 60);
+      this.ctx.fillText('Zoom: ' + this.zoomLevel, 4, 72);
       this.ctx.restore();
       
       var hull    = this.me.life / this.me.maxLife;
@@ -406,8 +412,8 @@ function Client() {
     },
     
     resize: function() {
-      this.canvas.width  = window.innerWidth;
-      this.canvas.height = window.innerHeight;
+      this.canvas.width  = Math.min(1024, window.innerWidth);
+      this.canvas.height = Math.min(768,window.innerHeight);
       
       if(!this.inGame) {
         this.menuPlay.x = this.canvas.width / 2;
@@ -469,6 +475,7 @@ function Client() {
       }, this));
       
       this.socket.emit('login', {name: name, auth: auth});
+      this.setStatus('Logged in...');
     },
     
     addUser: function(data) {
@@ -577,10 +584,21 @@ function Client() {
             }
             break;
           
+          //PGUP
+          case 33:
+            this.zoomIn();
+            break;
+          
+          //PGDN
+          case 34:
+            this.zoomOut();
+            break;
+          
           case 84:
             this.inChat = true;
             ev.preventDefault();
             break;
+          
         }
       } else {
         switch(ev.which) {
@@ -710,13 +728,40 @@ function Client() {
       }
     },
     
+    zoomOut: function() {
+      var newZoom = this.zoomLevel*2;
+      
+      if ( newZoom <= this.maxZoom ) {
+        this.setZoom(newZoom);
+      }
+    },
+    
+    zoomIn: function() {
+      var newZoom = this.zoomLevel/2;
+      
+      if ( newZoom >= 1 ) {
+        this.setZoom(newZoom);
+      }
+    },
+    
+    setZoom: function(zoomLevel) {
+      this.zoomLevel = zoomLevel;
+    },
+    
     onscreen: function(entity, screenX, screenY) {
-      return !(
-        screenX + entity.size / 2 < 0                     || // Right edge is left of canvas
-        screenX - entity.size / 2 > this.ctx.canvas.width || // Left edge is right of canvas
-        screenY + entity.size / 2 < 0                     || // Top edge is below canvas
-        screenY - entity.size / 2 > this.ctx.canvas.height   // Bottom edge is above canvas
-      );
+      
+      var onscreen = false;
+      if (
+        screenX + Math.min(1,entity.size / (2 * this.zoomLevel)) < 0           || // Right edge is left of canvas
+        screenX - (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.width || // Left edge is right of canvas
+        screenY + Math.min(1,entity.size / (2 * this.zoomLevel)) < 0           || // Top edge is below canvas
+        screenY - (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.height   // Bottom edge is above canvas
+      ) { 
+        onscreen = false;
+      } else {
+        onscreen = true;
+      }
+      return onscreen;
     }
   }
 }
