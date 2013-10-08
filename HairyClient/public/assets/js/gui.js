@@ -372,7 +372,7 @@ function Control(gui) {
         this.renderControl(ctx);
         
         if(this.onrender !== null) {
-          this.onrender();
+          this.onrender(ctx);
         }
         
         this.renderPost(ctx);
