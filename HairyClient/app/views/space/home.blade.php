@@ -6,6 +6,7 @@
     <title>Hairy Robot</title>
     {{ HTML::script('assets/js/jquery.min.js') }}
     {{ HTML::script('assets/js/socket.io.min.js') }}
+    {{ HTML::script('assets/js/gui.js') }}
     {{ HTML::script('assets/js/space/client.js') }}
     
     <style>

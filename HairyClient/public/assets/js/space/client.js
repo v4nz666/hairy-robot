@@ -879,37 +879,6 @@ function User() {
   }
 }
 
-function Button() {
-  return {
-    text: '',
-    x: 0,
-    y: 0,
-    w: 100,
-    h: 20,
-    forecolour: 'white',
-    backcolour: 'gray',
-    onclick: null,
-    
-    render: function(ctx) {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.fillStyle = this.backcolour;
-      ctx.fillRect(0, 0, this.w, this.h);
-      ctx.fillStyle = this.forecolour;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(this.text, this.w / 2, this.h / 2);
-      ctx.restore();
-    },
-    
-    click: function() {
-      if(this.onclick !== null) {
-        this.onclick();
-      }
-    }
-  }
-}
-
 function getTextHeight(font) {
   var text = $('<span>Hg</span>').css({ fontFamily: font });
   var block = $('<div style="display: inline-block; width: 1px; height: 0px;"></div>');
