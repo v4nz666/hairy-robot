@@ -247,6 +247,7 @@ function Control(gui) {
     onclick: null,
     onkeydown: null,
     onkeyup: null,
+    onrender: null,
     
     root: function() {
       if(this.contParent !== null) {
@@ -312,6 +313,11 @@ function Control(gui) {
     render: function(ctx) {
       if(this.renderPre(ctx)) {
         this.renderControl(ctx);
+        
+        if(this.onrender !== null) {
+          this.onrender();
+        }
+        
         this.renderPost(ctx);
       }
       
