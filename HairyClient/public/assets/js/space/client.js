@@ -424,29 +424,28 @@ function Client() {
       this.ctx = canvas.getContext('2d');
       
       this.guiMenu = new GUI(this.ctx);
-      var b = new Button(this.guiMenu);
-      b.text('Play');
-      b.onclick = $.proxy(function(x, y, button) {
-        b.gui.pop();
+      
+      var btnPlay = new Button(this.guiMenu);
+      btnPlay.x = 10;
+      btnPlay.y = 10;
+      btnPlay.w = 180;
+      
+      var fraMenu = new Frame(this.guiMenu);
+      fraMenu.w = 200;
+      fraMenu.h = 100;
+      
+      btnPlay.text('Play');
+      btnPlay.onclick = $.proxy(function(x, y, button) {
+        btnPlay.gui.pop();
         this.initGame();
       }, this);
       
-      var t = new Textbox(this.guiMenu);
-      t.x = 100;
-      t.y = 100;
+      fraMenu.controls.add(btnPlay);
       
-      var c = new Control(this.guiMenu);
-      c.w = 300;
-      c.h = 400;
-      c.backcolour = 'gray';
-      c.bordercolour = 'white';
-      c.controls.add(b);
-      c.controls.add(t);
-      
-      this.guiMenu.controls.add(c);
+      this.guiMenu.controls.add(fraMenu);
       this.guiMenu.onresize = $.proxy(function() {
-        c.x = (this.canvas.width  - c.w) / 2;
-        c.y = (this.canvas.height - c.h) / 2;
+        fraMenu.x = (this.canvas.width  - fraMenu.w) / 2;
+        fraMenu.y = (this.canvas.height - fraMenu.h) / 2;
       }, this);
       
       this.guis.push(this.guiMenu);
