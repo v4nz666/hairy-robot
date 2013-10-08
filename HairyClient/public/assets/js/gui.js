@@ -52,3 +52,17 @@ Button.prototype.renderControl = function(ctx) {
   ctx.textBaseline = this.textBaseline;
   ctx.fillText(this.text, this.w / 2, this.h / 2);
 }
+
+function Textbox() { }
+Textbox.prototype = new Control();
+Textbox.prototype.text = '';
+Textbox.prototype.textAlign = 'center';
+Textbox.prototype.textBaseline = 'middle';
+Textbox.prototype.renderControl = function(ctx) {
+  ctx.fillStyle = this.backcolour;
+  ctx.fillRect(0, 0, this.w, this.h);
+  ctx.fillStyle = this.forecolour;
+  ctx.textAlign = this.textAlign;
+  ctx.textBaseline = this.textBaseline;
+  ctx.fillText(this.text, this.w / 2, this.h / 2);
+}
