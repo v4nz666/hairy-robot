@@ -6,7 +6,8 @@ function Client() {
     user: [],
     me: null,
     
-    menuButtons: [],
+    guiMenu: null,
+    guis: new GUIs(),
     
     bullets: [],
     effects: [],
@@ -60,11 +61,7 @@ function Client() {
       this.ctx.save();
       
       if(this.status.length == 0) {
-        for(var i in this.menuButtons) {
-          if(i === 'length') { continue; }
-          var button = this.menuButtons[i];
-          button.render(this.ctx);
-        }
+        this.guiMenu.render(this.ctx);
       } else {
         this.ctx.fillStyle = 'white';
         this.ctx.fontAlign = 'center';
@@ -380,6 +377,8 @@ function Client() {
       this.ctx.restore();
       this.ctx.fillText(this.me.gun, 0, 26);
       this.ctx.restore();
+      
+      this.guis.render(this.ctx);
     },
     
     renderMessages: function() {
@@ -416,21 +415,32 @@ function Client() {
       this.canvas.height = Math.min(768,window.innerHeight);
       
       if(!this.inGame) {
-        this.menuPlay.x = this.canvas.width / 2;
-        this.menuPlay.y = this.canvas.height / 2;
+        //this.menuPlay.x = this.canvas.width / 2;
+        //this.menuPlay.y = this.canvas.height / 2;
       }
       
       this.render();
     },
     
     init: function() {
-      this.menuPlay = new Button;
-      this.menuPlay.text = 'Play';
-      this.menuPlay.onclick = $.proxy(function() {
+      this.guiMenu = new GUI();
+      var b = new Button(this.guiMenu);
+      b.text = 'Play';
+      b.onclick = $.proxy(function(x, y, button) {
+        b.gui.pop();
         this.initGame();
       }, this);
       
-      this.menuButtons.push(this.menuPlay);
+      var c = new Control(this.guiMenu);
+      c.w = 300;
+      c.h = 400;
+      c.backcolour = 'gray';
+      c.bordercolour = 'white';
+      c.controls.add(b);
+      
+      this.guiMenu.controls.add(c);
+      
+      this.guis.push(this.guiMenu);
       
       this.initMenu();
     },
@@ -456,7 +466,8 @@ function Client() {
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
       setInterval($.proxy(this.render, this), tickRate);
-      $(document).click($.proxy(this.click, this));
+      $(document).mousedown($.proxy(function(ev) { this.guis.mousedown(ev.pageX, ev.pageY, ev.which); }, this));
+      $(document).mouseup  ($.proxy(function(ev) { this.guis.mouseup  (ev.pageX, ev.pageY, ev.which); }, this));
       
       this.setStatus('Connecting...');
       this.socket = io.connect(ip + ':' + port, {'reconnect': false});
@@ -556,19 +567,6 @@ function Client() {
       user.life = stats.life;
       user.shields = stats.shields;
       user.gun = stats.gun;
-    },
-    
-    click: function(ev) {
-      if(!this.inGame) {
-        for(var i in this.menuButtons) {
-          if(i === 'length') { continue; }
-          var button = this.menuButtons[i];
-          if(ev.pageX >= button.x && ev.pageX <= button.x + button.w &&
-             ev.pageY >= button.y && ev.pageY <= button.y + button.h) {
-            button.click();
-          }
-        }
-      }
     },
     
     keyDown: function(ev) {
