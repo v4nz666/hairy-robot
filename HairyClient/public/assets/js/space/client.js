@@ -466,6 +466,7 @@ function Client() {
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
       setInterval($.proxy(this.render, this), tickRate);
+      $(document).mousemove($.proxy(function(ev) { this.guis.mousemove(ev.pageX, ev.pageY, ev.which); }, this));
       $(document).mousedown($.proxy(function(ev) { this.guis.mousedown(ev.pageX, ev.pageY, ev.which); }, this));
       $(document).mouseup  ($.proxy(function(ev) { this.guis.mouseup  (ev.pageX, ev.pageY, ev.which); }, this));
       

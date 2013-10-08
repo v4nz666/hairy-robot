@@ -25,6 +25,12 @@ function GUIs() {
       }
     },
     
+    mousemove: function(x, y, button) {
+      for(var i = 0; i < this.guis.length; i++) {
+        if(this.guis[i].mousemove(x, y, button)) break;
+      }
+    },
+    
     mousedown: function(x, y, button) {
       for(var i = 0; i < this.guis.length; i++) {
         if(this.guis[i].mousedown(x, y, button)) break;
@@ -59,6 +65,19 @@ function GUI() {
     
     pop: function() {
       this.guis.pop(this);
+    },
+    
+    mousemove: function(x, y, button) {
+      if(this.mousedowncontrol !== null) {
+        this.mousedowncontrol.mousemove(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), button);
+        return true;
+      } else {
+        var c = this.controls.hittest(x, y);
+        
+        if(c !== null) {
+          c.mousemove(x - this.allX(c), y - this.allY(c), button);
+        }
+      }
     },
     
     mousedown: function(x, y, button) {
