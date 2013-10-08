@@ -27,13 +27,13 @@ function GUIs() {
     
     mousedown: function(x, y, button) {
       for(var i = 0; i < this.guis.length; i++) {
-        this.guis[i].mousedown(x, y, button);
+        if(this.guis[i].mousedown(x, y, button)) break;
       }
     },
     
     mouseup: function(x, y, button) {
       for(var i = 0; i < this.guis.length; i++) {
-        this.guis[i].mouseup(x, y, button);
+        if(this.guis[i].mouseup(x, y, button)) break;
       }
     }
   }
@@ -68,7 +68,10 @@ function GUI() {
       if(this.mousedowncontrol !== null) {
         this.mousedowncontrol.setfocus();
         this.mousedowncontrol.mousedown(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), button);
+        return true;
       }
+      
+      return false;
     },
     
     mouseup: function(x, y, button) {
@@ -77,7 +80,10 @@ function GUI() {
         this.mousedowncontrol.click();
         this.mousedowncontrol = null;
         this.mousedownbutton = 0;
+        return true;
       }
+      
+      return false;
     },
     
     render: function(ctx) {
