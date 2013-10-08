@@ -361,7 +361,7 @@ function Control(gui) {
       
       if(this.bordercolour !== null) {
         ctx.strokeStyle = this.bordercolour;
-        ctx.strokeRect(0, 0, this.w, this.h);
+        ctx.strokeRect(0.5, 0.5, this.w, this.h);
       }
       
       ctx.restore();
