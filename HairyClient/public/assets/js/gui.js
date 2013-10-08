@@ -430,6 +430,15 @@ function Control(gui) {
   }
 }
 
+function Frame(gui) {
+  this.gui = gui;
+  
+  this.backcolour = 'gray';
+  this.bordercolour = 'white';
+}
+
+Frame.inherits(Control);
+
 function Label(gui) {
   this.gui = gui;
   
