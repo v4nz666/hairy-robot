@@ -25,6 +25,12 @@ function GUIs() {
       }
     },
     
+    resize: function(w, h) {
+      for(var i = 0; i < this.guis.length; i++) {
+        if(this.guis[i].resize(w, h)) break;
+      }
+    },
+    
     mousemove: function(x, y, button) {
       for(var i = 0; i < this.guis.length; i++) {
         if(this.guis[i].mousemove(x, y, button)) break;
@@ -71,6 +77,9 @@ function GUI() {
     mousedownbutton: 0,
     mousedowncontrol: null,
     mousemovecontrol: null,
+    
+    onrender: null,
+    onresize: null,
     
     setfocus: function(control) {
       if(this.focus !== null) {
@@ -150,8 +159,19 @@ function GUI() {
     
     render: function(ctx) {
       ctx.save();
+      
+      if(this.onrender !== null) {
+        this.onrender(ctx);
+      }
+      
       this.controls.render(ctx);
       ctx.restore();
+    },
+    
+    resize: function(w, h) {
+      if(this.onresize !== null) {
+        this.onresize(w, h);
+      }
     },
     
     allX: function(control) {

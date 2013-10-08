@@ -413,12 +413,7 @@ function Client() {
     resize: function() {
       this.canvas.width  = Math.min(1024, window.innerWidth);
       this.canvas.height = Math.min(768,window.innerHeight);
-      
-      if(!this.inGame) {
-        //this.menuPlay.x = this.canvas.width / 2;
-        //this.menuPlay.y = this.canvas.height / 2;
-      }
-      
+      this.guis.resize(this.canvas.width, this.canvas.height);
       this.render();
     },
     
@@ -439,6 +434,10 @@ function Client() {
       c.controls.add(b);
       
       this.guiMenu.controls.add(c);
+      this.guiMenu.onresize = $.proxy(function() {
+        c.x = (this.canvas.width  - c.w) / 2;
+        c.y = (this.canvas.height - c.h) / 2;
+      }, this);
       
       this.guis.push(this.guiMenu);
       
