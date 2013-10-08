@@ -6,16 +6,20 @@ function Control() {
     h: 20,
     visible: true,
     forecolour: 'white',
-    backcolour: 'gray',
-    bordercolour: 'white',
+    backcolour: null,
+    bordercolour: null,
     onclick: null,
     
     renderPre: function(ctx) {
       if(this.visible) {
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.fillStyle = this.backcolour;
-        ctx.fillRect(0, 0, this.w, this.h);
+        
+        if(this.backcolour !== null) {
+          ctx.fillStyle = this.backcolour;
+          ctx.fillRect(0, 0, this.w, this.h);
+        }
+        
         return true;
       }
       
@@ -23,8 +27,11 @@ function Control() {
     },
     
     renderPost: function(ctx) {
-      ctx.strokeStyle = this.bordercolour;
-      ctx.strokeRect(0, 0, this.w, this.h);
+      if(this.bordercolour !== null) {
+        ctx.strokeStyle = this.bordercolour;
+        ctx.strokeRect(0, 0, this.w, this.h);
+      }
+      
       ctx.restore();
     },
     
@@ -44,26 +51,24 @@ function Control() {
   }
 }
 
-function Button() { }
-Button.prototype = new Control();
-Button.prototype.text = '';
-Button.prototype.textAlign = 'center';
-Button.prototype.textBaseline = 'middle';
-Button.prototype.renderControl = function(ctx) {
+function Label() { }
+Label.prototype = new Control();
+Label.prototype.text = '';
+Label.prototype.textAlign = 'center';
+Label.prototype.textBaseline = 'middle';
+Label.prototype.renderControl = function(ctx) {
   ctx.fillStyle = this.forecolour;
   ctx.textAlign = this.textAlign;
   ctx.textBaseline = this.textBaseline;
   ctx.fillText(this.text, this.w / 2, this.h / 2);
 }
 
+function Button() { }
+Button.prototype = new Label();
+Button.prototype.backcolour = 'gray';
+Button.prototype.bordercolour = 'white';
+
 function Textbox() { }
-Textbox.prototype = new Control();
-Textbox.prototype.text = '';
-Textbox.prototype.textAlign = 'center';
-Textbox.prototype.textBaseline = 'middle';
-Textbox.prototype.renderControl = function(ctx) {
-  ctx.fillStyle = this.forecolour;
-  ctx.textAlign = this.textAlign;
-  ctx.textBaseline = this.textBaseline;
-  ctx.fillText(this.text, this.w / 2, this.h / 2);
-}
+Textbox.prototype = new Label();
+Button.prototype.backcolour = 'gray';
+Button.prototype.bordercolour = 'white';
