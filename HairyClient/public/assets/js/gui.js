@@ -7,12 +7,15 @@ function Control() {
     visible: true,
     forecolour: 'white',
     backcolour: 'gray',
+    bordercolour: 'white',
     onclick: null,
     
     renderPre: function(ctx) {
       if(this.visible) {
         ctx.save();
         ctx.translate(this.x, this.y);
+        ctx.fillStyle = this.backcolour;
+        ctx.fillRect(0, 0, this.w, this.h);
         return true;
       }
       
@@ -20,6 +23,8 @@ function Control() {
     },
     
     renderPost: function(ctx) {
+      ctx.strokeStyle = this.bordercolour;
+      ctx.strokeRect(0, 0, this.w, this.h);
       ctx.restore();
     },
     
@@ -45,8 +50,6 @@ Button.prototype.text = '';
 Button.prototype.textAlign = 'center';
 Button.prototype.textBaseline = 'middle';
 Button.prototype.renderControl = function(ctx) {
-  ctx.fillStyle = this.backcolour;
-  ctx.fillRect(0, 0, this.w, this.h);
   ctx.fillStyle = this.forecolour;
   ctx.textAlign = this.textAlign;
   ctx.textBaseline = this.textBaseline;
@@ -59,8 +62,6 @@ Textbox.prototype.text = '';
 Textbox.prototype.textAlign = 'center';
 Textbox.prototype.textBaseline = 'middle';
 Textbox.prototype.renderControl = function(ctx) {
-  ctx.fillStyle = this.backcolour;
-  ctx.fillRect(0, 0, this.w, this.h);
   ctx.fillStyle = this.forecolour;
   ctx.textAlign = this.textAlign;
   ctx.textBaseline = this.textBaseline;
