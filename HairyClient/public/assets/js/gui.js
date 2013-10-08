@@ -187,7 +187,7 @@ function ControlStack(owner) {
       if(this.last !== null) {
         this.last.render(ctx);
       }
-    },
+    }
   }
 }
 
