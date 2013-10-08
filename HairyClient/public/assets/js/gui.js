@@ -52,6 +52,7 @@ function GUI() {
     focus: null,
     mousedownbutton: 0,
     mousedowncontrol: null,
+    mousemovecontrol: null,
     
     setfocus: function(control) {
       if(this.focus !== null) {
@@ -73,6 +74,12 @@ function GUI() {
         return true;
       } else {
         var c = this.controls.hittest(x, y);
+        
+        if(c !== this.mousemovecontrol) {
+          if(this.mousemovecontrol !== null) this.mousemovecontrol.mouseout();
+          if(c                     !== null) c.mousein();
+          this.mousemovecontrol = c;
+        }
         
         if(c !== null) {
           c.mousemove(x - this.allX(c), y - this.allY(c), button);
