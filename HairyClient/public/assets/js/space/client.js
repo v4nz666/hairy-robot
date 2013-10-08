@@ -438,10 +438,6 @@ function Client() {
       c.bordercolour = 'white';
       c.controls.add(b);
       
-      c.onkeydown = function(key, shift, ctrl, alt) {
-        console.log(key, shift, ctrl, alt);
-      }
-      
       this.guiMenu.controls.add(c);
       
       this.guis.push(this.guiMenu);
@@ -651,6 +647,8 @@ function Client() {
     },
     
     keyPress: function(ev) {
+      this.guis.keypress(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
+      
       if(this.inGame) {
         if(this.inChat) {
           this.chatBuffer += String.fromCharCode(ev.which);

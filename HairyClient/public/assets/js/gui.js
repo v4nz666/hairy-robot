@@ -53,6 +53,12 @@ function GUIs() {
       for(var i = 0; i < this.guis.length; i++) {
         if(this.guis[i].keyup(key, shift, ctrl, alt)) break;
       }
+    },
+    
+    keypress: function(key, shift, ctrl, alt) {
+      for(var i = 0; i < this.guis.length; i++) {
+        if(this.guis[i].keypress(key, shift, ctrl, alt)) break;
+      }
     }
   }
 }
@@ -133,6 +139,12 @@ function GUI() {
     keyup: function(key, shift, ctrl, alt) {
       if(this.focus !== null) {
         this.focus.keyup(key, shift, ctrl, alt);
+      }
+    },
+    
+    keypress: function(key, shift, ctrl, alt) {
+      if(this.focus !== null) {
+        this.focus.keypress(key, shift, ctrl, alt);
       }
     },
     
@@ -271,6 +283,7 @@ function Control(gui) {
     onclick: null,
     onkeydown: null,
     onkeyup: null,
+    onkeypress: null,
     onrender: null,
     
     root: function() {
@@ -388,6 +401,10 @@ function Control(gui) {
     
     keyup: function(key, shift, ctrl, alt) {
       if(this.onkeyup !== null) { this.onkeyup(key, shift, ctrl, alt); }
+    },
+    
+    keypress: function(key, shift, ctrl, alt) {
+      if(this.onkeypress !== null) { this.onkeypress(key, shift, ctrl, alt); }
     }
   }
 }
