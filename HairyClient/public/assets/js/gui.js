@@ -70,5 +70,5 @@ Button.prototype.bordercolour = 'white';
 
 function Textbox() { }
 Textbox.prototype = new Label();
-Button.prototype.backcolour = 'gray';
-Button.prototype.bordercolour = 'white';
+Textbox.prototype.backcolour = 'gray';
+Textbox.prototype.bordercolour = 'white';
