@@ -6,7 +6,6 @@ function Client() {
     user: [],
     me: null,
     
-    guiMenu: null,
     guis: new GUIs(),
     
     bullets: [],
@@ -53,6 +52,8 @@ function Client() {
       } else {
         this.renderGame();
       }
+      
+      this.guis.render();
     },
     
     renderMenu: function() {
@@ -60,9 +61,7 @@ function Client() {
       
       this.ctx.save();
       
-      if(this.status.length == 0) {
-        this.guiMenu.render(this.ctx);
-      } else {
+      if(this.status.length !== 0) {
         this.ctx.fillStyle = 'white';
         this.ctx.fontAlign = 'center';
         this.ctx.fontBaseline = 'middle';
@@ -377,8 +376,6 @@ function Client() {
       this.ctx.restore();
       this.ctx.fillText(this.me.gun, 0, 26);
       this.ctx.restore();
-      
-      this.guis.render();
     },
     
     renderMessages: function() {
@@ -423,14 +420,14 @@ function Client() {
       this.canvas = $('#canvas')[0];
       this.ctx = canvas.getContext('2d');
       
-      this.guiMenu = new GUI(this.ctx);
+      var guiMenu = new GUI(this.ctx);
       
-      var btnPlay = new Button(this.guiMenu);
+      var btnPlay = new Button(guiMenu);
       btnPlay.x = 10;
       btnPlay.y = 10;
       btnPlay.w = 180;
       
-      var fraMenu = new Frame(this.guiMenu);
+      var fraMenu = new Frame(guiMenu);
       fraMenu.w = 200;
       fraMenu.h = 100;
       
@@ -442,13 +439,13 @@ function Client() {
       
       fraMenu.controls.add(btnPlay);
       
-      this.guiMenu.controls.add(fraMenu);
-      this.guiMenu.onresize = $.proxy(function() {
+      guiMenu.controls.add(fraMenu);
+      guiMenu.onresize = $.proxy(function() {
         fraMenu.x = (this.canvas.width  - fraMenu.w) / 2;
         fraMenu.y = (this.canvas.height - fraMenu.h) / 2;
       }, this);
       
-      this.guis.push(this.guiMenu);
+      this.guis.push(guiMenu);
       
       this.initMenu();
     },
