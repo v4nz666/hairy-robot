@@ -1,3 +1,7 @@
+function constrain(number, min, max) {
+  return Math.min(Math.max(number, min), max);
+}
+
 function getTextHeight(font) {
   var text = $('<span>Hg</span>').css({ fontFamily: font });
   var block = $('<div style="display: inline-block; width: 1px; height: 0px;"></div>');
