@@ -438,6 +438,10 @@ function Client() {
       c.bordercolour = 'white';
       c.controls.add(b);
       
+      c.onkeydown = function(key, shift, ctrl, alt) {
+        console.log(key, shift, ctrl, alt);
+      }
+      
       this.guiMenu.controls.add(c);
       
       this.guis.push(this.guiMenu);
@@ -466,6 +470,13 @@ function Client() {
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
       setInterval($.proxy(this.render, this), tickRate);
+      
+      // Hook our keyboard events
+      $(document).keydown($.proxy(this.keyDown, this));
+      $(document).keyup($.proxy(this.keyUp, this));
+      $(document).keypress($.proxy(this.keyPress, this));
+      
+      // Hook our mouse events
       $(document).mousemove($.proxy(function(ev) { this.guis.mousemove(ev.pageX, ev.pageY, ev.which); }, this));
       $(document).mousedown($.proxy(function(ev) { this.guis.mousedown(ev.pageX, ev.pageY, ev.which); }, this));
       $(document).mouseup  ($.proxy(function(ev) { this.guis.mouseup  (ev.pageX, ev.pageY, ev.which); }, this));
@@ -525,11 +536,6 @@ function Client() {
       this.socket.on('badd',       $.proxy(this.badd, this));
       this.socket.on('brem',       $.proxy(this.brem, this));
       
-      // Hook our keyboard events
-      $(document).keydown($.proxy(this.keyDown, this));
-      $(document).keyup($.proxy(this.keyUp, this));
-      $(document).keypress($.proxy(this.keyPress, this));
-      
       this.inGame = true;
       
       console.log(this);
@@ -571,75 +577,85 @@ function Client() {
     },
     
     keyDown: function(ev) {
-      if(ev.which == 8) { ev.preventDefault(); }
+      this.guis.keydown(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
       
-      if(!this.inChat) {
-        switch(ev.which) {
-          case 32: case 37: case 38: case 39: case 40:
-            code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-            if((this.keys & code) == 0) {
-              this.keys |= code;
-              this.socket.emit('keys', {keys: this.keys});
-            }
-            break;
-          
-          //PGUP
-          case 33:
-            this.zoomIn();
-            break;
-          
-          //PGDN
-          case 34:
-            this.zoomOut();
-            break;
-          
-          case 84:
-            this.inChat = true;
-            ev.preventDefault();
-            break;
-          
-        }
-      } else {
-        switch(ev.which) {
-          case 8:
-            if(this.chatBuffer.length != 0) {
-              this.chatBuffer = this.chatBuffer.substr(0, this.chatBuffer.length - 1);
-              this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
-            }
+      if(this.inGame) {
+        if(ev.which == 8) { ev.preventDefault(); }
+        
+        if(!this.inChat) {
+          switch(ev.which) {
+            case 32: case 37: case 38: case 39: case 40:
+              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+              if((this.keys & code) == 0) {
+                this.keys |= code;
+                this.socket.emit('keys', {keys: this.keys});
+              }
+              break;
             
-            break;
-          
-          case 13:
-            if(this.chatBuffer.length != 0) {
-              this.socket.emit('msg', {msg: this.chatBuffer});
-              this.chatBuffer = '';
-              this.chatBufferW = 0;
-            }
+            //PGUP
+            case 33:
+              this.zoomIn();
+              break;
             
-            this.inChat = false;
-            break;
+            //PGDN
+            case 34:
+              this.zoomOut();
+              break;
+            
+            case 84:
+              this.inChat = true;
+              ev.preventDefault();
+              break;
+            
+          }
+        } else {
+          switch(ev.which) {
+            case 8:
+              if(this.chatBuffer.length != 0) {
+                this.chatBuffer = this.chatBuffer.substr(0, this.chatBuffer.length - 1);
+                this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
+              }
+              
+              break;
+            
+            case 13:
+              if(this.chatBuffer.length != 0) {
+                this.socket.emit('msg', {msg: this.chatBuffer});
+                this.chatBuffer = '';
+                this.chatBufferW = 0;
+              }
+              
+              this.inChat = false;
+              break;
+          }
         }
       }
     },
     
     keyUp: function(ev) {
-      if(!this.inChat) {
-        switch(ev.which) {
-          case 32: case 37: case 38: case 39: case 40:
-            code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-            if((this.keys & code) != 0) {
-              this.keys &= ~code;
-              this.socket.emit('keys', {keys: this.keys});
-            }
-            break;
+      this.guis.keyup(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
+      
+      if(this.inGame) {
+        if(!this.inChat) {
+          switch(ev.which) {
+            case 32: case 37: case 38: case 39: case 40:
+              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+              if((this.keys & code) != 0) {
+                this.keys &= ~code;
+                this.socket.emit('keys', {keys: this.keys});
+              }
+              break;
+          }
         }
       }
     },
     
     keyPress: function(ev) {
-      if(this.inChat) {
-        this.chatBuffer += String.fromCharCode(ev.which);
-        this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
+      if(this.inGame) {
+        if(this.inChat) {
+          this.chatBuffer += String.fromCharCode(ev.which);
+          this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
+        }
       }
     },
     

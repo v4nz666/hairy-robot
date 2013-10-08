@@ -41,6 +41,18 @@ function GUIs() {
       for(var i = 0; i < this.guis.length; i++) {
         if(this.guis[i].mouseup(x, y, button)) break;
       }
+    },
+    
+    keydown: function(key, shift, ctrl, alt) {
+      for(var i = 0; i < this.guis.length; i++) {
+        if(this.guis[i].keydown(key, shift, ctrl, alt)) break;
+      }
+    },
+    
+    keyup: function(key, shift, ctrl, alt) {
+      for(var i = 0; i < this.guis.length; i++) {
+        if(this.guis[i].keyup(key, shift, ctrl, alt)) break;
+      }
     }
   }
 }
@@ -110,6 +122,18 @@ function GUI() {
       }
       
       return false;
+    },
+    
+    keydown: function(key, shift, ctrl, alt) {
+      if(this.focus !== null) {
+        this.focus.keydown(key, shift, ctrl, alt);
+      }
+    },
+    
+    keyup: function(key, shift, ctrl, alt) {
+      if(this.focus !== null) {
+        this.focus.keyup(key, shift, ctrl, alt);
+      }
     },
     
     render: function(ctx) {
@@ -358,12 +382,12 @@ function Control(gui) {
       if(this.onclick !== null) { this.onclick(); }
     },
     
-    keydown: function(key) {
-      if(this.onkeydown !== null) { this.onkeydown(key); }
+    keydown: function(key, shift, ctrl, alt) {
+      if(this.onkeydown !== null) { this.onkeydown(key, shift, ctrl, alt); }
     },
     
-    keyup: function(key) {
-      if(this.onkeyup !== null) { this.onkeyup(key); }
+    keyup: function(key, shift, ctrl, alt) {
+      if(this.onkeyup !== null) { this.onkeyup(key, shift, ctrl, alt); }
     }
   }
 }
