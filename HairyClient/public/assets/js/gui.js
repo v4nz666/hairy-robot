@@ -19,9 +19,9 @@ function GUIs() {
       this.guis.length = 0;
     },
     
-    render: function(ctx) {
+    render: function() {
       for(var i = this.guis.length; --i >= 0;) {
-        this.guis[i].render(ctx);
+        this.guis[i].render();
       }
     },
     
@@ -69,8 +69,9 @@ function GUIs() {
   }
 }
 
-function GUI() {
+function GUI(ctx) {
   return {
+    ctx: ctx,
     guis: null,
     controls: new ControlStack(null),
     focus: null,
@@ -157,15 +158,15 @@ function GUI() {
       }
     },
     
-    render: function(ctx) {
-      ctx.save();
+    render: function() {
+      this.ctx.save();
       
       if(this.onrender !== null) {
-        this.onrender(ctx);
+        this.onrender(this.ctx);
       }
       
-      this.controls.render(ctx);
-      ctx.restore();
+      this.controls.render(this.ctx);
+      this.ctx.restore();
     },
     
     resize: function(w, h) {
@@ -429,24 +430,121 @@ function Control(gui) {
   }
 }
 
-function Label(gui) { this.gui = gui; }
-Label.inherits(Control);
-Label.prototype.text = '';
-Label.prototype.textAlign = 'center';
-Label.prototype.textBaseline = 'middle';
-Label.prototype.renderControl = function(ctx) {
-  ctx.fillStyle = this.forecolour;
-  ctx.textAlign = this.textAlign;
-  ctx.textBaseline = this.textBaseline;
-  ctx.fillText(this.text, this.w / 2, this.h / 2);
+function Label(gui) {
+  this.gui = gui;
+  
+  this.textAlign = 'center';
+  this.textBaseline = 'middle';
+  
+  var _text = '';
+  
+  this.text = function(text) {
+    if(typeof text === 'undefined') {
+      return _text;
+    } else {
+      _text = text;
+    }
+  };
+  
+  this.renderControl = function(ctx) {
+    ctx.fillStyle = this.forecolour;
+    ctx.textAlign = this.textAlign;
+    ctx.textBaseline = this.textBaseline;
+    
+    switch(this.textAlign) {
+      case 'center': ctx.fillText(_text, this.w / 2, this.h / 2); break;
+      case 'right':  ctx.fillText(_text, this.w    , this.h / 2); break;
+      default:       ctx.fillText(_text,          0, this.h / 2); break;
+    }
+  };
 }
 
-function Button(gui) { this.gui = gui; }
-Button.inherits(Label);
-Button.prototype.backcolour = 'gray';
-Button.prototype.bordercolour = 'white';
+Label.inherits(Control);
 
-function Textbox(gui) { this.gui = gui; }
+function Button(gui) {
+  this.gui = gui;
+  
+  this.backcolour = 'gray';
+  this.bordercolour = 'white';
+}
+
+Button.inherits(Label);
+
+function Textbox(gui) {
+  this.gui = gui;
+  
+  this.backcolour = 'gray';
+  this.bordercolour = 'white';
+  this.textAlign = 'left';
+  this.textW = 0;
+  this.textH = getTextHeight(this.gui.ctx.font).ascent;
+  this.selx = 0;
+  
+  var _selstart = 0;
+  
+  this.text = function(text) {
+    if(typeof text === 'undefined') {
+      return this.uber('text', text);
+    } else {
+      this.uber('text', text);
+      this.textW = this.gui.ctx.measureText(text).width;
+      this.textH = getTextHeight(this.gui.ctx.font).ascent;
+      this.selstart(text.length);
+    }
+  }
+  
+  this.selstart = function(selstart) {
+    _selstart = constrain(selstart, 0, this.text().length);
+    this.selx = this.gui.ctx.measureText(this.text().substr(0, selstart)).width;
+  }
+  
+  this.renderControl = function(ctx) {
+    this.uber('renderControl', ctx);
+    
+    if(this.focus) {
+      ctx.fillStyle = this.forecolour;
+      ctx.fillRect(this.selx, (this.h - this.textH) / 2, 1, this.textH);
+    }
+  }
+  
+  this.keypress = function(key, shift, ctrl, alt) {
+    var s = _selstart;
+    this.text(this.text().substr(0, _selstart) + String.fromCharCode(key) + this.text().substr(_selstart, this.text().length));
+    this.selstart(s + 1);
+    this.uber('keypress', key, shift, ctrl, alt);
+  }
+  
+  this.keydown = function(key, shift, ctrl, alt) {
+    switch(key) {
+      case 8:
+        if(_selstart > 0) {
+          var s = _selstart;
+          this.text(this.text().substr(0, _selstart - 1) + this.text().substr(_selstart, this.text().length));
+          this.selstart(s - 1);
+        }
+        
+        break;
+      
+      case 46:
+        if(_selstart < this.text().length) {
+          var s = _selstart;
+          this.text(this.text().substr(0, _selstart) + this.text().substr(_selstart + 1, this.text().length));
+          this.selstart(s);
+        }
+        
+        break;
+      
+      case 37:
+        this.selstart(_selstart - 1);
+        break;
+      
+      case 39:
+        this.selstart(_selstart + 1);
+        break;
+    }
+    
+    this.uber('keydown', key, shift, ctrl, alt);
+  }
+}
+
 Textbox.inherits(Label);
-Textbox.prototype.backcolour = 'gray';
-Textbox.prototype.bordercolour = 'white';

@@ -378,7 +378,7 @@ function Client() {
       this.ctx.fillText(this.me.gun, 0, 26);
       this.ctx.restore();
       
-      this.guis.render(this.ctx);
+      this.guis.render();
     },
     
     renderMessages: function() {
@@ -418,13 +418,22 @@ function Client() {
     },
     
     init: function() {
-      this.guiMenu = new GUI();
+      this.setStatus('Initialising...');
+      
+      this.canvas = $('#canvas')[0];
+      this.ctx = canvas.getContext('2d');
+      
+      this.guiMenu = new GUI(this.ctx);
       var b = new Button(this.guiMenu);
-      b.text = 'Play';
+      b.text('Play');
       b.onclick = $.proxy(function(x, y, button) {
         b.gui.pop();
         this.initGame();
       }, this);
+      
+      var t = new Textbox(this.guiMenu);
+      t.x = 100;
+      t.y = 100;
       
       var c = new Control(this.guiMenu);
       c.w = 300;
@@ -432,6 +441,7 @@ function Client() {
       c.backcolour = 'gray';
       c.bordercolour = 'white';
       c.controls.add(b);
+      c.controls.add(t);
       
       this.guiMenu.controls.add(c);
       this.guiMenu.onresize = $.proxy(function() {
@@ -449,11 +459,6 @@ function Client() {
     },
     
     initMenu: function() {
-      this.setStatus('Initialising...');
-      
-      this.canvas = $('#canvas')[0];
-      this.ctx = canvas.getContext('2d');
-      
       var name = $('input[name=username]').val();
       var auth = $('input[name=auth]').val();
       var ip   = $('input[name=ip]').val();
@@ -572,11 +577,11 @@ function Client() {
     },
     
     keyDown: function(ev) {
+      if(ev.which == 8) { ev.preventDefault(); }
+      
       this.guis.keydown(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
       
       if(this.inGame) {
-        if(ev.which == 8) { ev.preventDefault(); }
-        
         if(!this.inChat) {
           switch(ev.which) {
             case 32: case 37: case 38: case 39: case 40:
