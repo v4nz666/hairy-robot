@@ -499,12 +499,16 @@ function Textbox(gui) {
   }
   
   this.renderControl = function(ctx) {
+    ctx.save();
+    ctx.translate(2, 0);
     this.uber('renderControl', ctx);
     
     if(this.focus) {
       ctx.fillStyle = this.forecolour;
       ctx.fillRect(this.selx, (this.h - this.textH) / 2, 1, this.textH);
     }
+    
+    ctx.restore();
   }
   
   this.keypress = function(key, shift, ctrl, alt) {
