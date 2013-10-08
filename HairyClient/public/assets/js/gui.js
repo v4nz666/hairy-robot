@@ -430,7 +430,7 @@ function Control(gui) {
 }
 
 function Label(gui) { this.gui = gui; }
-Label.prototype = new Control();
+Label.inherits(Control);
 Label.prototype.text = '';
 Label.prototype.textAlign = 'center';
 Label.prototype.textBaseline = 'middle';
@@ -442,11 +442,11 @@ Label.prototype.renderControl = function(ctx) {
 }
 
 function Button(gui) { this.gui = gui; }
-Button.prototype = new Label();
+Button.inherits(Label);
 Button.prototype.backcolour = 'gray';
 Button.prototype.bordercolour = 'white';
 
 function Textbox(gui) { this.gui = gui; }
-Textbox.prototype = new Label();
+Textbox.inherits(Label);
 Textbox.prototype.backcolour = 'gray';
 Textbox.prototype.bordercolour = 'white';
