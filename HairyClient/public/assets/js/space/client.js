@@ -47,12 +47,6 @@ function Client() {
     },
     
     render: function() {
-      if(!this.inGame) {
-        this.renderMenu();
-      } else {
-        this.renderGame();
-      }
-      
       this.guis.render();
     },
     
@@ -341,8 +335,6 @@ function Client() {
     },
     
     renderGUI: function() {
-      this.renderMessages();
-      
       this.ctx.save();
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.fps + ' FPS', 4, 12);
@@ -387,7 +379,6 @@ function Client() {
       var y = this.canvas.height - 2;
       
       this.ctx.save();
-      this.ctx.textBaseline = 'bottom';
       this.ctx.fillStyle = 'rgb(255, 255, 255)';
       
       if(this.inChat) {
@@ -445,6 +436,10 @@ function Client() {
         fraMenu.y = (this.canvas.height - fraMenu.h) / 2;
       }, this);
       
+      guiMenu.onrender = $.proxy(function() {
+        this.renderMenu();
+      }, this);
+      
       this.guis.push(guiMenu);
       
       this.initMenu();
@@ -465,7 +460,7 @@ function Client() {
       
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
-      setInterval($.proxy(this.render, this), tickRate);
+      setInterval($.proxy(function() { this.guis.render(); }, this), tickRate);
       
       // Hook our keyboard events
       $(document).keydown($.proxy(this.keyDown, this));
@@ -520,6 +515,29 @@ function Client() {
     },
     
     initGame: function() {
+      var guiGame = new GUI(this.ctx);
+      var txtChat = new Textbox(guiGame);
+      var fraChat = new Frame(guiGame);
+      fraChat.w = 200;
+      fraChat.onrender = $.proxy(function() {
+        this.renderMessages();
+      }, this);
+      
+      guiGame.controls.add(txtChat);
+      guiGame.controls.add(fraChat);
+      guiGame.onresize = $.proxy(function(w, h) {
+        txtChat.x = 2;
+        txtChat.y = this.canvas.height - txtChat.h - 2;
+        fraChat.h = txtChat.y;
+      }, this);
+      
+      guiGame.onrender = $.proxy(function() {
+        this.renderGame();
+      }, this);
+      
+      guiGame.resize(this.canvas.width, this.canvas.height);
+      this.guis.push(guiGame);
+      
       // Register event handlers
       this.socket.on('msg',        $.proxy(this.addMsg, this));
       this.socket.on('stats',      $.proxy(this.stats, this));
