@@ -103,7 +103,7 @@ function Client() {
         this.me.onscreenX = Math.floor(this.me.x / this.zoomLevel);
         // Near the right side of the map
       } else if(this.me.x >= this.worldWidth - (this.ctx.canvas.width / 2 * this.zoomLevel)) {
-        this.offsetX = Math.floor((this.worldWidth - (this.ctx.canvas.width)) / this.zoomLevel);
+        this.offsetX = this.worldWidth - this.ctx.canvas.width * this.zoomLevel;
         this.me.onscreenX = Math.floor(this.ctx.canvas.width - ((this.worldWidth - this.me.x) / this.zoomLevel));
       // In the middle
       } else {
@@ -117,7 +117,7 @@ function Client() {
         this.me.onscreenY = Math.floor(this.me.y / this.zoomLevel);
       // Near the bottom of the map
       } else if(this.me.y >= this.worldHeight - (this.ctx.canvas.height / 2 * this.zoomLevel)) {
-        this.offsetY = Math.floor((this.worldHeight - (this.ctx.canvas.height)) / this.zoomLevel);
+        this.offsetY = this.worldHeight - this.ctx.canvas.height * this.zoomLevel;
         this.me.onscreenY = Math.floor(this.ctx.canvas.height- ((this.worldHeight - this.me.y) / this.zoomLevel));
       // In the middle of the map
       } else {
@@ -125,8 +125,8 @@ function Client() {
         this.me.onscreenY = Math.floor(this.ctx.canvas.height / 2);
       }
       
-      this.gridOffsetX = (this.offsetX % this.gridSize) / this.zoomLevel;
-      this.gridOffsetY = (this.offsetY % this.gridSize) / this.zoomLevel;
+      this.gridOffsetX = Math.floor((this.offsetX  / this.zoomLevel) % this.gridSize);
+      this.gridOffsetY = Math.floor((this.offsetY  / this.zoomLevel) % this.gridSize);
     },
     
     renderBackground: function() {
@@ -350,11 +350,13 @@ function Client() {
       this.ctx.save();
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.fps + ' FPS', 4, 12);
-      this.ctx.fillText('X: ' + this.me.x + " Y: " + this.me.y, 4, 24);
-      this.ctx.fillText('Angle: ' + this.me.angle, 4, 36);
-      this.ctx.fillText('X-Offset: ' + this.offsetX + ' Y-Offset: ' + this.offsetY, 4, 48);
-      this.ctx.fillText('X-Scr: ' + this.me.onscreenX + ' Y-Scr: ' + this.me.onscreenY, 4, 60);
-      this.ctx.fillText('Zoom: ' + this.zoomLevel, 4, 72);
+      this.ctx.fillText('X:        ' + this.me.x         + ' Y:        ' + this.me.y, 4, 24);
+      this.ctx.fillText('Angle:    ' + this.me.angle, 4, 36);
+      this.ctx.fillText('X-Offset: ' + this.offsetX      + ' Y-Offset: ' + this.offsetY, 4, 48);
+      this.ctx.fillText('Grid-X:   ' + this.gridOffsetX  + ' Grid-Y:   ' + this.gridOffsetY, 4, 60);
+      this.ctx.fillText('X-Scr:    ' + this.me.onscreenX + ' Y-Scr:    ' + this.me.onscreenY, 4, 72);
+      this.ctx.fillText('Zoom:     ' + this.zoomLevel, 4, 84);
+      
       this.ctx.restore();
       
       var hull    = this.me.life / this.me.maxLife;
@@ -412,8 +414,8 @@ function Client() {
     },
     
     resize: function() {
-      this.canvas.width  = Math.min(1024, window.innerWidth);
-      this.canvas.height = Math.min(768,window.innerHeight);
+      this.canvas.width  = window.innerWidth;
+      this.canvas.height = window.innerHeight;
       
       if(!this.inGame) {
         this.menuPlay.x = this.canvas.width / 2;
