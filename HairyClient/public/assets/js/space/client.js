@@ -15,8 +15,6 @@ function Client() {
     messages: [],
     maxMessages: 255,
     inChat: false,
-    chatBuffer: '',
-    chatBufferW: 0,
     
     keys: 0,
     
@@ -378,17 +376,11 @@ function Client() {
       
       var h = getTextHeight(this.ctx.font).ascent;
       var x = 4;
-      var y = this.canvas.height - 2;
+      var y = 0;
       
       this.ctx.save();
       this.ctx.fillStyle = 'rgb(255, 255, 255)';
-      
-      if(this.inChat) {
-        this.ctx.fillText(this.chatBuffer, x, y);
-        this.ctx.fillRect(x + this.chatBufferW, y - h, 1, h);
-      } else {
-        this.ctx.fillText('Press "T" to chat', x, y);
-      }
+      this.ctx.textBaseline = 'top';
       
       for(var i = max; --i >= min;) {
         y -= h;
@@ -520,17 +512,31 @@ function Client() {
     initGame: function() {
       var guiGame = new GUI(this.ctx);
       var txtChat = new Textbox(guiGame);
+      txtChat.w = 200;
+      txtChat.onkeypress = $.proxy(function(key, shift, ctrl, alt) {
+        if(key === 13) {
+          if(txtChat.text().length != 0) {
+            this.socket.emit('msg', {msg: txtChat.text()});
+            txtChat.text('');
+          }
+          
+          this.inChat = false;
+        }
+      }, this);
+      
       var fraChat = Frame(guiGame);
       fraChat.w = 200;
       fraChat.onrender = $.proxy(function() {
+        this.ctx.save();
+        this.ctx.translate(0, fraChat.h);
         this.renderMessages();
+        this.ctx.restore();
       }, this);
       
       guiGame.controls.add(txtChat);
       guiGame.controls.add(fraChat);
       guiGame.onresize = $.proxy(function(w, h) {
-        txtChat.x = 2;
-        txtChat.y = this.canvas.height - txtChat.h - 2;
+        txtChat.y = this.canvas.height - txtChat.h;
         fraChat.h = txtChat.y;
       }, this);
       
@@ -624,26 +630,6 @@ function Client() {
               ev.preventDefault();
               break;
             
-          }
-        } else {
-          switch(ev.which) {
-            case 8:
-              if(this.chatBuffer.length != 0) {
-                this.chatBuffer = this.chatBuffer.substr(0, this.chatBuffer.length - 1);
-                this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
-              }
-              
-              break;
-            
-            case 13:
-              if(this.chatBuffer.length != 0) {
-                this.socket.emit('msg', {msg: this.chatBuffer});
-                this.chatBuffer = '';
-                this.chatBufferW = 0;
-              }
-              
-              this.inChat = false;
-              break;
           }
         }
       }
