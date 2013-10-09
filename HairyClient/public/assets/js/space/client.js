@@ -371,7 +371,7 @@ function Client() {
     
     renderMessages: function() {
       var max = Math.min(this.maxMessages, this.messages.length);
-      var min = this.txtChat.visible ? 0 : Math.max(max - 6, 0);
+      var min = this.txtChat.visible() ? 0 : Math.max(max - 6, 0);
       
       var h = getTextHeight(this.ctx.font).ascent;
       var x = 4;
@@ -512,16 +512,16 @@ function Client() {
       var guiGame = new GUI(this.ctx);
       var txtChat = new Textbox(guiGame);
       this.txtChat = txtChat;
-      txtChat.visible = true;
+      txtChat.visible(false);
       txtChat.w = 200;
       txtChat.onkeypress = $.proxy(function(key, shift, ctrl, alt) {
         if(key === 13) {
-          if(txtChat.text().length != 0) {
+          if(txtChat.text().length !== 0) {
             this.socket.emit('msg', {msg: txtChat.text()});
             txtChat.text('');
           }
           
-          this.txtChat.visible = false;
+          this.txtChat.visible(false);
         }
       }, this);
       
@@ -606,7 +606,7 @@ function Client() {
       this.guis.keydown(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
       
       if(this.inGame) {
-        if(!this.txtChat.visible) {
+        if(!this.txtChat.visible()) {
           switch(ev.which) {
             case 32: case 37: case 38: case 39: case 40:
               code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
@@ -627,7 +627,8 @@ function Client() {
               break;
             
             case 84:
-              this.txtChat.visible = true;
+              this.txtChat.visible(true);
+              this.txtChat.setfocus();
               ev.preventDefault();
               break;
             
@@ -640,7 +641,7 @@ function Client() {
       this.guis.keyup(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
       
       if(this.inGame) {
-        if(!this.txtChat.visible) {
+        if(!this.txtChat.visible()) {
           switch(ev.which) {
             case 32: case 37: case 38: case 39: case 40:
               code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
