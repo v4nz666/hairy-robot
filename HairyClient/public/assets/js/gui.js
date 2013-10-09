@@ -435,7 +435,7 @@ function Frame(gui) {
   var me = Control(gui);
   me.backcolour = 'gray';
   me.bordercolour = 'white';
-  return fr;
+  return me;
 }
 
 function Label(gui) {
