@@ -535,9 +535,12 @@ function Textbox(gui) {
   
   me.keypressSuper = me.keypress;
   me.keypress = function(key, shift, ctrl, alt) {
-    var s = this._selstart;
-    this.text(this.text().substr(0, this._selstart) + String.fromCharCode(key) + this.text().substr(this._selstart, this.text().length));
-    this.selstart(s + 1);
+    if(key !== 13) {
+      var s = this._selstart;
+      this.text(this.text().substr(0, this._selstart) + String.fromCharCode(key) + this.text().substr(this._selstart, this.text().length));
+      this.selstart(s + 1);
+    }
+    
     this.keypressSuper(key, shift, ctrl, alt);
   }
   
