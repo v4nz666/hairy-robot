@@ -421,7 +421,7 @@ function Client() {
       btnPlay.y = 10;
       btnPlay.w = 180;
       
-      var fraMenu = new Frame(guiMenu);
+      var fraMenu = Frame(guiMenu);
       fraMenu.w = 200;
       fraMenu.h = 100;
       
@@ -520,7 +520,7 @@ function Client() {
     initGame: function() {
       var guiGame = new GUI(this.ctx);
       var txtChat = new Textbox(guiGame);
-      var fraChat = new Frame(guiGame);
+      var fraChat = Frame(guiGame);
       fraChat.w = 200;
       fraChat.onrender = $.proxy(function() {
         this.renderMessages();

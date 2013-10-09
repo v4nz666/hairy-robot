@@ -431,13 +431,12 @@ function Control(gui) {
 }
 
 function Frame(gui) {
-  this.gui = gui;
-  
-  this.backcolour = 'gray';
-  this.bordercolour = 'white';
+  // Parasitic inheritance
+  var me = Control(gui);
+  me.backcolour = 'gray';
+  me.bordercolour = 'white';
+  return fr;
 }
-
-Frame.inherits(Control);
 
 function Label(gui) {
   this.gui = gui;
