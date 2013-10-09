@@ -439,77 +439,74 @@ function Frame(gui) {
 }
 
 function Label(gui) {
-  this.gui = gui;
+  var me = Control(gui);
+  me.textAlign = 'center';
+  me.textBaseline = 'middle';
+  me._text = '';
   
-  this.textAlign = 'center';
-  this.textBaseline = 'middle';
-  
-  var _text = '';
-  
-  this.text = function(text) {
+  me.text = function(text) {
     if(typeof text === 'undefined') {
-      return _text;
+      return this._text;
     } else {
-      _text = text;
+      this._text = text;
     }
   };
   
-  this.renderControl = function(ctx) {
+  me.renderControl = function(ctx) {
     ctx.fillStyle = this.forecolour;
     ctx.textAlign = this.textAlign;
     ctx.textBaseline = this.textBaseline;
     
     switch(this.textAlign) {
-      case 'center': ctx.fillText(_text, this.w / 2, this.h / 2); break;
-      case 'right':  ctx.fillText(_text, this.w    , this.h / 2); break;
-      default:       ctx.fillText(_text,          0, this.h / 2); break;
+      case 'center': ctx.fillText(this._text, this.w / 2, this.h / 2); break;
+      case 'right':  ctx.fillText(this._text, this.w    , this.h / 2); break;
+      default:       ctx.fillText(this._text,          0, this.h / 2); break;
     }
   };
+  
+  return me;
 }
-
-Label.inherits(Control);
 
 function Button(gui) {
-  this.gui = gui;
-  
-  this.backcolour = 'gray';
-  this.bordercolour = 'white';
+  var me = Label(gui);
+  me.backcolour = 'gray';
+  me.bordercolour = 'white';
+  return me;
 }
 
-Button.inherits(Label);
-
 function Textbox(gui) {
-  this.gui = gui;
+  var me = Label(gui);
+  me.backcolour = 'gray';
+  me.bordercolour = 'white';
+  me.textAlign = 'left';
+  me.textW = 0;
+  me.textH = getTextHeight(me.gui.ctx.font).ascent;
+  me.selx = 0;
   
-  this.backcolour = 'gray';
-  this.bordercolour = 'white';
-  this.textAlign = 'left';
-  this.textW = 0;
-  this.textH = getTextHeight(this.gui.ctx.font).ascent;
-  this.selx = 0;
+  me._selstart = 0;
   
-  var _selstart = 0;
-  
-  this.text = function(text) {
+  me.textSuper = me.text;
+  me.text = function(text) {
     if(typeof text === 'undefined') {
-      return this.uber('text', text);
+      return this.textSuper(text);
     } else {
-      this.uber('text', text);
+      this.textSuper(text);
       this.textW = this.gui.ctx.measureText(text).width;
       this.textH = getTextHeight(this.gui.ctx.font).ascent;
       this.selstart(text.length);
     }
   }
   
-  this.selstart = function(selstart) {
-    _selstart = constrain(selstart, 0, this.text().length);
+  me.selstart = function(selstart) {
+    this._selstart = constrain(selstart, 0, this.text().length);
     this.selx = this.gui.ctx.measureText(this.text().substr(0, selstart)).width;
   }
   
-  this.renderControl = function(ctx) {
+  me.renderControlSuper = me.renderControl;
+  me.renderControl = function(ctx) {
     ctx.save();
     ctx.translate(2, 0);
-    this.uber('renderControl', ctx);
+    this.renderControlSuper(ctx);
     
     if(this.focus) {
       ctx.fillStyle = this.forecolour;
@@ -519,44 +516,46 @@ function Textbox(gui) {
     ctx.restore();
   }
   
-  this.keypress = function(key, shift, ctrl, alt) {
-    var s = _selstart;
-    this.text(this.text().substr(0, _selstart) + String.fromCharCode(key) + this.text().substr(_selstart, this.text().length));
+  me.keypressSuper = me.keypress;
+  me.keypress = function(key, shift, ctrl, alt) {
+    var s = this._selstart;
+    this.text(this.text().substr(0, this._selstart) + String.fromCharCode(key) + this.text().substr(this._selstart, this.text().length));
     this.selstart(s + 1);
-    this.uber('keypress', key, shift, ctrl, alt);
+    this.keypressSuper(key, shift, ctrl, alt);
   }
   
-  this.keydown = function(key, shift, ctrl, alt) {
+  me.keydownSuper = me.keydown;
+  me.keydown = function(key, shift, ctrl, alt) {
     switch(key) {
       case 8:
-        if(_selstart > 0) {
-          var s = _selstart;
-          this.text(this.text().substr(0, _selstart - 1) + this.text().substr(_selstart, this.text().length));
+        if(this._selstart > 0) {
+          var s = this._selstart;
+          this.text(this.text().substr(0, this._selstart - 1) + this.text().substr(this._selstart, this.text().length));
           this.selstart(s - 1);
         }
         
         break;
       
       case 46:
-        if(_selstart < this.text().length) {
-          var s = _selstart;
-          this.text(this.text().substr(0, _selstart) + this.text().substr(_selstart + 1, this.text().length));
+        if(this._selstart < this.text().length) {
+          var s = this._selstart;
+          this.text(this.text().substr(0, this._selstart) + this.text().substr(this._selstart + 1, this.text().length));
           this.selstart(s);
         }
         
         break;
       
       case 37:
-        this.selstart(_selstart - 1);
+        this.selstart(this._selstart - 1);
         break;
       
       case 39:
-        this.selstart(_selstart + 1);
+        this.selstart(this._selstart + 1);
         break;
     }
     
-    this.uber('keydown', key, shift, ctrl, alt);
+    this.keydownSuper(key, shift, ctrl, alt);
   }
+  
+  return me;
 }
-
-Textbox.inherits(Label);
