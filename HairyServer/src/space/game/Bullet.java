@@ -11,6 +11,9 @@ public class Bullet extends Entity {
   private User _user;
   public final int damage;
   
+  private int _range;
+  private double _startX, _startY;
+  
   private Add _add = new Add();
   private Rem _rem = new Rem();
   
@@ -24,6 +27,10 @@ public class Bullet extends Entity {
   
   public Bullet(User user, space.data.guns.Bullet bullet, float offsetAngle, float offsetSpacing) {
     super(nextID(), user.x, user.y, bullet.getSize(), user.id);
+    
+    _range = bullet.getRange();
+    _startX = user.x;
+    _startY = user.y;
     
     _user = user;
     angle = user.angle;
@@ -60,11 +67,16 @@ public class Bullet extends Entity {
                return Math.max(a, b);
   }
   
+  private double distance(double x1, double y1, double x2, double y2) {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  }
+  
   @Override
   public void update(double deltaT) {
     super.update(deltaT);
     
-    if(x < -size || x > Server.W + size ||
+    if(distance(x, y, _startX, _startY) > _range ||
+       x < -size || x > Server.W + size ||
        y < -size || y > Server.H + size) {
       remove();
     }

@@ -6,7 +6,7 @@ function Client() {
     user: [],
     me: null,
     
-    menuButtons: [],
+    guis: new GUIs(),
     
     bullets: [],
     effects: [],
@@ -47,11 +47,7 @@ function Client() {
     },
     
     render: function() {
-      if(!this.inGame) {
-        this.renderMenu();
-      } else {
-        this.renderGame();
-      }
+      this.guis.render();
     },
     
     renderMenu: function() {
@@ -59,13 +55,7 @@ function Client() {
       
       this.ctx.save();
       
-      if(this.status.length == 0) {
-        for(var i in this.menuButtons) {
-          if(i === 'length') { continue; }
-          var button = this.menuButtons[i];
-          button.render(this.ctx);
-        }
-      } else {
+      if(this.status.length !== 0) {
         this.ctx.fillStyle = 'white';
         this.ctx.fontAlign = 'center';
         this.ctx.fontBaseline = 'middle';
@@ -345,8 +335,6 @@ function Client() {
     },
     
     renderGUI: function() {
-      this.renderMessages();
-      
       this.ctx.save();
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.fps + ' FPS', 4, 12);
@@ -393,7 +381,6 @@ function Client() {
       var y = this.canvas.height - 2;
       
       this.ctx.save();
-      this.ctx.textBaseline = 'bottom';
       this.ctx.fillStyle = 'rgb(255, 255, 255)';
       
       if(this.inChat) {
@@ -417,22 +404,46 @@ function Client() {
       this.canvas.width  = window.innerWidth;
       this.canvas.height = window.innerHeight;
       
-      if(!this.inGame) {
-        this.menuPlay.x = this.canvas.width / 2;
-        this.menuPlay.y = this.canvas.height / 2;
-      }
-      
+      this.guis.resize(this.canvas.width, this.canvas.height);
       this.render();
     },
     
     init: function() {
-      this.menuPlay = new Button;
-      this.menuPlay.text = 'Play';
-      this.menuPlay.onclick = $.proxy(function() {
+      this.setStatus('Initialising...');
+      
+      this.canvas = $('#canvas')[0];
+      this.ctx = canvas.getContext('2d');
+      
+      var guiMenu = new GUI(this.ctx);
+      
+      var btnPlay = new Button(guiMenu);
+      btnPlay.x = 10;
+      btnPlay.y = 10;
+      btnPlay.w = 180;
+      
+      var fraMenu = new Frame(guiMenu);
+      fraMenu.w = 200;
+      fraMenu.h = 100;
+      
+      btnPlay.text('Play');
+      btnPlay.onclick = $.proxy(function(x, y, button) {
+        btnPlay.gui.pop();
         this.initGame();
       }, this);
       
-      this.menuButtons.push(this.menuPlay);
+      fraMenu.controls.add(btnPlay);
+      
+      guiMenu.controls.add(fraMenu);
+      guiMenu.onresize = $.proxy(function() {
+        fraMenu.x = (this.canvas.width  - fraMenu.w) / 2;
+        fraMenu.y = (this.canvas.height - fraMenu.h) / 2;
+      }, this);
+      
+      guiMenu.onrender = $.proxy(function() {
+        this.renderMenu();
+      }, this);
+      
+      this.guis.push(guiMenu);
       
       this.initMenu();
     },
@@ -442,11 +453,6 @@ function Client() {
     },
     
     initMenu: function() {
-      this.setStatus('Initialising...');
-      
-      this.canvas = $('#canvas')[0];
-      this.ctx = canvas.getContext('2d');
-      
       var name = $('input[name=username]').val();
       var auth = $('input[name=auth]').val();
       var ip   = $('input[name=ip]').val();
@@ -457,8 +463,17 @@ function Client() {
       
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
-      setInterval($.proxy(this.render, this), tickRate);
-      $(document).click($.proxy(this.click, this));
+      setInterval($.proxy(function() { this.guis.render(); }, this), tickRate);
+      
+      // Hook our keyboard events
+      $(document).keydown($.proxy(this.keyDown, this));
+      $(document).keyup($.proxy(this.keyUp, this));
+      $(document).keypress($.proxy(this.keyPress, this));
+      
+      // Hook our mouse events
+      $(document).mousemove($.proxy(function(ev) { this.guis.mousemove(ev.pageX, ev.pageY, ev.which); }, this));
+      $(document).mousedown($.proxy(function(ev) { this.guis.mousedown(ev.pageX, ev.pageY, ev.which); }, this));
+      $(document).mouseup  ($.proxy(function(ev) { this.guis.mouseup  (ev.pageX, ev.pageY, ev.which); }, this));
       
       this.setStatus('Connecting...');
       this.socket = io.connect(ip + ':' + port, {'reconnect': false});
@@ -503,6 +518,29 @@ function Client() {
     },
     
     initGame: function() {
+      var guiGame = new GUI(this.ctx);
+      var txtChat = new Textbox(guiGame);
+      var fraChat = new Frame(guiGame);
+      fraChat.w = 200;
+      fraChat.onrender = $.proxy(function() {
+        this.renderMessages();
+      }, this);
+      
+      guiGame.controls.add(txtChat);
+      guiGame.controls.add(fraChat);
+      guiGame.onresize = $.proxy(function(w, h) {
+        txtChat.x = 2;
+        txtChat.y = this.canvas.height - txtChat.h - 2;
+        fraChat.h = txtChat.y;
+      }, this);
+      
+      guiGame.onrender = $.proxy(function() {
+        this.renderGame();
+      }, this);
+      
+      guiGame.resize(this.canvas.width, this.canvas.height);
+      this.guis.push(guiGame);
+      
       // Register event handlers
       this.socket.on('msg',        $.proxy(this.addMsg, this));
       this.socket.on('stats',      $.proxy(this.stats, this));
@@ -514,11 +552,6 @@ function Client() {
       this.socket.on('kill',       $.proxy(this.kill, this));
       this.socket.on('badd',       $.proxy(this.badd, this));
       this.socket.on('brem',       $.proxy(this.brem, this));
-      
-      // Hook our keyboard events
-      $(document).keydown($.proxy(this.keyDown, this));
-      $(document).keyup($.proxy(this.keyUp, this));
-      $(document).keypress($.proxy(this.keyPress, this));
       
       this.inGame = true;
       
@@ -560,89 +593,88 @@ function Client() {
       user.gun = stats.gun;
     },
     
-    click: function(ev) {
-      if(!this.inGame) {
-        for(var i in this.menuButtons) {
-          if(i === 'length') { continue; }
-          var button = this.menuButtons[i];
-          if(ev.offsetX >= button.x && ev.offsetX <= button.x + button.w &&
-             ev.offsetY >= button.y && ev.offsetY <= button.y + button.h) {
-            button.click();
+    keyDown: function(ev) {
+      if(ev.which == 8) { ev.preventDefault(); }
+      
+      this.guis.keydown(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
+      
+      if(this.inGame) {
+        if(!this.inChat) {
+          switch(ev.which) {
+            case 32: case 37: case 38: case 39: case 40:
+              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+              if((this.keys & code) == 0) {
+                this.keys |= code;
+                this.socket.emit('keys', {keys: this.keys});
+              }
+              break;
+            
+            //PGUP
+            case 33:
+              this.zoomIn();
+              break;
+            
+            //PGDN
+            case 34:
+              this.zoomOut();
+              break;
+            
+            case 84:
+              this.inChat = true;
+              ev.preventDefault();
+              break;
+            
+          }
+        } else {
+          switch(ev.which) {
+            case 8:
+              if(this.chatBuffer.length != 0) {
+                this.chatBuffer = this.chatBuffer.substr(0, this.chatBuffer.length - 1);
+                this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
+              }
+              
+              break;
+            
+            case 13:
+              if(this.chatBuffer.length != 0) {
+                this.socket.emit('msg', {msg: this.chatBuffer});
+                this.chatBuffer = '';
+                this.chatBufferW = 0;
+              }
+              
+              this.inChat = false;
+              break;
           }
         }
       }
     },
     
-    keyDown: function(ev) {
-      if(ev.which == 8) { ev.preventDefault(); }
-      
-      if(!this.inChat) {
-        switch(ev.which) {
-          case 32: case 37: case 38: case 39: case 40:
-            code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-            if((this.keys & code) == 0) {
-              this.keys |= code;
-              this.socket.emit('keys', {keys: this.keys});
-            }
-            break;
-          
-          //PGUP
-          case 33:
-            this.zoomIn();
-            break;
-          
-          //PGDN
-          case 34:
-            this.zoomOut();
-            break;
-          
-          case 84:
-            this.inChat = true;
-            ev.preventDefault();
-            break;
-          
-        }
-      } else {
-        switch(ev.which) {
-          case 8:
-            if(this.chatBuffer.length != 0) {
-              this.chatBuffer = this.chatBuffer.substr(0, this.chatBuffer.length - 1);
-              this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
-            }
-            
-            break;
-          
-          case 13:
-            if(this.chatBuffer.length != 0) {
-              this.socket.emit('msg', {msg: this.chatBuffer});
-              this.chatBuffer = '';
-              this.chatBufferW = 0;
-            }
-            
-            this.inChat = false;
-            break;
-        }
-      }
-    },
-    
     keyUp: function(ev) {
-      if(!this.inChat) {
-        switch(ev.which) {
-          case 32: case 37: case 38: case 39: case 40:
-            code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-            if((this.keys & code) != 0) {
-              this.keys &= ~code;
-              this.socket.emit('keys', {keys: this.keys});
-            }
-            break;
+      this.guis.keyup(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
+      
+      if(this.inGame) {
+        if(!this.inChat) {
+          switch(ev.which) {
+            case 32: case 37: case 38: case 39: case 40:
+              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+              if((this.keys & code) != 0) {
+                this.keys &= ~code;
+                this.socket.emit('keys', {keys: this.keys});
+              }
+              break;
+          }
         }
       }
     },
     
     keyPress: function(ev) {
-      if(this.inChat) {
-        this.chatBuffer += String.fromCharCode(ev.which);
-        this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
+      this.guis.keypress(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
+      
+      if(this.inGame) {
+        if(this.inChat) {
+          this.chatBuffer += String.fromCharCode(ev.which);
+          this.chatBufferW = this.ctx.measureText(this.chatBuffer).width;
+        }
       }
     },
     
@@ -880,63 +912,6 @@ function User() {
     lastHit: 0
   }
 }
-
-function Button() {
-  return {
-    text: '',
-    x: 0,
-    y: 0,
-    w: 100,
-    h: 20,
-    forecolour: 'white',
-    backcolour: 'gray',
-    onclick: null,
-    
-    render: function(ctx) {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.fillStyle = this.backcolour;
-      ctx.fillRect(0, 0, this.w, this.h);
-      ctx.fillStyle = this.forecolour;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(this.text, this.w / 2, this.h / 2);
-      ctx.restore();
-    },
-    
-    click: function() {
-      if(this.onclick !== null) {
-        this.onclick();
-      }
-    }
-  }
-}
-
-function getTextHeight(font) {
-  var text = $('<span>Hg</span>').css({ fontFamily: font });
-  var block = $('<div style="display: inline-block; width: 1px; height: 0px;"></div>');
-  var div = $('<div></div>');
-  var body = $('body');
-  
-  div.append(text, block);
-  body.append(div);
-  
-  try {
-    var result = {};
-    
-    block.css({ verticalAlign: 'baseline' });
-    result.ascent = block.offset().top - text.offset().top;
-    
-    block.css({ verticalAlign: 'bottom' });
-    result.height = block.offset().top - text.offset().top;
-    
-    result.descent = result.height - result.ascent;
-  } finally {
-    div.remove();
-  }
-  
-  return result;
-};
 
 $(document).ready(function() {
   var client = Client();
