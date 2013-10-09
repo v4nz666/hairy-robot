@@ -89,7 +89,10 @@ function GUI(ctx) {
       }
       
       this.focus = control;
-      this.focus.gotfocus();
+      
+      if(this.focus !== null) {
+        this.focus.gotfocus();
+      }
     },
     
     pop: function() {
@@ -289,7 +292,7 @@ function Control(gui) {
     y: 0,
     w: 100,
     h: 20,
-    visible: true,
+    _visible: true,
     forecolour: 'white',
     backcolour: null,
     bordercolour: null,
@@ -313,6 +316,20 @@ function Control(gui) {
       }
       
       return this;
+    },
+    
+    visible: function(visible) {
+      if(typeof visible === 'undefined') {
+        return this._visible;
+      }
+      
+      if(this._visible !== visible) {
+        this._visible = visible;
+        
+        if(!visible && focus) {
+          this.gui.setfocus(this.contParent);
+        }
+      }
     },
     
     setfocus: function() {
@@ -341,7 +358,7 @@ function Control(gui) {
     },
     
     renderPre: function(ctx) {
-      if(this.visible) {
+      if(this._visible) {
         ctx.save();
         ctx.translate(this.x, this.y);
         
