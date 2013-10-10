@@ -511,9 +511,10 @@ function Client() {
     initGame: function() {
       var guiGame = new GUI(this.ctx);
       var txtChat = new Textbox(guiGame);
-      this.txtChat = txtChat;
       txtChat.visible(false);
       txtChat.w = 200;
+      txtChat.backcolour = 'rgba(127, 127, 127, 0.5)';
+      txtChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
       txtChat.onkeypress = $.proxy(function(key, shift, ctrl, alt) {
         if(key === 13) {
           if(txtChat.text().length !== 0) {
@@ -521,18 +522,25 @@ function Client() {
             txtChat.text('');
           }
           
-          this.txtChat.visible(false);
+          txtChat.visible(false);
+          fraChat.backcolour = null;
+          fraChat.bordercolour = null;
         }
       }, this);
       
       var fraChat = Frame(guiGame);
       fraChat.w = 200;
+      fraChat.backcolour = null;
+      fraChat.bordercolour = null;
       fraChat.onrender = $.proxy(function() {
         this.ctx.save();
         this.ctx.translate(0, fraChat.h);
         this.renderMessages();
         this.ctx.restore();
       }, this);
+      
+      this.txtChat = txtChat;
+      this.fraChat = fraChat;
       
       guiGame.controls.add(txtChat);
       guiGame.controls.add(fraChat);
@@ -627,6 +635,8 @@ function Client() {
               break;
             
             case 84:
+              this.fraChat.backcolour = 'rgba(127, 127, 127, 0.25)';
+              this.fraChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
               this.txtChat.visible(true);
               this.txtChat.setfocus();
               ev.preventDefault();
