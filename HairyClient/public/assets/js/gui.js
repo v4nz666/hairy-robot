@@ -128,7 +128,7 @@ function GUI(ctx) {
       }
       
       if(this.onmousemove !== null) {
-        ret |= this.onmousemove(x, y, button);
+        ret |= this.onmousemove(x, y, button, ret);
       }
       
       return ret;
@@ -147,7 +147,7 @@ function GUI(ctx) {
       }
       
       if(this.onmousedown !== null) {
-        ret |= this.onmousedown(x, y, button);
+        ret |= this.onmousedown(x, y, button, ret);
       }
       
       return ret;
@@ -165,7 +165,7 @@ function GUI(ctx) {
       }
       
       if(this.onmouseup !== null) {
-        ret |= this.onmouseup(x, y, button);
+        ret |= this.onmouseup(x, y, button, ret);
       }
       
       if(this.onclick !== null) {
@@ -184,7 +184,7 @@ function GUI(ctx) {
       }
       
       if(this.onkeydown !== null) {
-        ret |= this.onkeydown(key, shift, ctrl, alt);
+        ret |= this.onkeydown(key, shift, ctrl, alt, ret);
       }
       
       return ret;
@@ -199,7 +199,7 @@ function GUI(ctx) {
       }
       
       if(this.onkeyup !== null) {
-        ret |= this.onkeyup(key, shift, ctrl, alt);
+        ret |= this.onkeyup(key, shift, ctrl, alt, ret);
       }
       
       return ret;
@@ -214,7 +214,7 @@ function GUI(ctx) {
       }
       
       if(this.onkeypress !== null) {
-        ret |= this.onkeypress(key, shift, ctrl, alt);
+        ret |= this.onkeypress(key, shift, ctrl, alt, ret);
       }
       
       return ret;
