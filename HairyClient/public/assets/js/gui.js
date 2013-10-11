@@ -31,39 +31,39 @@ function GUIs() {
       }
     },
     
-    mousemove: function(x, y, button) {
+    mousemove: function(ev) {
       for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].mousemove(x, y, button)) break;
+        if(this.guis[i].mousemove(ev)) break;
       }
     },
     
-    mousedown: function(x, y, button) {
+    mousedown: function(ev) {
       for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].mousedown(x, y, button)) break;
+        if(this.guis[i].mousedown(ev)) break;
       }
     },
     
-    mouseup: function(x, y, button) {
+    mouseup: function(ev) {
       for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].mouseup(x, y, button)) break;
+        if(this.guis[i].mouseup(ev)) break;
       }
     },
     
-    keydown: function(key, shift, ctrl, alt) {
+    keydown: function(ev) {
       for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].keydown(key, shift, ctrl, alt)) break;
+        if(this.guis[i].keydown(ev)) break;
       }
     },
     
-    keyup: function(key, shift, ctrl, alt) {
+    keyup: function(ev) {
       for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].keyup(key, shift, ctrl, alt)) break;
+        if(this.guis[i].keyup(ev)) break;
       }
     },
     
-    keypress: function(key, shift, ctrl, alt) {
+    keypress: function(ev) {
       for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].keypress(key, shift, ctrl, alt)) break;
+        if(this.guis[i].keypress(ev)) break;
       }
     }
   }
@@ -106,14 +106,23 @@ function GUI(ctx) {
       this.guis.pop(this);
     },
     
-    mousemove: function(x, y, button) {
+    mousemove: function(ev) {
       var ret = false;
       
       if(this.mousedowncontrol !== null) {
-        this.mousedowncontrol.mousemove(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), button);
+        var allx = this.allX(this.mousedowncontrol);
+        var ally = this.allY(this.mousedowncontrol);
+        var button = ev.which;
+        ev.pageX -= allx;
+        ev.pageY -= ally;
+        ev.which = this.mousedownbutton;
+        this.mousedowncontrol.mousemove(ev);
+        ev.pageX += allx;
+        ev.pageY += ally;
+        ev.which = button;
         ret = true;
       } else {
-        var c = this.controls.hittest(x, y);
+        var c = this.controls.hittest(ev.pageX, ev.pageY);
         
         if(c !== this.mousemovecontrol) {
           if(this.mousemovecontrol !== null) this.mousemovecontrol.mouseout();
@@ -122,50 +131,77 @@ function GUI(ctx) {
         }
         
         if(c !== null) {
-          c.mousemove(x - this.allX(c), y - this.allY(c), button);
+          var allx = this.allX(c);
+          var ally = this.allY(c);
+          ev.pageX -= allx;
+          ev.pageY -= ally;
+          c.mousemove(ev);
+          ev.pageX += allx;
+          ev.pageY += ally;
           ret = true;
         }
       }
       
       if(this.onmousemove !== null) {
-        ret |= this.onmousemove(x, y, button, ret);
+        ret |= this.onmousemove(ev, ret);
       }
       
       return ret;
     },
     
-    mousedown: function(x, y, button) {
+    mousedown: function(ev) {
       var ret = false;
       
-      this.mousedownbutton = button;
-      this.mousedowncontrol = this.controls.hittest(x, y);
+      this.mousedownbutton = ev.which;
+      this.mousedowncontrol = this.controls.hittest(ev.pageX, ev.pageY);
       
       if(this.mousedowncontrol !== null) {
+        var allx = this.allX(this.mousedowncontrol);
+        var ally = this.allY(this.mousedowncontrol);
+        ev.pageX -= allx;
+        ev.pageY -= ally;
+        
         this.mousedowncontrol.setfocus();
-        this.mousedowncontrol.mousedown(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), button);
+        this.mousedowncontrol.mousedown(ev);
+        
+        ev.pageX += allx;
+        ev.pageY += ally;
+        
         ret = true;
       }
       
       if(this.onmousedown !== null) {
-        ret |= this.onmousedown(x, y, button, ret);
+        ret |= this.onmousedown(ev, ret);
       }
       
       return ret;
     },
     
-    mouseup: function(x, y, button) {
+    mouseup: function(ev) {
       var ret = false;
       
       if(this.mousedowncontrol !== null) {
-        this.mousedowncontrol.mouseup(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), this.mousedownbutton);
+        var allx = this.allX(this.mousedowncontrol);
+        var ally = this.allY(this.mousedowncontrol);
+        var button = ev.which;
+        ev.pageX -= allx;
+        ev.pageY -= ally;
+        ev.which = this.mousedownbutton;
+        
+        this.mousedowncontrol.mouseup(ev);
         this.mousedowncontrol.click();
         this.mousedowncontrol = null;
         this.mousedownbutton = 0;
+        
+        ev.pageX += allx;
+        ev.pageY += ally;
+        ev.which = button;
+        
         ret = true;
       }
       
       if(this.onmouseup !== null) {
-        ret |= this.onmouseup(x, y, button, ret);
+        ret |= this.onmouseup(ev, ret);
       }
       
       if(this.onclick !== null) {
@@ -175,46 +211,46 @@ function GUI(ctx) {
       return ret;
     },
     
-    keydown: function(key, shift, ctrl, alt) {
+    keydown: function(ev) {
       var ret = false;
       
       if(this.focus !== null) {
-        this.focus.keydown(key, shift, ctrl, alt);
+        this.focus.keydown(ev);
         ret = true;
       }
       
       if(this.onkeydown !== null) {
-        ret |= this.onkeydown(key, shift, ctrl, alt, ret);
+        ret |= this.onkeydown(ev, ret);
       }
       
       return ret;
     },
     
-    keyup: function(key, shift, ctrl, alt) {
+    keyup: function(ev) {
       var ret = false;
       
       if(this.focus !== null) {
-        this.focus.keyup(key, shift, ctrl, alt);
+        this.focus.keyup(ev);
         ret = true;
       }
       
       if(this.onkeyup !== null) {
-        ret |= this.onkeyup(key, shift, ctrl, alt, ret);
+        ret |= this.onkeyup(ev, ret);
       }
       
       return ret;
     },
     
-    keypress: function(key, shift, ctrl, alt) {
+    keypress: function(ev) {
       var ret = false;
       
       if(this.focus !== null) {
-        this.focus.keypress(key, shift, ctrl, alt);
+        this.focus.keypress(ev);
         ret = true;
       }
       
       if(this.onkeypress !== null) {
-        ret |= this.onkeypress(key, shift, ctrl, alt, ret);
+        ret |= this.onkeypress(ev, ret);
       }
       
       return ret;
@@ -479,32 +515,32 @@ function Control(gui) {
           if(this.onmouseout !== null) { this.onmouseout(); }
         },
         
-        mousemove: function(x, y, button) {
-          if(this.onmousemove !== null) { this.onmousemove(x, y, button); }
+        mousemove: function(ev) {
+          if(this.onmousemove !== null) { this.onmousemove(ev); }
         },
         
-        mousedown: function(x, y, button) {
-          if(this.onmousedown !== null) { this.onmousedown(x, y, button); }
+        mousedown: function(ev) {
+          if(this.onmousedown !== null) { this.onmousedown(ev); }
         },
         
-        mouseup: function(x, y, button) {
-          if(this.onmouseup !== null) { this.onmouseup(x, y, button); }
+        mouseup: function(ev) {
+          if(this.onmouseup !== null) { this.onmouseup(ev); }
         },
         
         click: function() {
           if(this.onclick !== null) { this.onclick(); }
         },
         
-        keydown: function(key, shift, ctrl, alt) {
-          if(this.onkeydown !== null) { this.onkeydown(key, shift, ctrl, alt); }
+        keydown: function(ev) {
+          if(this.onkeydown !== null) { this.onkeydown(ev); }
         },
         
-        keyup: function(key, shift, ctrl, alt) {
-          if(this.onkeyup !== null) { this.onkeyup(key, shift, ctrl, alt); }
+        keyup: function(ev) {
+          if(this.onkeyup !== null) { this.onkeyup(ev); }
         },
         
-        keypress: function(key, shift, ctrl, alt) {
-          if(this.onkeypress !== null) { this.onkeypress(key, shift, ctrl, alt); }
+        keypress: function(ev) {
+          if(this.onkeypress !== null) { this.onkeypress(ev); }
         }
       }
     }
@@ -612,19 +648,19 @@ function Textbox(gui) {
       }
       
       me.keypressSuper = me.keypress;
-      me.keypress = function(key, shift, ctrl, alt) {
-        if(key !== 13) {
+      me.keypress = function(ev) {
+        if(ev.which !== 13) {
           var s = _selstart;
-          this.text(this.text().substr(0, _selstart) + String.fromCharCode(key) + this.text().substr(_selstart, this.text().length));
+          this.text(this.text().substr(0, _selstart) + String.fromCharCode(ev.which) + this.text().substr(_selstart, this.text().length));
           this.selstart(s + 1);
         }
         
-        this.keypressSuper(key, shift, ctrl, alt);
+        this.keypressSuper(ev);
       }
       
       me.keydownSuper = me.keydown;
-      me.keydown = function(key, shift, ctrl, alt) {
-        switch(key) {
+      me.keydown = function(ev) {
+        switch(ev.which) {
           case 8:
             if(_selstart > 0) {
               var s = _selstart;
@@ -652,7 +688,7 @@ function Textbox(gui) {
             break;
         }
         
-        this.keydownSuper(key, shift, ctrl, alt);
+        this.keydownSuper(ev);
       }
       
       return me;
