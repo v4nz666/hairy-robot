@@ -27,7 +27,7 @@ function GUIs() {
     
     resize: function(w, h) {
       for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].resize(w, h)) break;
+        this.guis[i].resize(w, h);
       }
     },
     
