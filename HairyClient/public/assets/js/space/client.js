@@ -457,14 +457,14 @@ function Client() {
       setInterval($.proxy(function() { this.guis.render(); }, this), tickRate);
       
       // Hook our keyboard events
-      $(document).keydown($.proxy(this.keyDown, this));
-      $(document).keyup($.proxy(this.keyUp, this));
+      $(document).keydown ($.proxy(this.keyDown , this));
+      $(document).keyup   ($.proxy(this.keyUp   , this));
       $(document).keypress($.proxy(this.keyPress, this));
       
       // Hook our mouse events
-      $(document).mousemove($.proxy(function(ev) { this.guis.mousemove(ev.pageX, ev.pageY, ev.which); }, this));
-      $(document).mousedown($.proxy(function(ev) { this.guis.mousedown(ev.pageX, ev.pageY, ev.which); }, this));
-      $(document).mouseup  ($.proxy(function(ev) { this.guis.mouseup  (ev.pageX, ev.pageY, ev.which); }, this));
+      $(document).mousemove($.proxy(this.guis.mousemove, this.guis));
+      $(document).mousedown($.proxy(this.guis.mousedown, this.guis));
+      $(document).mouseup  ($.proxy(this.guis.mouseup  , this.guis));
       
       this.setStatus('Connecting...');
       this.socket = io.connect(ip + ':' + port, {'reconnect': false});
@@ -515,8 +515,8 @@ function Client() {
       txtChat.w = 200;
       txtChat.backcolour = 'rgba(127, 127, 127, 0.5)';
       txtChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
-      txtChat.onkeypress = $.proxy(function(key, shift, ctrl, alt) {
-        if(key === 13) {
+      txtChat.onkeypress = $.proxy(function(ev) {
+        if(ev.which === 13) {
           if(txtChat.text().length !== 0) {
             this.socket.emit('msg', {msg: txtChat.text()});
             txtChat.text('');
@@ -544,6 +544,39 @@ function Client() {
       
       guiGame.controls.add(txtChat);
       guiGame.controls.add(fraChat);
+      
+      guiGame.onkeydown = $.proxy(function(ev, handled) {
+        if(!handled) {
+          switch(ev.which) {
+            case 32: case 37: case 38: case 39: case 40:
+              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+              if((this.keys & code) == 0) {
+                this.keys |= code;
+                this.socket.emit('keys', {keys: this.keys});
+              }
+              break;
+            
+            //PGUP
+            case 33:
+              this.zoomIn();
+              break;
+            
+            //PGDN
+            case 34:
+              this.zoomOut();
+              break;
+            
+            case 84:
+              this.fraChat.backcolour = 'rgba(127, 127, 127, 0.25)';
+              this.fraChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
+              this.txtChat.visible(true);
+              this.txtChat.setfocus();
+              ev.preventDefault();
+              break;
+          }
+        }
+      }, this);
+      
       guiGame.onresize = $.proxy(function(w, h) {
         txtChat.y = this.canvas.height - txtChat.h;
         fraChat.h = txtChat.y;
@@ -611,44 +644,11 @@ function Client() {
     keyDown: function(ev) {
       if(ev.which == 8) { ev.preventDefault(); }
       
-      this.guis.keydown(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
-      
-      if(this.inGame) {
-        if(!this.txtChat.visible()) {
-          switch(ev.which) {
-            case 32: case 37: case 38: case 39: case 40:
-              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-              if((this.keys & code) == 0) {
-                this.keys |= code;
-                this.socket.emit('keys', {keys: this.keys});
-              }
-              break;
-            
-            //PGUP
-            case 33:
-              this.zoomIn();
-              break;
-            
-            //PGDN
-            case 34:
-              this.zoomOut();
-              break;
-            
-            case 84:
-              this.fraChat.backcolour = 'rgba(127, 127, 127, 0.25)';
-              this.fraChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
-              this.txtChat.visible(true);
-              this.txtChat.setfocus();
-              ev.preventDefault();
-              break;
-            
-          }
-        }
-      }
+      this.guis.keydown(ev);
     },
     
     keyUp: function(ev) {
-      this.guis.keyup(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
+      this.guis.keyup(ev);
       
       if(this.inGame) {
         if(!this.txtChat.visible()) {
@@ -666,7 +666,7 @@ function Client() {
     },
     
     keyPress: function(ev) {
-      this.guis.keypress(ev.which, ev.shiftKey, ev.ctrlKey, ev.altKey);
+      this.guis.keypress(ev);
     },
     
     update: function(up) {
