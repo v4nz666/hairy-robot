@@ -654,8 +654,6 @@ function Client() {
     },
     
     keyDown: function(ev) {
-      if(ev.which == 8) { ev.preventDefault(); }
-      
       this.guis.keydown(ev);
     },
     

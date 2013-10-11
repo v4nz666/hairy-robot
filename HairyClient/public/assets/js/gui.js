@@ -50,6 +50,8 @@ function GUIs() {
     },
     
     keydown: function(ev) {
+      if(ev.which == 8) { ev.preventDefault(); }
+      
       for(var i = 0; i < this.guis.length; i++) {
         if(this.guis[i].keydown(ev)) break;
       }
