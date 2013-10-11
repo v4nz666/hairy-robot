@@ -456,12 +456,10 @@ function Client() {
       var tickRate = 1000 / frameRate;
       setInterval($.proxy(function() { this.guis.render(); }, this), tickRate);
       
-      // Hook our keyboard events
-      $(document).keydown ($.proxy(this.keyDown , this));
-      $(document).keyup   ($.proxy(this.keyUp   , this));
-      $(document).keypress($.proxy(this.keyPress, this));
-      
-      // Hook our mouse events
+      // Hook our events
+      $(document).keydown  ($.proxy(this.guis.keydown  , this.guis));
+      $(document).keyup    ($.proxy(this.guis.keyup    , this.guis));
+      $(document).keypress ($.proxy(this.guis.keypress , this.guis));
       $(document).mousemove($.proxy(this.guis.mousemove, this.guis));
       $(document).mousedown($.proxy(this.guis.mousedown, this.guis));
       $(document).mouseup  ($.proxy(this.guis.mouseup  , this.guis));
@@ -651,18 +649,6 @@ function Client() {
       user.life = stats.life;
       user.shields = stats.shields;
       user.gun = stats.gun;
-    },
-    
-    keyDown: function(ev) {
-      this.guis.keydown(ev);
-    },
-    
-    keyUp: function(ev) {
-      this.guis.keyup(ev);
-    },
-    
-    keyPress: function(ev) {
-      this.guis.keypress(ev);
     },
     
     update: function(up) {
