@@ -114,8 +114,11 @@ function GUI(ctx) {
         
         if(c !== null) {
           c.mousemove(x - this.allX(c), y - this.allY(c), button);
+          return true;
         }
       }
+      
+      return false;
     },
     
     mousedown: function(x, y, button) {
@@ -146,19 +149,28 @@ function GUI(ctx) {
     keydown: function(key, shift, ctrl, alt) {
       if(this.focus !== null) {
         this.focus.keydown(key, shift, ctrl, alt);
+        return true;
       }
+      
+      return false;
     },
     
     keyup: function(key, shift, ctrl, alt) {
       if(this.focus !== null) {
         this.focus.keyup(key, shift, ctrl, alt);
+        return true;
       }
+      
+      return false;
     },
     
     keypress: function(key, shift, ctrl, alt) {
       if(this.focus !== null) {
         this.focus.keypress(key, shift, ctrl, alt);
+        return true;
       }
+      
+      return false;
     },
     
     render: function() {
