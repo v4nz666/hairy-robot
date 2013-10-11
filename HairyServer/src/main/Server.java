@@ -24,7 +24,7 @@ public class Server {
   public Star_System system = new Star_System();
   
   // 134,217,728 ~= 1/1000 scale of Sol system, at 32m/coord
-  public static final int W = 134217728, H = 134217728; 
+  public static final int W = 134217728, H = 134217728;
   public static final int spread = 15;
   public static final int bulletSize = 2;
   public static final int maxPowerups = 3;
