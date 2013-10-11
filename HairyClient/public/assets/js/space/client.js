@@ -549,7 +549,7 @@ function Client() {
         if(!handled) {
           switch(ev.which) {
             case 32: case 37: case 38: case 39: case 40:
-              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+              var code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
               if((this.keys & code) == 0) {
                 this.keys |= code;
                 this.socket.emit('keys', {keys: this.keys});
@@ -574,6 +574,18 @@ function Client() {
               ev.preventDefault();
               break;
           }
+        }
+      }, this);
+      
+      guiGame.onkeyup = $.proxy(function(ev, handled) {
+        switch(ev.which) {
+          case 32: case 37: case 38: case 39: case 40:
+            var code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+            if((this.keys & code) != 0) {
+              this.keys &= ~code;
+              this.socket.emit('keys', {keys: this.keys});
+            }
+            break;
         }
       }, this);
       
@@ -649,20 +661,6 @@ function Client() {
     
     keyUp: function(ev) {
       this.guis.keyup(ev);
-      
-      if(this.inGame) {
-        if(!this.txtChat.visible()) {
-          switch(ev.which) {
-            case 32: case 37: case 38: case 39: case 40:
-              code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-              if((this.keys & code) != 0) {
-                this.keys &= ~code;
-                this.socket.emit('keys', {keys: this.keys});
-              }
-              break;
-          }
-        }
-      }
     },
     
     keyPress: function(ev) {
