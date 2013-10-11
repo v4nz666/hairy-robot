@@ -79,6 +79,13 @@ function GUI(ctx) {
     mousedowncontrol: null,
     mousemovecontrol: null,
     
+    onmousemove: null,
+    onmousedown: null,
+    onmouseup: null,
+    onclick: null,
+    onkeydown: null,
+    onkeyup: null,
+    onkeypress: null,
     onrender: null,
     onresize: null,
     
@@ -100,9 +107,11 @@ function GUI(ctx) {
     },
     
     mousemove: function(x, y, button) {
+      var ret = false;
+      
       if(this.mousedowncontrol !== null) {
         this.mousedowncontrol.mousemove(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), button);
-        return true;
+        ret = true;
       } else {
         var c = this.controls.hittest(x, y);
         
@@ -114,63 +123,101 @@ function GUI(ctx) {
         
         if(c !== null) {
           c.mousemove(x - this.allX(c), y - this.allY(c), button);
-          return true;
+          ret = true;
         }
       }
       
-      return false;
+      if(this.onmousemove !== null) {
+        ret |= this.onmousemove(x, y, button);
+      }
+      
+      return ret;
     },
     
     mousedown: function(x, y, button) {
+      var ret = false;
+      
       this.mousedownbutton = button;
       this.mousedowncontrol = this.controls.hittest(x, y);
       
       if(this.mousedowncontrol !== null) {
         this.mousedowncontrol.setfocus();
         this.mousedowncontrol.mousedown(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), button);
-        return true;
+        ret = true;
       }
       
-      return false;
+      if(this.onmousedown !== null) {
+        ret |= this.onmousedown(x, y, button);
+      }
+      
+      return ret;
     },
     
     mouseup: function(x, y, button) {
+      var ret = false;
+      
       if(this.mousedowncontrol !== null) {
         this.mousedowncontrol.mouseup(x - this.allX(this.mousedowncontrol), y - this.allY(this.mousedowncontrol), this.mousedownbutton);
         this.mousedowncontrol.click();
         this.mousedowncontrol = null;
         this.mousedownbutton = 0;
-        return true;
+        ret = true;
       }
       
-      return false;
+      if(this.onmouseup !== null) {
+        ret |= this.onmouseup(x, y, button);
+      }
+      
+      if(this.onclick !== null) {
+        ret |= this.onclick();
+      }
+      
+      return ret;
     },
     
     keydown: function(key, shift, ctrl, alt) {
+      var ret = false;
+      
       if(this.focus !== null) {
         this.focus.keydown(key, shift, ctrl, alt);
-        return true;
+        ret = true;
       }
       
-      return false;
+      if(this.onkeydown !== null) {
+        ret |= this.onkeydown(key, shift, ctrl, alt);
+      }
+      
+      return ret;
     },
     
     keyup: function(key, shift, ctrl, alt) {
+      var ret = false;
+      
       if(this.focus !== null) {
         this.focus.keyup(key, shift, ctrl, alt);
-        return true;
+        ret = true;
       }
       
-      return false;
+      if(this.onkeyup !== null) {
+        ret |= this.onkeyup(key, shift, ctrl, alt);
+      }
+      
+      return ret;
     },
     
     keypress: function(key, shift, ctrl, alt) {
+      var ret = false;
+      
       if(this.focus !== null) {
         this.focus.keypress(key, shift, ctrl, alt);
-        return true;
+        ret = true;
       }
       
-      return false;
+      if(this.onkeypress !== null) {
+        ret |= this.onkeypress(key, shift, ctrl, alt);
+      }
+      
+      return ret;
     },
     
     render: function() {
