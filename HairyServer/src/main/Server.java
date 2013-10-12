@@ -20,7 +20,7 @@ public class Server {
   private static Server _instance = new Server();
   public static Server instance() { return _instance; }
   
-  public Star_System system = new Star_System();
+  public static Star_System star_system = new Star_System();
   
   // 134,217,728 ~= 1/1000 scale of Sol system, at 32m/coord
   public static final int W = 134217728, H = 134217728;
@@ -272,5 +272,9 @@ public class Server {
     public Update(User.Update[] usersOnScreen) {
       this.usersOnScreen = usersOnScreen;
     }
+  }
+
+  public static Star_System getCurrentSystem(User user) {
+    return star_system;
   }
 }

@@ -590,8 +590,7 @@ function Client() {
     
     setParams: function(data){
       console.log('setting client/world[', data, ']');
-      this.worldWidth = data.w;
-      this.worldHeight = data.h;
+      this.system = data.system;
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
     },
