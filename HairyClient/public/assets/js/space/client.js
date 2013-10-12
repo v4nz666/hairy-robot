@@ -78,9 +78,9 @@ function Client() {
         this.offsetX = 0;
         this.me.onscreenX = Math.floor(this.me.x / this.zoomLevel);
         // Near the right side of the map
-      } else if(this.me.x >= this.worldWidth - (this.ctx.canvas.width / 2 * this.zoomLevel)) {
-        this.offsetX = this.worldWidth - this.ctx.canvas.width * this.zoomLevel;
-        this.me.onscreenX = Math.floor(this.ctx.canvas.width - ((this.worldWidth - this.me.x) / this.zoomLevel));
+      } else if(this.me.x >= this.system.size - (this.ctx.canvas.width / 2 * this.zoomLevel)) {
+        this.offsetX = this.system.size - this.ctx.canvas.width * this.zoomLevel;
+        this.me.onscreenX = Math.floor(this.ctx.canvas.width - ((this.system.size - this.me.x) / this.zoomLevel));
       // In the middle
       } else {
         this.offsetX = Math.floor(this.me.x - (this.ctx.canvas.width / 2 * this.zoomLevel));
@@ -92,9 +92,9 @@ function Client() {
         this.offsetY = 0;
         this.me.onscreenY = Math.floor(this.me.y / this.zoomLevel);
       // Near the bottom of the map
-      } else if(this.me.y >= this.worldHeight - (this.ctx.canvas.height / 2 * this.zoomLevel)) {
-        this.offsetY = this.worldHeight - this.ctx.canvas.height * this.zoomLevel;
-        this.me.onscreenY = Math.floor(this.ctx.canvas.height- ((this.worldHeight - this.me.y) / this.zoomLevel));
+      } else if(this.me.y >= this.system.size - ((this.ctx.canvas.height / 2) * this.zoomLevel)) {
+        this.offsetY = this.system.size - this.ctx.canvas.height * this.zoomLevel;
+        this.me.onscreenY = Math.floor(this.ctx.canvas.height- ((this.system.size - this.me.y) / this.zoomLevel));
       // In the middle of the map
       } else {
         this.offsetY = Math.floor(this.me.y - (this.ctx.canvas.height / 2 * this.zoomLevel));
@@ -271,8 +271,8 @@ function Client() {
           delete expl.particles[i];
         }
         
-        screenX = p.x - this.offsetX;
-        screenY = p.y - this.offsetY;
+        screenX = (p.x - this.offsetX) / this.zoomLevel;
+        screenY = (p.y - this.offsetY) / this.zoomLevel;
         
         if(!this.onscreen(p, screenX, screenY)) {
           continue;
