@@ -8,6 +8,8 @@
     {{ HTML::script('assets/js/socket.io.min.js') }}
     {{ HTML::script('assets/js/helper.js') }}
     {{ HTML::script('assets/js/gui.js') }}
+    {{ HTML::script('assets/js/space/ship.js') }}
+    {{ HTML::script('assets/js/space/shipeditor.js') }}
     {{ HTML::script('assets/js/space/client.js') }}
     
     <style>

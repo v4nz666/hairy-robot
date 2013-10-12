@@ -43,11 +43,16 @@ function Client() {
       this.ctx.restore();
     },
     
-    renderMenu: function() {
+    render: function() {
       this.clear();
-      
       this.ctx.save();
-      
+      this.guis.render();
+      this.ctx.restore();
+      this.ticks++;
+      this.fpsTicks++;
+    },
+    
+    renderMenu: function() {
       if(this.status.length !== 0) {
         this.ctx.fillStyle = 'white';
         this.ctx.fontAlign = 'center';
@@ -55,11 +60,6 @@ function Client() {
         this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
         this.ctx.fillText(this.status, 0, 0);
       }
-      
-      this.ctx.restore();
-      
-      this.ticks++;
-      this.fpsTicks++;
     },
     
     renderGame: function() {
@@ -67,15 +67,11 @@ function Client() {
       
       this.calculateOffsets();
       
-      this.clear();
       this.renderBackground();
       this.renderBullets();
       this.renderUsers();
       this.renderEffects();
       this.renderGUI();
-      
-      this.ticks++;
-      this.fpsTicks++;
     },
     
     calculateOffsets: function() {
@@ -383,29 +379,42 @@ function Client() {
       btnPlay.x = 10;
       btnPlay.y = 10;
       btnPlay.w = 180;
-      
       btnPlay.text('Play');
-      btnPlay.onclick = $.proxy(function(x, y, button) {
+      btnPlay.onclick = $.proxy(function(ev) {
         btnPlay.gui.pop();
         this.initGame();
       }, this);
       
+      var btnEdit = new Button(guiMenu);
+      btnEdit.x = 10;
+      btnEdit.y = 30;
+      btnEdit.w = 180;
+      btnEdit.text('Edit Ships');
+      btnEdit.onclick = $.proxy(function(ev) {
+        btnEdit.gui.pop();
+        this.guis.push(ShipEditor(this.ctx));
+      }, this);
+      
       var btnParts = new Button(guiMenu);
-      
       btnParts.x = 10;
-      btnParts.y = 30;
+      btnParts.y = 50;
       btnParts.w = 180;
-      
       btnParts.text('Get Parts');
       btnParts.onclick = function() {
         $.ajax({
           url: '/games/store/parts',
           dataType: 'json',
         })
-          .done(function(data) { console.log(data); } )
-          .fail(function() { console.log('Failed to get parts'); } );
+          .done(function(data) { console.log(data); })
+          .fail(function() { console.log('Failed to get parts'); });
       }
+      
+      var fraMenu = Frame(guiMenu);
+      fraMenu.w = 200;
+      fraMenu.h = 100;
+      
       fraMenu.controls.add(btnPlay);
+      fraMenu.controls.add(btnEdit);
       fraMenu.controls.add(btnParts);
       
       guiMenu.controls.add(fraMenu);
@@ -438,7 +447,7 @@ function Client() {
       
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
-      setInterval($.proxy(this.guis.render, this.guis), tickRate);
+      setInterval($.proxy(this.render, this), tickRate);
       
       // Hook our events
       $(document).keydown  ($.proxy(this.guis.keydown  , this.guis));
