@@ -23,7 +23,7 @@ public class Star_System {
     // 2^27 x 32m/coordinate ~= 1/1000 scale our Solar system, so range from half
     //  that to twice that.
     _size = (int)Math.pow(2, 26 + _rand.nextInt(3));
-    System.out.println("System Size[" + (int)(_size * 32) + "m][" + _size + "px]");
+    System.out.println("System Size[" + (long)_size * 32 + "m][" + _size + "px]");
     
     this._star = Star.Generate(this);
     this.generatePlanets();
