@@ -522,6 +522,7 @@ function Client() {
       }, this);
       
       var fraChat = Frame(guiGame);
+      fraChat.acceptinput = false;
       fraChat.w = 200;
       fraChat.backcolour = null;
       fraChat.bordercolour = null;
