@@ -22,8 +22,6 @@ public class Server {
   
   public static Star_System star_system = new Star_System();
   
-  // 134,217,728 ~= 1/1000 scale of Sol system, at 32m/coord
-  public static final int W = 134217728, H = 134217728;
   public static final int spread = 15;
   public static final int bulletSize = 2;
   public final double acc = 1 * 0.0625;
@@ -84,8 +82,8 @@ public class Server {
               try {
                 double x = Double.parseDouble(msg[1]);
                 double y = Double.parseDouble(msg[2]);
-                user.x = Math.min(Math.max(x, 0), W);
-                user.y = Math.min(Math.max(y, 0), H);
+                user.x = Math.min(Math.max(x, 0), star_system.getSize());
+                user.y = Math.min(Math.max(y, 0), star_system.getSize());
               } catch(Exception ex) {
                 client.sendEvent("msg", new Msg("Server", "Usage: warp x y"));
               }
@@ -209,8 +207,8 @@ public class Server {
     victim.life = victim.maxLife;
     victim.shields = victim.maxShields;
     victim.setGun(space.data.guns.Gun.getGunDefault());
-    victim.x = W / 2;
-    victim.y = H / 2;
+    victim.x = star_system.getSize() / 2;
+    victim.y = star_system.getSize() / 2;
     victim.vx = 0;
     victim.vy = 0;
     victim.angle = 0;

@@ -168,8 +168,8 @@ public class User extends Entity {
     
     int xmin = size / 2;
     int ymin = xmin;
-    int xmax = Server.W - xmin; //TODO: No more fixed size
-    int ymax = Server.H - ymin;
+    int xmax = Server.star_system.getSize() - xmin; //TODO: No more fixed size
+    int ymax = Server.star_system.getSize() - ymin;
     
     if(x < xmin) { x = xmin; vx = 0; }
     if(x > xmax) { x = xmax; vx = 0; }

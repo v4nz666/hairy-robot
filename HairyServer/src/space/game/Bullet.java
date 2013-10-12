@@ -76,8 +76,8 @@ public class Bullet extends Entity {
     super.update(deltaT);
     
     if(distance(x, y, _startX, _startY) > _range ||
-       x < -size || x > Server.W + size ||
-       y < -size || y > Server.H + size) {
+       x < -size || x > Server.star_system.getSize() + size ||
+       y < -size || y > Server.star_system.getSize() + size) {
       remove();
     }
   }
