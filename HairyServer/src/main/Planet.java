@@ -17,14 +17,14 @@ public class Planet extends Entity {
     return (int)((d / 1000) + (d / 3000 * _rand.nextFloat() - d/6000) );
   }
   
-  public Planet(int d) {
-    this(-1, d, 0, generateSize(d));
+  public Planet(Star_System _system, int d) {
+    this(-1, d, _system.getSize() / 2 , generateSize(d));
   }
   
   public Planet(int id, double x, double y, int size) {
     super(id, x, y, size);
     this._radius = size / 2;
-    System.out.println("Planet generated with size [" + size + "]");
+    System.out.println("Planet generated with size [" + size + "]x, y[" + x + "," + y + "]");
   }
 
   

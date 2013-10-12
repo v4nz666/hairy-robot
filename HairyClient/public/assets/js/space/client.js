@@ -66,6 +66,7 @@ function Client() {
       this.calculateOffsets();
       
       this.renderBackground();
+      this.renderCelestials();
       this.renderBullets();
       this.renderUsers();
       this.renderEffects();
@@ -140,6 +141,36 @@ function Client() {
         c = c + 1;
       }
       
+      ctx.restore();
+    },
+    
+    renderCelestials: function() {
+      var ctx = this.ctx;
+      var screenX;
+      var screenY;
+      
+      for (i in this.system.planets) {
+        var p = this.system.planets[i];
+        
+        screenX = (p.x - this.offsetX) / this.zoomLevel;
+        screenY = (p.y - this.offsetY) / this.zoomLevel;
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, p.size / this.zoomLevel, 0, this.PIx2);
+        ctx.fillStyle = 'blue';
+        ctx.fill();
+        ctx.restore();
+      }
+      
+      screenX = (this.system.star.x - this.offsetX) / this.zoomLevel;
+      screenY = (this.system.star.y - this.offsetY) / this.zoomLevel;
+      
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, this.system.star.size / this.zoomLevel, 0, this.PIx2);
+      ctx.fillStyle = 'yellow';
+      ctx.fill();
       ctx.restore();
     },
     
@@ -618,11 +649,12 @@ function Client() {
     },
     
     onscreen: function(entity, screenX, screenY) {
+      //TODO: Why is this so confusing (and wrong...)?!
       return !(
-        screenX + Math.min(1, entity.size / (2 * this.zoomLevel)) < 0                     || // Right edge is left of canvas
-        screenX -            (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.width || // Left edge is right of canvas
-        screenY + Math.min(1, entity.size / (2 * this.zoomLevel)) < 0                     || // Top edge is below canvas
-        screenY -            (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.height); // Bottom edge is above canvas
+        screenX + (entity.size / 2 * this.zoomLevel) < 0                     || // Right edge is left of canvas
+        screenX - (entity.size / 2 * this.zoomLevel) > this.ctx.canvas.width || // Left edge is right of canvas
+        screenY + (entity.size / 2 * this.zoomLevel) < 0                     || // Top edge is below canvas
+        screenY - (entity.size / 2 * this.zoomLevel) > this.ctx.canvas.height); // Bottom edge is above canvas
     }
   }
 }

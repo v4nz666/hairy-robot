@@ -12,8 +12,8 @@ public class Star_System {
   public String getName() { return _name; }
   public int getSize() { return _size; }
   
-  public Planet[] _planets;
-  public Star _star;
+  public Planet[] planets;
+  public Star star;
   
   public Star_System() {
     
@@ -25,23 +25,23 @@ public class Star_System {
     _size = (int)Math.pow(2, 26 + _rand.nextInt(3));
     System.out.println("System Size[" + (long)_size * 32 + "m][" + _size + "px]");
     
-    this._star = Star.Generate(this);
+    this.star = Star.Generate(this);
     this.generatePlanets();
   }
   
   private void generatePlanets() {
-    this._planets = new Planet[_rand.nextInt(8)];
+    this.planets = new Planet[_rand.nextInt(8)];
     
     int fib = 1;
     int last;
     
-    for (int i = 0; i < _planets.length; i++) {
+    for (int i = 0; i < planets.length; i++) {
       last = fib;
       fib = fib + last;
 
       int d = fib * (1500000 + (int)(25000 *_rand.nextFloat())); 
       
-      _planets[i] = new Planet(d);
+      planets[i] = new Planet(this, d);
 
     }
     
