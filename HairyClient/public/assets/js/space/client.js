@@ -419,7 +419,7 @@ function Client() {
       var ip   = $('input[name=ip]').val();
       var port = $('input[name=port]').val();
       
-      window.addEventListener('resize', $.proxy(this.resize, this), false);
+      $(window).resize($.proxy(this.resize, this));
       this.resize();
       
       var frameRate = 60;
