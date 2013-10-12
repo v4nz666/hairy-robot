@@ -83,6 +83,30 @@ public class Server {
     _server.addEventListener("msg", Msg.class, new DataListener<Msg>() {
       @Override
       public void onData(SocketIOClient client, Msg data, AckRequest ackSender) {
+        // Temporary chat commands
+        if(data.msg.startsWith("/")) {
+          User user = _userMap.get(client);
+          String[] msg = data.msg.split(" ");
+          switch(msg[0]) {
+            case "/warp":
+              try {
+                double x = Double.parseDouble(msg[1]);
+                double y = Double.parseDouble(msg[2]);
+                user.x = Math.min(Math.max(x, 0), W);
+                user.y = Math.min(Math.max(y, 0), H);
+              } catch(Exception ex) {
+                client.sendEvent("msg", new Msg("Server", "Usage: warp x y"));
+              }
+              
+              return;
+              
+            case "/gun":
+              user.setGun(space.data.guns.Gun.getGunRandom());
+              _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
+              return;
+          }
+        }
+        
         _server.getBroadcastOperations().sendEvent("msg", new Msg(_userMap.get(client).name, data.msg));
       }
     });
