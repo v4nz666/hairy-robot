@@ -415,11 +415,8 @@ function Client() {
       }*/
       
       var menu = MainMenu(this.ctx);
-      menu.onrender = $.proxy(function() {
-        this.renderMenu();
-      }, this);
-      
-      menu.onplay = $.proxy(function() {
+      menu.onrender = $.proxy(this.renderMenu, this);
+      menu.onplay   = $.proxy(function() {
         menu.pop();
         this.initGame();
       }, this);
@@ -567,11 +564,8 @@ function Client() {
         fraChat.h = txtChat.y;
       }, this);
       
-      guiGame.onrender = $.proxy(function() {
-        this.renderGame();
-      }, this);
+      guiGame.onrender = $.proxy(this.renderGame, this);
       
-      guiGame.resize(this.canvas.width, this.canvas.height);
       this.guis.push(guiGame);
       
       // Register event handlers
