@@ -12,8 +12,6 @@ function Client() {
     effects: [],
     
     status: '',
-    messages: [],
-    maxMessages: 255,
     
     keys: 0,
     
@@ -334,28 +332,6 @@ function Client() {
       this.ctx.restore();
     },
     
-    renderMessages: function() {
-      var max = Math.min(this.maxMessages, this.messages.length);
-      var min = this.txtChat.visible() ? 0 : Math.max(max - 6, 0);
-      
-      var h = getTextHeight(this.ctx.font).ascent;
-      var x = 4;
-      var y = 0;
-      
-      this.ctx.save();
-      this.ctx.fillStyle = 'rgb(255, 255, 255)';
-      this.ctx.textBaseline = 'top';
-      
-      for(var i = max; --i >= min;) {
-        y -= h;
-        id = this.messages[i].id;
-        msg = this.messages[i].msg;
-        this.ctx.fillText(id + ': ' + msg, x, y);
-      }
-      
-      this.ctx.restore();
-    },
-    
     resize: function() {
       this.canvas.width  = window.innerWidth;
       this.canvas.height = window.innerHeight;
@@ -388,32 +364,6 @@ function Client() {
       
       this.resize();
       
-      /*var guiMenu = new GUI(this.ctx);
-      
-      var btnEdit = new Button(guiMenu);
-      btnEdit.x = 10;
-      btnEdit.y = 30;
-      btnEdit.w = 180;
-      btnEdit.text('Edit Ships');
-      btnEdit.onclick = $.proxy(function(ev) {
-        btnEdit.gui.pop();
-        this.guis.push(ShipEditor(this.ctx));
-      }, this);
-      
-      var btnParts = new Button(guiMenu);
-      btnParts.x = 10;
-      btnParts.y = 50;
-      btnParts.w = 180;
-      btnParts.text('Get Parts');
-      btnParts.onclick = function() {
-        $.ajax({
-          url: '/games/store/parts',
-          dataType: 'json',
-        })
-          .done(function(data) { console.log(data); })
-          .fail(function() { console.log('Failed to get parts'); });
-      }*/
-      
       var menu = MainMenu(this.ctx);
       menu.onrender = $.proxy(this.renderMenu, this);
       menu.onplay   = $.proxy(function() {
@@ -427,6 +377,10 @@ function Client() {
     
     setStatus: function(status) {
       this.status = status;
+    },
+    
+    gotchat: function(msg) {
+    
     },
     
     initMenu: function() {
@@ -468,53 +422,17 @@ function Client() {
       user.shields = data.shields;
       user.gun = data.gun;
       this.user[user.id] = user;
-      this.addMsg({id: 'Server', msg: user.name + ' has joined the game!'});
+      this.gotchat({id: 'Server', msg: user.name + ' has joined the game!'});
     },
     
     remUser: function(data) {
       console.log('Removing user [' + data.id + ']');
-      this.addMsg({id: 'Server', msg: this.user[data.id].name + ' has left the game!'});
+      this.gotchat({id: 'Server', msg: this.user[data.id].name + ' has left the game!'});
       delete this.user[data.id];
     },
     
     initGame: function() {
-      var guiGame = new GUI(this.ctx);
-      var txtChat = new Textbox(guiGame);
-      txtChat.visible(false);
-      txtChat.w = 200;
-      txtChat.backcolour = 'rgba(127, 127, 127, 0.5)';
-      txtChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
-      txtChat.onkeypress = $.proxy(function(ev) {
-        if(ev.which === 13) {
-          if(txtChat.text().length !== 0) {
-            this.socket.emit('msg', {msg: txtChat.text()});
-            txtChat.text('');
-          }
-          
-          txtChat.visible(false);
-          fraChat.backcolour = null;
-          fraChat.bordercolour = null;
-        }
-      }, this);
-      
-      var fraChat = Frame(guiGame);
-      fraChat.acceptinput = false;
-      fraChat.w = 200;
-      fraChat.backcolour = null;
-      fraChat.bordercolour = null;
-      fraChat.onrender = $.proxy(function() {
-        this.ctx.save();
-        this.ctx.translate(0, fraChat.h);
-        this.renderMessages();
-        this.ctx.restore();
-      }, this);
-      
-      this.txtChat = txtChat;
-      this.fraChat = fraChat;
-      
-      guiGame.controls.add(txtChat);
-      guiGame.controls.add(fraChat);
-      
+      var guiGame = Game(this.ctx, this.socket);
       guiGame.onkeydown = $.proxy(function(ev, handled) {
         if(!handled) {
           switch(ev.which) {
@@ -537,10 +455,8 @@ function Client() {
               break;
             
             case 84:
-              this.fraChat.backcolour = 'rgba(127, 127, 127, 0.25)';
-              this.fraChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
-              this.txtChat.visible(true);
-              this.txtChat.setfocus();
+              console.log(guiGame);
+              guiGame.showchat();
               ev.preventDefault();
               break;
           }
@@ -559,25 +475,21 @@ function Client() {
         }
       }, this);
       
-      guiGame.onresize = $.proxy(function(w, h) {
-        txtChat.y = this.canvas.height - txtChat.h;
-        fraChat.h = txtChat.y;
-      }, this);
-      
       guiGame.onrender = $.proxy(this.renderGame, this);
       
       this.guis.push(guiGame);
+      this.gotchat = guiGame.gotchat;
       
       // Register event handlers
-      this.socket.on('msg',        $.proxy(this.addMsg, this));
-      this.socket.on('stats',      $.proxy(this.stats, this));
-      this.socket.on('update',     $.proxy(this.update, this));
-      this.socket.on('effect',     $.proxy(this.effect, this));
-      this.socket.on('remuser',    $.proxy(this.remUser, this));
-      this.socket.on('hit',        $.proxy(this.hit, this));
-      this.socket.on('kill',       $.proxy(this.kill, this));
-      this.socket.on('badd',       $.proxy(this.badd, this));
-      this.socket.on('brem',       $.proxy(this.brem, this));
+      this.socket.on('msg',     $.proxy(this.gotchat, this));
+      this.socket.on('stats',   $.proxy(this.stats, this));
+      this.socket.on('update',  $.proxy(this.update, this));
+      this.socket.on('effect',  $.proxy(this.effect, this));
+      this.socket.on('remuser', $.proxy(this.remUser, this));
+      this.socket.on('hit',     $.proxy(this.hit, this));
+      this.socket.on('kill',    $.proxy(this.kill, this));
+      this.socket.on('badd',    $.proxy(this.badd, this));
+      this.socket.on('brem',    $.proxy(this.brem, this));
       
       this.inGame = true;
       
@@ -589,14 +501,6 @@ function Client() {
       this.system = data.system;
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
-    },
-    
-    addMsg: function(msg) {
-      while(this.messages.length >= this.maxMessages) {
-        this.messages.shift();
-      }
-      
-      this.messages.push(msg);
     },
     
     stats: function(stats) {

@@ -7,7 +7,7 @@ function MainMenu(ctx) {
       
       me.onplay = null;
       me.init = function() {
-        var btnPlay = new Button(this);
+        var btnPlay = Button(this);
         btnPlay.x = 10;
         btnPlay.y = 10;
         btnPlay.w = 180;
@@ -18,10 +18,36 @@ function MainMenu(ctx) {
           }
         }, this);
         
+        var btnEdit = new Button(this);
+        btnEdit.x = 10;
+        btnEdit.y = 30;
+        btnEdit.w = 180;
+        btnEdit.text('Edit Ships');
+        btnEdit.onclick = $.proxy(function(ev) {
+          btnEdit.gui.pop();
+          this.guis.push(ShipEditor(this.ctx));
+        }, this);
+        
+        var btnParts = Button(this);
+        btnParts.x = 10;
+        btnParts.y = 50;
+        btnParts.w = 180;
+        btnParts.text('Get Parts');
+        btnParts.onclick = function() {
+          $.ajax({
+            url: '/games/store/parts',
+            dataType: 'json',
+          })
+            .done(function(data) { console.log(data); })
+            .fail(function() { console.log('Failed to get parts'); });
+        }
+        
         var fraMenu = Frame(this);
         fraMenu.w = 200;
         fraMenu.h = 100;
         fraMenu.controls.add(btnPlay);
+        fraMenu.controls.add(btnEdit);
+        fraMenu.controls.add(btnParts);
         
         this.controls.add(fraMenu);
         this.onresize = $.proxy(function() {
