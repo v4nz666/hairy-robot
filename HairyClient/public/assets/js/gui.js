@@ -389,6 +389,7 @@ function Control(gui) {
         gui: gui,
         focus: false,
         
+        acceptinput: true,
         x: 0,
         y: 0,
         w: 100,
@@ -440,7 +441,7 @@ function Control(gui) {
         },
         
         hittest: function(x, y) {
-          if(_visible) {
+          if(_visible && this.acceptinput) {
             var c = this.controls.hittest(x - this.x, y - this.y);
             if(c !== null) {
               return c;
