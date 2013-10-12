@@ -375,14 +375,14 @@ function Client() {
       
       var guiMenu = new GUI(this.ctx);
       
+      var fraMenu = Frame(guiMenu);
+      fraMenu.w = 200;
+      fraMenu.h = 100;
+      
       var btnPlay = new Button(guiMenu);
       btnPlay.x = 10;
       btnPlay.y = 10;
       btnPlay.w = 180;
-      
-      var fraMenu = Frame(guiMenu);
-      fraMenu.w = 200;
-      fraMenu.h = 100;
       
       btnPlay.text('Play');
       btnPlay.onclick = $.proxy(function(x, y, button) {
@@ -390,7 +390,23 @@ function Client() {
         this.initGame();
       }, this);
       
+      var btnParts = new Button(guiMenu);
+      
+      btnParts.x = 10;
+      btnParts.y = 30;
+      btnParts.w = 180;
+      
+      btnParts.text('Get Parts');
+      btnParts.onclick = function() {
+        $.ajax({
+          url: '/games/store/parts',
+          dataType: 'json',
+        })
+          .done(function(data) { console.log(data); } )
+          .fail(function() { console.log('Failed to get parts'); } );
+      }
       fraMenu.controls.add(btnPlay);
+      fraMenu.controls.add(btnParts);
       
       guiMenu.controls.add(fraMenu);
       guiMenu.onresize = $.proxy(function() {
