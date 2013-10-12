@@ -43,10 +43,6 @@ function Client() {
       this.ctx.restore();
     },
     
-    render: function() {
-      this.guis.render();
-    },
-    
     renderMenu: function() {
       this.clear();
       
@@ -396,7 +392,6 @@ function Client() {
       this.canvas.height = window.innerHeight;
       
       this.guis.resize(this.canvas.width, this.canvas.height);
-      this.render();
     },
     
     init: function() {
@@ -454,7 +449,7 @@ function Client() {
       
       var frameRate = 60;
       var tickRate = 1000 / frameRate;
-      setInterval($.proxy(function() { this.guis.render(); }, this), tickRate);
+      setInterval($.proxy(this.guis.render, this.guis), tickRate);
       
       // Hook our events
       $(document).keydown  ($.proxy(this.guis.keydown  , this.guis));
