@@ -2,7 +2,6 @@ package main;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import space.game.Bullet;
@@ -27,17 +26,12 @@ public class Server {
   public static final int W = 134217728, H = 134217728;
   public static final int spread = 15;
   public static final int bulletSize = 2;
-  public static final int maxPowerups = 3;
   public final double acc = 1 * 0.0625;
   public final double dec = 0.75 * 0.0625;
-  
-  private Random _rand = new Random();
   
   private ConcurrentLinkedDeque<User> _user = new ConcurrentLinkedDeque<>();
   private HashMap<SocketIOClient, User> _userMap = new HashMap<>();
   private ConcurrentLinkedDeque<Bullet> _bullet = new ConcurrentLinkedDeque<>();
-  private ConcurrentLinkedDeque<Powerup> _powerup = new ConcurrentLinkedDeque<>();
-  private Powerup[] _powerupConv = new Powerup[0];
   
   private SocketIOServer _server;
   private Sandbox _sandbox = new Sandbox();
@@ -46,8 +40,6 @@ public class Server {
   private long _interval;
   private int _ticksPerSecond = 60;
   private int _tps = 60;
-  
-  private long _powerupTimer;
   
   private SQL _sql;
   
@@ -131,13 +123,6 @@ public class Server {
       }
     });
     
-    _sandbox.trackCollision(User.class, Powerup.class, new Sandbox.CollisionCallback<User, Powerup>() {
-      @Override
-      public void hit(User entity, Powerup hitBy) {
-        userPowerup(entity, hitBy);
-      }
-    });
-    
     System.out.println("Server running.");
     
     _interval = 1000000000 / _ticksPerSecond;
@@ -198,7 +183,6 @@ public class Server {
     
     System.out.println("New user added " + user.id);
     socket.sendEvent("setParams", user.serializeParams());
-    socket.sendEvent("powerups", _powerup.toArray(_powerupConv));
   }
   
   private void removeUser(SocketIOClient socket) {
@@ -247,31 +231,12 @@ public class Server {
     _server.getBroadcastOperations().sendEvent("brem", bullet.serializeForRem());
   }
   
-  public void addPowerup() {
-    Powerup p = Powerup.random(_rand.nextInt(W), _rand.nextInt(H));
-    _powerup.push(p);
-    _sandbox.addToSandbox(p);
-    _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
-  }
-  
-  public void removePowerup(Powerup p) {
-    _sandbox.removeFromSandbox(p);
-    _powerup.remove(p);
-  }
-  
   private void tick(double deltaT) {
     User.Update[] update = new User.Update[_user.size()];
     
     int i = 0;
     for(User user : _user) {
       update[i++] = user.serializeUpdate();
-    }
-    
-    if(_powerupTimer <= System.nanoTime()) {
-      _powerupTimer = System.nanoTime() + (_rand.nextInt(5) + 10) * 1000000000l; // 5-15 seconds
-      if(_powerup.size() < maxPowerups) {
-        addPowerup();
-      }
     }
     
     _server.getBroadcastOperations().sendEvent("update", new Update(update));
@@ -299,13 +264,6 @@ public class Server {
     }
     
     removeBullet(bullet);
-  }
-  
-  private void userPowerup(User user, Powerup powerup) {
-    powerup.use(user);
-    removePowerup(powerup);
-    _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
-    _server.getBroadcastOperations().sendEvent("powerups", _powerup.toArray(_powerupConv));
   }
   
   public static class Update {

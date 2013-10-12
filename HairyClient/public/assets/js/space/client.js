@@ -72,7 +72,6 @@ function Client() {
       this.renderBullets();
       this.renderUsers();
       this.renderEffects();
-      this.renderPowerups();
       this.renderGUI();
       
       this.ticks++;
@@ -298,32 +297,6 @@ function Client() {
         if(p.ttl == 0) {
           delete expl.particles[key];
         }
-      }
-    },
-    
-    renderPowerups: function() {
-      for(i in this.powerups) {
-        if(i === 'length') { continue; }
-        obj = this.powerups[i];
-        
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.moveTo(obj.x + obj.size / 2, obj.y + obj.size / 6);
-        this.ctx.lineTo(obj.x - obj.size / 3, obj.y - obj.size / 2);
-        this.ctx.lineTo(obj.x               , obj.y + obj.size / 2);
-        this.ctx.lineTo(obj.x + obj.size / 3, obj.y - obj.size / 2);
-        this.ctx.lineTo(obj.x - obj.size / 2, obj.y + obj.size / 6);
-        this.ctx.lineTo(obj.x + obj.size / 2, obj.y + obj.size / 6);
-        this.ctx.closePath();
-        this.ctx.fillStyle = obj.color;
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.arc(obj.x, obj.y, obj.size / 2, 0, this.PIx2);
-        
-        this.ctx.strokeStyle = obj.color;
-        this.ctx.stroke();
-        this.ctx.restore();
       }
     },
     
@@ -600,7 +573,6 @@ function Client() {
       this.socket.on('stats',      $.proxy(this.stats, this));
       this.socket.on('update',     $.proxy(this.update, this));
       this.socket.on('effect',     $.proxy(this.effect, this));
-      this.socket.on('powerups',   $.proxy(this.powerupUpdate, this));
       this.socket.on('remuser',    $.proxy(this.remUser, this));
       this.socket.on('hit',        $.proxy(this.hit, this));
       this.socket.on('kill',       $.proxy(this.kill, this));
@@ -622,11 +594,6 @@ function Client() {
       this.worldHeight = data.h;
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
-    },
-    
-    powerupUpdate: function(powerups) {
-      this.powerups = powerups;
-      console.log('Got Powerups[', this.powerups, ']');
     },
     
     addMsg: function(msg) {
