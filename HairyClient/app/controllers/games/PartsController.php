@@ -8,7 +8,7 @@ class PartsController extends \Controller {
   
   public function getAll() {
     $allParts = \SpacePart::all()->toJSON();
-    return json_encode($allParts);
+    return $allParts;
   }
   
   public function build() {
