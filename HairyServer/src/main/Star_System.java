@@ -41,6 +41,11 @@ public class Star_System {
 
       int d = i * (1500000 + (int)(25000 *_rand.nextFloat())); 
       
+      //TODO: I don't think this does what you want it to do
+      // Java unfortunately doesn't support doing anything by
+      // reference so setting p to a new planet won't update
+      // the array, it'll only change p for the duration of
+      // this iteration of the loop
       p = new Planet(d);
       
       
