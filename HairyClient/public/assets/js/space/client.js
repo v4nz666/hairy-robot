@@ -369,21 +369,7 @@ function Client() {
       this.canvas = $('#canvas')[0];
       this.ctx = canvas.getContext('2d');
       
-      var guiMenu = new GUI(this.ctx);
-      
-      var fraMenu = Frame(guiMenu);
-      fraMenu.w = 200;
-      fraMenu.h = 100;
-      
-      var btnPlay = new Button(guiMenu);
-      btnPlay.x = 10;
-      btnPlay.y = 10;
-      btnPlay.w = 180;
-      btnPlay.text('Play');
-      btnPlay.onclick = $.proxy(function(ev) {
-        btnPlay.gui.pop();
-        this.initGame();
-      }, this);
+      /*var guiMenu = new GUI(this.ctx);
       
       var btnEdit = new Button(guiMenu);
       btnEdit.x = 10;
@@ -407,28 +393,19 @@ function Client() {
         })
           .done(function(data) { console.log(data); })
           .fail(function() { console.log('Failed to get parts'); });
-      }
+      }*/
       
-      var fraMenu = Frame(guiMenu);
-      fraMenu.w = 200;
-      fraMenu.h = 100;
-      
-      fraMenu.controls.add(btnPlay);
-      fraMenu.controls.add(btnEdit);
-      fraMenu.controls.add(btnParts);
-      
-      guiMenu.controls.add(fraMenu);
-      guiMenu.onresize = $.proxy(function() {
-        fraMenu.x = (this.canvas.width  - fraMenu.w) / 2;
-        fraMenu.y = (this.canvas.height - fraMenu.h) / 2;
-      }, this);
-      
-      guiMenu.onrender = $.proxy(function() {
+      var menu = MainMenu(this.ctx);
+      menu.onrender = $.proxy(function() {
         this.renderMenu();
       }, this);
       
-      this.guis.push(guiMenu);
+      menu.onplay = $.proxy(function() {
+        menu.pop();
+        this.initGame();
+      }, this);
       
+      this.guis.push(menu);
       this.initMenu();
     },
     
