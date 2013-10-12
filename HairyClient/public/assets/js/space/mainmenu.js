@@ -24,9 +24,9 @@ function MainMenu(ctx) {
         fraMenu.controls.add(btnPlay);
         
         this.controls.add(fraMenu);
-        this.onresize = $.proxy(function(w, h) {
-          fraMenu.x = (w - fraMenu.w) / 2;
-          fraMenu.y = (h - fraMenu.h) / 2;
+        this.onresize = $.proxy(function() {
+          fraMenu.x = (ctx.canvas.width  - fraMenu.w) / 2;
+          fraMenu.y = (ctx.canvas.height - fraMenu.h) / 2;
         }, this);
       }
       

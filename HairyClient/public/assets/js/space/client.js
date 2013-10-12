@@ -359,8 +359,7 @@ function Client() {
     resize: function() {
       this.canvas.width  = window.innerWidth;
       this.canvas.height = window.innerHeight;
-      
-      this.guis.resize(this.canvas.width, this.canvas.height);
+      this.guis.resize();
     },
     
     init: function() {
@@ -368,6 +367,21 @@ function Client() {
       
       this.canvas = $('#canvas')[0];
       this.ctx = canvas.getContext('2d');
+      
+      var frameRate = 60;
+      var tickRate = 1000 / frameRate;
+      
+      // Hook our events
+      $(document).keydown  ($.proxy(this.guis.keydown  , this.guis));
+      $(document).keyup    ($.proxy(this.guis.keyup    , this.guis));
+      $(document).keypress ($.proxy(this.guis.keypress , this.guis));
+      $(document).mousemove($.proxy(this.guis.mousemove, this.guis));
+      $(document).mousedown($.proxy(this.guis.mousedown, this.guis));
+      $(document).mouseup  ($.proxy(this.guis.mouseup  , this.guis));
+      $(window)  .resize   ($.proxy(this.resize        , this));
+      
+      setInterval($.proxy(this.render, this), tickRate);
+      this.resize();
       
       /*var guiMenu = new GUI(this.ctx);
       
@@ -418,21 +432,6 @@ function Client() {
       var auth = $('input[name=auth]').val();
       var ip   = $('input[name=ip]').val();
       var port = $('input[name=port]').val();
-      
-      $(window).resize($.proxy(this.resize, this));
-      this.resize();
-      
-      var frameRate = 60;
-      var tickRate = 1000 / frameRate;
-      setInterval($.proxy(this.render, this), tickRate);
-      
-      // Hook our events
-      $(document).keydown  ($.proxy(this.guis.keydown  , this.guis));
-      $(document).keyup    ($.proxy(this.guis.keyup    , this.guis));
-      $(document).keypress ($.proxy(this.guis.keypress , this.guis));
-      $(document).mousemove($.proxy(this.guis.mousemove, this.guis));
-      $(document).mousedown($.proxy(this.guis.mousedown, this.guis));
-      $(document).mouseup  ($.proxy(this.guis.mouseup  , this.guis));
       
       this.setStatus('Connecting...');
       this.socket = io.connect(ip + ':' + port, {'reconnect': false});

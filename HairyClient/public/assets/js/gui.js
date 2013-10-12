@@ -4,6 +4,7 @@ function GUIs() {
     
     push: function(gui) {
       gui.guis = this;
+      gui.resize();
       this.guis.push(gui);
     },
     
@@ -25,9 +26,9 @@ function GUIs() {
       }
     },
     
-    resize: function(w, h) {
+    resize: function() {
       for(var i = 0; i < this.guis.length; i++) {
-        this.guis[i].resize(w, h);
+        this.guis[i].resize();
       }
     },
     
@@ -269,9 +270,9 @@ function GUI(ctx) {
       this.ctx.restore();
     },
     
-    resize: function(w, h) {
+    resize: function() {
       if(this.onresize !== null) {
-        this.onresize(w, h);
+        this.onresize();
       }
     },
     
