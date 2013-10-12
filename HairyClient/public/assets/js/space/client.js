@@ -719,19 +719,11 @@ function Client() {
     },
     
     onscreen: function(entity, screenX, screenY) {
-      
-      var onscreen = false;
-      if (
-        screenX + Math.min(1,entity.size / (2 * this.zoomLevel)) < 0           || // Right edge is left of canvas
-        screenX - (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.width || // Left edge is right of canvas
-        screenY + Math.min(1,entity.size / (2 * this.zoomLevel)) < 0           || // Top edge is below canvas
-        screenY - (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.height   // Bottom edge is above canvas
-      ) { 
-        onscreen = false;
-      } else {
-        onscreen = true;
-      }
-      return onscreen;
+      return !(
+        screenX + Math.min(1, entity.size / (2 * this.zoomLevel)) < 0                     || // Right edge is left of canvas
+        screenX -            (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.width || // Left edge is right of canvas
+        screenY + Math.min(1, entity.size / (2 * this.zoomLevel)) < 0                     || // Top edge is below canvas
+        screenY -            (entity.size / (2 * this.zoomLevel)) > this.ctx.canvas.height); // Bottom edge is above canvas
     }
   }
 }
