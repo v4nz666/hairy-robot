@@ -440,14 +440,16 @@ function Control(gui) {
         },
         
         hittest: function(x, y) {
-          var c = this.controls.hittest(x - this.x, y - this.y);
-          if(c !== null) {
-            return c;
-          }
-          
-          if(x >= this.x && x <= this.x + this.w &&
-             y >= this.y && y <= this.y + this.h) {
-            return this;
+          if(_visible) {
+            var c = this.controls.hittest(x - this.x, y - this.y);
+            if(c !== null) {
+              return c;
+            }
+            
+            if(x >= this.x && x <= this.x + this.w &&
+               y >= this.y && y <= this.y + this.h) {
+              return this;
+            }
           }
           
           if(this.contNext !== null) {
