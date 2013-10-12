@@ -381,6 +381,11 @@ function Client() {
       $(window)  .resize   ($.proxy(this.resize        , this));
       
       setInterval($.proxy(this.render, this), tickRate);
+      setInterval($.proxy(function() {
+        this.fps = this.fpsTicks;
+        this.fpsTicks = 0;
+      }, this), 1000);
+      
       this.resize();
       
       /*var guiMenu = new GUI(this.ctx);
@@ -583,10 +588,6 @@ function Client() {
       this.inGame = true;
       
       console.log(this);
-      setInterval($.proxy(function() {
-        this.fps = this.fpsTicks;
-        this.fpsTicks = 0;
-      }, this), 1000);
     },
     
     setParams: function(data){
