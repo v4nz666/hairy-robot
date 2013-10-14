@@ -731,10 +731,12 @@ function List(gui) {
           }
           
           var l = Label(gui);
+          l.textAlign = 'left';
           l.text(text);
           l.x = 4;
           l.y = (f.h - l.h) / 2;
           
+          f.text = l.text;
           f.controls.add(l);
           me.controls.add(f);
           priv.item.push(f);
