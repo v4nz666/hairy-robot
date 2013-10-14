@@ -29,7 +29,7 @@
     </style>
   </head>
   
-  <body>
+  <body style="overflow:hidden;">
     {{ Form::hidden('username', Auth::user()->username) }}
     {{ Form::hidden('auth'    , Auth::user()->auth    ) }}
     {{ Form::hidden('ip'      , $ip) }}

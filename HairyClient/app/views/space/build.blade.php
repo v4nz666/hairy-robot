@@ -8,7 +8,7 @@
     {{ HTML::script('assets/js/space/build.js') }}
   </head>
   
-  <body>
+  <body style="overflow:hidden;">
     <div id="game">
       <div id="main" style="border: 1px solid gray; display: inline-block;">
         <canvas id="canvas" style="width: 800px; height: 600px;"></canvas>
