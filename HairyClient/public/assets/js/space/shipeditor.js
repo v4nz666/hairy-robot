@@ -11,17 +11,29 @@ function ShipEditor(ctx) {
         $.ajax({
           url: '/games/store/parts',
           dataType: 'json',
-        }).done(function(data) { priv.part = data; })
-          .fail(function() { console.log('Failed to get parts'); });
+        }).done(function(data) {
+          priv.part = data;
+          
+          for(var i = 0; i < priv.part.length; i++) {
+            console.log(priv.part[i].name + ' - ' + priv.part[i].desc);
+            var item = list.items().push(priv.part[i].name + ' - ' + priv.part[i].desc);
+            item.part = priv.part[i];
+            item.onselect = itemsel;
+          }
+        }).fail(function() {
+          console.log('Failed to get parts');
+        });
         
         priv.ship = Ship();
         
         var list = List(this);
         list.h = 500;
         list.w = 500;
-        list.items().push('Test').onselect = function(item) { console.log(item); };
-        list.items().push('Test 2').onselect = function(item) { console.log(item); };
-        list.items().push('Test 3').onselect = function(item) { console.log(item); };
+        
+        var itemsel = function(item) {
+          console.log(item.text());
+        };
+        
         this.controls.add(list);
       }
       
