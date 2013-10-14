@@ -578,6 +578,7 @@ function Label(gui) {
           return _text;
         } else {
           _text = text;
+          h = getTextHeight(this.gui.ctx.font).ascent;
         }
       };
       
@@ -698,6 +699,42 @@ function Textbox(gui) {
       }
       
       return me;
+    }
+  }.create();
+}
+
+function List(gui) {
+  return {
+    item: [],
+    create: function() {
+      var priv = this;
+      
+      var items = {
+        push: function(text) {
+          var prev = priv.item[priv.item.length - 1];
+          console.log(prev);
+          
+          var f = Frame(gui);
+          f.w = this.w;
+          f.h = 40;
+          f.y = this.item[this.item.length - 1].y + 40;
+          
+          var l = Label(gui);
+          l.text(text);
+          l.x = 4;
+          l.y = (f.h - l.h) / 2;
+          
+          f.controls.add(l);
+          this.controls.add(f);
+          item.push(f);
+        }
+      }
+      
+      return {
+        items: function() {
+          return priv.items;
+        }
+      };
     }
   }.create();
 }
