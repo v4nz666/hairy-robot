@@ -16,13 +16,19 @@ public class Planet extends Entity {
   }
   
   public Planet(Star_System _system, int d) {
-    this(-1, d, _system.getSize() / 2 , generateSize(d));
+    this(-1, 0, 0, generateSize(d));
+
+    // Select a random spot in the orbit to generate our planet at
+    int theta = _rand.nextInt(360);
+    int mid = _system.getSize() / 2;
+    
+    this.x = Math.floor(mid + (Math.cos(theta * Math.PI / 180) * d));
+    this.y = Math.floor(mid - (Math.sin(theta * Math.PI / 180) * d));
+    System.out.println("Planet: size [" + this.size + "] at[" + theta + "]degrees " + 
+        "[" + (int)this.x + ", " + (int)this.y + "]");
   }
   
   public Planet(int id, double x, double y, int size) {
     super(id, x, y, size);
-    System.out.println("Planet generated with size [" + size + "]x, y[" + x + "," + y + "]");
   }
-
-  
 }
