@@ -161,7 +161,7 @@ function Client() {
         
         ctx.save();
         ctx.beginPath();
-        ctx.arc(screenX, screenY, (p.size / 2) / this.zoomLevel, 0, this.PIx2);
+        ctx.arc(screenX, screenY, (p.size) / this.zoomLevel, 0, this.PIx2);
         ctx.fillStyle = 'blue';
         ctx.fill();
         ctx.restore();
@@ -246,14 +246,14 @@ function Client() {
         var size = user.size / this.zoomLevel;
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = 'white';
-        this.ctx.fillText(user.name, screenX, screenY - size / 2);
+        this.ctx.fillText(user.name, screenX, screenY - size);
         
         this.ctx.translate(screenX, screenY);
         this.ctx.rotate(user.angle * this.toRads);
         
         if(user.shields > 0) {
           this.ctx.beginPath();
-          this.ctx.arc(0, 0, size / 2, 0, this.PIx2);
+          this.ctx.arc(0, 0, size, 0, this.PIx2);
           this.ctx.closePath();
           
           if(user.shields / user.maxShields > 0.25 || this.ticks > user.lastHit) {
@@ -266,10 +266,10 @@ function Client() {
         }
         
         this.ctx.beginPath();
-        this.ctx.moveTo( size / 2, 0);
-        this.ctx.lineTo(-size / 2, size / 4);
-        this.ctx.bezierCurveTo(0, 5, 0, -5, -size / 2, -size / 4);
-        this.ctx.lineTo(size / 2, 0);
+        this.ctx.moveTo( size, 0);
+        this.ctx.lineTo(-size, size / 2);
+        this.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
+        this.ctx.lineTo(size, 0);
         this.ctx.fillStyle = user.color;
         this.ctx.fill();
         
@@ -633,7 +633,7 @@ function Client() {
     },
     
     zoomOut: function() {
-      var newZoom = this.zoomLevel*2;
+      var newZoom = this.zoomLevel * 2;
       
       if ( newZoom <= this.maxZoom ) {
         this.setZoom(newZoom);
@@ -641,7 +641,7 @@ function Client() {
     },
     
     zoomIn: function() {
-      var newZoom = this.zoomLevel/2;
+      var newZoom = this.zoomLevel / 2;
       
       if ( newZoom >= 1 ) {
         this.setZoom(newZoom);
@@ -653,7 +653,7 @@ function Client() {
     },
     
     onscreen: function(entity, screenX, screenY) {
-      var size = entity.size / 2 * this.zoomLevel;
+      var size = entity.size * this.zoomLevel;
       var w = this.canvas.width;
       var h = this.canvas.height;
       
@@ -717,7 +717,7 @@ function Effect(type, x, y, data) {
       var smokeCount = 30;
       var smokeVel = 0.6;
       var smokeTTL = 30;
-      var smokeSize = 2;
+      var smokeSize = 1;
       var fireCount = 30;
       var fireVel = 0.6;
       var fireTTL = 30;

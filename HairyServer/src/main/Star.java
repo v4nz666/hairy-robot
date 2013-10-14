@@ -25,8 +25,7 @@ public class Star extends Entity {
     // Temperatures range from 300K to 30000K
     int temp = 3000 + 1000 * _rand.nextInt(27);
     
-    // TODO make "size" mean radius throughout project
-    return new Star(-1, x, y, radius * 2, mass, temp);
+    return new Star(-1, x, y, radius, mass, temp);
   }
   
   public Star(int id, double x, double y, int size, float mass, int temperature) {
