@@ -733,6 +733,7 @@ function List(gui) {
           var l = Label(gui);
           l.textAlign = 'left';
           l.text(text);
+          l.acceptinput = false;
           l.x = 4;
           l.y = (f.h - l.h) / 2;
           
