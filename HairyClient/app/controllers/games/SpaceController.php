@@ -20,7 +20,7 @@ class SpaceController extends \Controller {
       $user->shields = $user->max_shields;
       $user->gun = "main.Gun\$PointDefenseTurret";
       $user->turn_speed = 5;
-      $user->size = 32;
+      $user->size = 16;
       $user->colour = '#FF00FF';
       $user->x = 400;
       $user->y = 300;
