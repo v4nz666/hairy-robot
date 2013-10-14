@@ -649,12 +649,15 @@ function Client() {
     },
     
     onscreen: function(entity, screenX, screenY) {
-      //TODO: Why is this so confusing (and wrong...)?!
+      var size = entity.size / 2 * this.zoomLevel;
+      var w = this.canvas.width;
+      var h = this.canvas.height;
+      
       return !(
-        screenX + (entity.size / 2 * this.zoomLevel) < 0                     || // Right edge is left of canvas
-        screenX - (entity.size / 2 * this.zoomLevel) > this.ctx.canvas.width || // Left edge is right of canvas
-        screenY + (entity.size / 2 * this.zoomLevel) < 0                     || // Top edge is below canvas
-        screenY - (entity.size / 2 * this.zoomLevel) > this.ctx.canvas.height); // Bottom edge is above canvas
+        screenX + (size) < 0 || // Right edge is left of canvas
+        screenX - (size) > w || // Left edge is right of canvas
+        screenY + (size) < 0 || // Top edge is below canvas
+        screenY - (size) > h);  // Bottom edge is above canvas
     }
   }
 }
