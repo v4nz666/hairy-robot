@@ -168,7 +168,7 @@ public class User extends Entity {
     
     int xmin = size / 2;
     int ymin = xmin;
-    int xmax = Server.star_system.getSize() - xmin; //TODO: No more fixed size
+    int xmax = Server.star_system.getSize() - xmin;
     int ymax = Server.star_system.getSize() - ymin;
     
     if(x < xmin) { x = xmin; vx = 0; }
@@ -189,7 +189,7 @@ public class User extends Entity {
   public class Params {
     public int getId() { return id; }
     // Let the user know the size of the world she'll be playing in
-     public Star_System getSystem() { return Server.star_system; }
+    public Star_System getSystem() { return Server.star_system; }
   }
   
   public class Stats {
