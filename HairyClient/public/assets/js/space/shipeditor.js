@@ -2,6 +2,7 @@ function ShipEditor(ctx) {
   return {
     ship: null,
     part: null,
+    selected: null,
     
     create: function(ctx) {
       var priv = this;
@@ -15,7 +16,6 @@ function ShipEditor(ctx) {
           priv.part = data;
           
           for(var i = 0; i < priv.part.length; i++) {
-            console.log(priv.part[i].name + ' - ' + priv.part[i].desc);
             var item = list.items().push(priv.part[i].name + ' - ' + priv.part[i].desc);
             item.part = priv.part[i];
             item.onselect = itemsel;
@@ -27,14 +27,18 @@ function ShipEditor(ctx) {
         priv.ship = Ship();
         
         var list = List(this);
-        list.h = 500;
-        list.w = 500;
+        list.w = 250;
         
         var itemsel = function(item) {
-          console.log(item.text());
+          priv.selected = item.part;
         };
         
         this.controls.add(list);
+        
+        this.onresize = function() {
+          list.h = ctx.canvas.height;
+          list.x = ctx.canvas.width - list.w;
+        };
       }
       
       me.init();
