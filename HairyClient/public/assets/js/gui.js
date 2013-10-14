@@ -708,16 +708,21 @@ function List(gui) {
     item: [],
     create: function() {
       var priv = this;
-      
+      var me = Control(gui);
       var items = {
         push: function(text) {
           var prev = priv.item[priv.item.length - 1];
-          console.log(prev);
+          prev = typeof prev === 'undefined' ? null : prev;
           
           var f = Frame(gui);
-          f.w = this.w;
-          f.h = 40;
-          f.y = this.item[this.item.length - 1].y + 40;
+          f.w = me.w;
+          
+          if(prev !== null) {
+            f.h = 40;
+            f.y = prev.y + prev.h;
+          } else {
+            f.h = 40;
+          }
           
           var l = Label(gui);
           l.text(text);
@@ -725,16 +730,16 @@ function List(gui) {
           l.y = (f.h - l.h) / 2;
           
           f.controls.add(l);
-          this.controls.add(f);
-          item.push(f);
+          me.controls.add(f);
+          priv.item.push(f);
         }
       }
       
-      return {
-        items: function() {
-          return priv.items;
-        }
+      me.items = function() {
+        return items;
       };
+      
+      return me;
     }
   }.create();
 }

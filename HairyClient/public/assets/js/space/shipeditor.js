@@ -20,6 +20,8 @@ function ShipEditor(ctx) {
         list.h = 500;
         list.w = 500;
         list.items().push('Test');
+        list.items().push('Test 2');
+        list.items().push('Test 3');
         this.controls.add(list);
       }
       
