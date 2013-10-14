@@ -8,7 +8,7 @@ class SpaceController extends \Controller {
     $this->beforeFilter('csrf', ['on' => ['post', 'put', 'delete']]);
   }
   
-  public function home($ip = 'hairy.monoxidedesign.com', $port = 9092) {
+  public function home($ip = 'jr.glo.lan', $port = 9092) {
     $user = \Auth::user()->spaceUser;
     if($user === null) {
       $user = new \SpaceUser;
