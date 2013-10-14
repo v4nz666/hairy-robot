@@ -706,6 +706,7 @@ function Textbox(gui) {
 function List(gui) {
   return {
     item: [],
+    selected: null,
     create: function() {
       var priv = this;
       var me = Control(gui);
@@ -724,6 +725,11 @@ function List(gui) {
             f.h = 40;
           }
           
+          f.onselected = null;
+          f.onclick = function() {
+            me.selected(f);
+          }
+          
           var l = Label(gui);
           l.text(text);
           l.x = 4;
@@ -732,12 +738,31 @@ function List(gui) {
           f.controls.add(l);
           me.controls.add(f);
           priv.item.push(f);
+          
+          return f;
         }
       }
       
       me.items = function() {
         return items;
       };
+      
+      me.selected = function(selected) {
+        if(typeof selected === 'undefined') {
+          return priv.selected;
+        }
+        
+        if(priv.selected !== null) {
+          priv.selected.backcolour = 'gray';
+        }
+        
+        priv.selected = selected;
+        priv.selected.backcolour = 'green';
+        
+        if(priv.selected.onselect !== null) {
+          priv.selected.onselect(priv.selected);
+        }
+      }
       
       return me;
     }
