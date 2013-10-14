@@ -398,15 +398,6 @@ function Client() {
       }, this), 1000);
       
       this.resize();
-      
-      var menu = MainMenu(this.ctx);
-      menu.onrender = $.proxy(this.renderMenu, this);
-      menu.onplay   = $.proxy(function() {
-        menu.pop();
-        this.initGame();
-      }, this);
-      
-      this.guis.push(menu);
       this.initMenu();
     },
     
@@ -419,6 +410,15 @@ function Client() {
     },
     
     initMenu: function() {
+      var menu = MainMenu(this.ctx);
+      menu.onrender = $.proxy(this.renderMenu, this);
+      menu.onplay   = $.proxy(function() {
+        menu.pop();
+        this.initGame();
+      }, this);
+      
+      this.guis.push(menu);
+      
       var name = $('input[name=username]').val();
       var auth = $('input[name=auth]').val();
       var ip   = $('input[name=ip]').val();
