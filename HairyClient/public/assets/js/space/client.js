@@ -155,9 +155,13 @@ function Client() {
         screenX = (p.x - this.offsetX) / this.zoomLevel;
         screenY = (p.y - this.offsetY) / this.zoomLevel;
         
+        if(!this.onscreen(p, screenX, screenY)) {
+          continue;
+        }
+        
         ctx.save();
         ctx.beginPath();
-        ctx.arc(screenX, screenY, p.size / this.zoomLevel, 0, this.PIx2);
+        ctx.arc(screenX, screenY, (p.size / 2) / this.zoomLevel, 0, this.PIx2);
         ctx.fillStyle = 'blue';
         ctx.fill();
         ctx.restore();
