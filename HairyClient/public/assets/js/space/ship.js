@@ -17,6 +17,9 @@ function Ship() {
         },
         
         render: function(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          
           for(i = 0; i < this.parts.length; i++) {
             var part = this.parts[i];
             
@@ -25,6 +28,8 @@ function Ship() {
             part.draw(ctx);
             ctx.restore();
           }
+          
+          ctx.restore();
         },
         
         addPart: function(x, y, part) {
