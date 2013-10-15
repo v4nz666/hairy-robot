@@ -28,30 +28,41 @@ public class Star_System {
     this.generatePlanets();
   }
   
+  /**
+   * Generate our Planets at distances defined by the Fibonacci sequence: 
+   *  1,2,3,5,8,13,21,34,55,89.
+   *  
+   * We'll be skipping the Planet that would be at "5", and replacing it with an
+   * Asteroid Belt
+   */
   private void generatePlanets() {
     this.planets = new Planet[9];
     
     int fib = 1;
     int last;
+    int i, j;
+    // Distance of the farthest planet (1000000 
+    int maxD = (this._size / 2) - 1000000;
     
-    int[] seq = new int[planets.length];
+    // Our Fibonacci sequence
+    int[] seq = new int[planets.length + 1];
     
-    for (int i = 0; i < planets.length; i++) {
+    // +1 for asteroid belt 
+    for (i = 0; i < planets.length + 1; i++) {
       seq[i] = fib;
       
       last = fib;
       fib = fib + last;
     }
-    int maxD = (this._size / 2) - 1000000;
-    System.out.println("Max Distance[" + maxD + "]");
     
     int div = maxD / seq[seq.length -1];
     
-    System.out.println("Division size[" + div + "]");
-    
-    for (int i = 0; i < planets.length; i++) {
+    for (i = 0; i < planets.length; i++) {
       
-      int d = div * seq[i]; 
+      // Use j, so we can leave a gap for the Asteroid belt where planet[3] would be
+      j = i <= 2 ? i : i + 1;
+      
+      int d = div * seq[j]; 
       planets[i] = new Planet(this, d);
     }
   }
