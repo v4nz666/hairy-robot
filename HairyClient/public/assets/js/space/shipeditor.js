@@ -118,9 +118,14 @@ function ShipEditor(ctx) {
           var x = priv.gridX;
           var y = priv.gridY;
           
-          if(priv.ship.addPart(x - priv.startX, y - priv.startY, priv.selected)) {
-            if(x < priv.startX) { priv.startX -= 1; }
-            if(y < priv.startY) { priv.startY -= 1; }
+          switch(ev.which) {
+            case 1:
+              if(priv.ship.addPart(x - priv.startX, y - priv.startY, priv.selected)) {
+                if(x < priv.startX) { priv.startX -= 1; }
+                if(y < priv.startY) { priv.startY -= 1; }
+              }
+              
+              break;
           }
         };
       }
