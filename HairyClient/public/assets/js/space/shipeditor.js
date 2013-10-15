@@ -63,7 +63,7 @@ function ShipEditor(ctx) {
           
           ctx.save();
           ctx.translate(priv.gridX * 16, priv.gridY * 16);
-          priv.selected.render(ctx);
+          priv.selected.draw(ctx);
           
           if(priv.ship.isValid(priv.gridX - priv.startX, priv.gridY - priv.startY)) {
             ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';

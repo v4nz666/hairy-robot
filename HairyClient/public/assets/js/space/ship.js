@@ -12,15 +12,14 @@ $.ajax({
 }).done(function(data) {
   console.log('Got parts');
   
-  var render = function(ctx, render) {
-    ctx.fillStyle = 'magenta';
-    ctx.fillRect(0, 0, 16, 16);
+  var draw = function(ctx, render) {
+    eval(this.render);
   }
   
   stat.part = data;
   
   for(var i = 0; i < stat.part.length; i++) {
-    stat.part[i].render = render;
+    stat.part[i].draw = draw;
   }
 }).fail(function() {
   console.log('Failed to get parts');
@@ -194,7 +193,7 @@ function RenderPart(x, y, part) {
     right: null,
     
     draw: function(ctx) {
-      this.part.render(ctx, this);
+      this.part.draw(ctx, this);
     }
   }
   
