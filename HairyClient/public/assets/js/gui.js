@@ -711,6 +711,14 @@ function List(gui) {
       var priv = this;
       var me = Control(gui);
       var items = {
+        first: function() {
+          return priv.item[0];
+        },
+        
+        last: function() {
+          return priv.item[priv.item.length - 1];
+        },
+        
         push: function(text) {
           var prev = priv.item[priv.item.length - 1];
           prev = typeof prev === 'undefined' ? null : prev;
@@ -727,7 +735,7 @@ function List(gui) {
           
           f.onselected = null;
           f.onclick = function() {
-            me.selected(f);
+            this.selected(f);
           }
           
           var l = Label(gui);
@@ -743,29 +751,29 @@ function List(gui) {
           priv.item.push(f);
           
           return f;
+        },
+        
+        selected: function(selected) {
+          if(typeof selected === 'undefined') {
+            return priv.selected;
+          }
+          
+          if(priv.selected !== null) {
+            priv.selected.backcolour = 'gray';
+          }
+          
+          priv.selected = selected;
+          priv.selected.backcolour = 'green';
+          
+          if(priv.selected.onselect !== null) {
+            priv.selected.onselect(priv.selected);
+          }
         }
       }
       
       me.items = function() {
         return items;
       };
-      
-      me.selected = function(selected) {
-        if(typeof selected === 'undefined') {
-          return priv.selected;
-        }
-        
-        if(priv.selected !== null) {
-          priv.selected.backcolour = 'gray';
-        }
-        
-        priv.selected = selected;
-        priv.selected.backcolour = 'green';
-        
-        if(priv.selected.onselect !== null) {
-          priv.selected.onselect(priv.selected);
-        }
-      }
       
       return me;
     }
