@@ -25,7 +25,7 @@ public class User extends Entity {
           
           try(ResultSet r2 = select.executeQuery()) {
             if(r2.next()) {
-              User user = new User(socket, r2.getInt("id"), name, r2.getFloat("x"), r2.getFloat("y"), r2.getInt("size"));
+              User user = new User(socket, r2.getInt("id"), name, r2.getDouble("x"), r2.getDouble("y"), r2.getInt("size"));
               user.maxLife = r2.getInt("max_life");
               user.maxShields = r2.getInt("max_shields");
               user.maxVel = r2.getFloat("max_vel");
@@ -78,7 +78,7 @@ public class User extends Entity {
   private Hit    _hit    = new Hit();
   private Kill   _kill   = new Kill();
   
-  private User(SocketIOClient socket, int dbID, String name, float x, float y, int size) {
+  private User(SocketIOClient socket, int dbID, String name, double x, double y, int size) {
     super(Server.getID(), x, y, size);
     this.dbID = dbID;
     this.name = name;

@@ -21,8 +21,8 @@ class TableSpaceUserCreate extends Migration {
       $table->float('turn_speed');
       $table->integer('size')->unsigned();
       $table->string('colour', 7);
-      $table->float('x');
-      $table->float('y');
+      $table->double('x');
+      $table->double('y');
       $table->integer('kills');
       $table->integer('deaths');
       $table->timestamps();
