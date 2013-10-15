@@ -7,7 +7,7 @@ class PartsController extends \Controller {
   }
   
   public function getAll() {
-    $allParts = \SpacePart::all()->toJSON();
+    $allParts = \SpacePart::with('infos', 'attribs')->get()->toJSON();
     return $allParts;
   }
   
