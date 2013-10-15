@@ -41,7 +41,7 @@ public class Star_System {
     int fib = 1;
     int last;
     int i, j;
-    // Distance of the farthest planet (1000000 
+    // Distance of the farthest planet (1000000km from the outer edge)
     int maxD = (this._size / 2) - 1000000;
     
     // Our Fibonacci sequence
