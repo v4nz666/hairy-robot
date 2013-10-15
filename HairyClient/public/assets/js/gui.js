@@ -207,11 +207,15 @@ function GUI(ctx) {
         ret |= this.onmouseup(ev, ret);
       }
       
-      if(this.onclick !== null) {
-        ret |= this.onclick();
-      }
+      ret |= this.click();
       
       return ret;
+    },
+    
+    click: function() {
+      if(this.onclick !== null) {
+        return this.onclick();
+      }
     },
     
     keydown: function(ev) {
