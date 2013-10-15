@@ -8,6 +8,8 @@ function ShipEditor(ctx) {
     halfH: 0,
     mouseX: 0,
     mouseY: 0,
+    startX: 0,
+    startY: 0,
     gridX: 0,
     gridY: 0,
     
@@ -63,13 +65,13 @@ function ShipEditor(ctx) {
           ctx.translate(priv.gridX * 16, priv.gridY * 16);
           priv.selected.render(ctx);
           
-          if(priv.ship.isValid(priv.gridX, priv.gridY)) {
+          if(priv.ship.isValid(priv.gridX - priv.startX, priv.gridY - priv.startY)) {
             ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
           } else {
             ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
           }
           
-          ctx.fillRect(0, 0, priv.selected.w * 16, priv.selected.h * 16);
+          ctx.fillRect(0, 0, 16, 16);
           ctx.restore();
           
           ctx.save();
@@ -104,7 +106,7 @@ function ShipEditor(ctx) {
           if(gridX != priv.gridX || gridY != priv.gridY) {
             priv.gridX = gridX;
             priv.gridY = gridY;
-            priv.hover = priv.ship.partAt(priv.gridX, priv.gridY);
+            priv.hover = priv.ship.partAt(priv.gridX - priv.startX, priv.gridY - priv.startY);
             
             if(ev.which != 0) {
               me.click(ev);
@@ -116,9 +118,9 @@ function ShipEditor(ctx) {
           var x = priv.gridX;
           var y = priv.gridY;
           
-          if(priv.ship.addPart(x, y, priv.selected)) {
-            //if(x < 0) { this.startX += x; }
-            //if(y < 0) { this.startY += y; }
+          if(priv.ship.addPart(x - priv.startX, y - priv.startY, priv.selected)) {
+            if(x < priv.startX) { priv.startX -= 1; }
+            if(y < priv.startY) { priv.startY -= 1; }
           }
         };
       }
