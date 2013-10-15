@@ -1,3 +1,31 @@
+stat = {
+  part: [],
+  
+  loaded: function() {
+    return part.length !== 0;
+  }
+};
+
+$.ajax({
+  url: '/games/store/parts',
+  dataType: 'json',
+}).done(function(data) {
+  console.log('Got parts');
+  
+  var render = function(ctx, render) {
+    ctx.fillStyle = 'magenta';
+    ctx.fillRect(0, 0, 16, 16);
+  }
+  
+  stat.part = data;
+  
+  for(var i = 0; i < stat.part.length; i++) {
+    stat.part[i].render = render;
+  }
+}).fail(function() {
+  console.log('Failed to get parts');
+});
+
 function Ship() {
   return {
     create: function() {
@@ -166,10 +194,13 @@ function RenderPart(x, y, part) {
     right: null,
     
     draw: function(ctx) {
-      this.part.draw(ctx, this);
+      this.part.render(ctx, this);
     }
   }
   
-  part.create(me);
+  for(var i = 0; i < part.attribs.length; i++) {
+    me[part.attribs[i]] = 0;
+  }
+  
   return me;
 }
