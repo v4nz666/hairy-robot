@@ -36,6 +36,8 @@ function ShipEditor(ctx) {
           item.onselect = itemsel;
         }
         
+        lstParts.items().selected(lstParts.items().first());
+        
         this.controls.add(fraInfo);
         this.controls.add(lstParts);
         
@@ -53,6 +55,42 @@ function ShipEditor(ctx) {
           ctx.save();
           ctx.translate(priv.halfW, priv.halfH);
           priv.ship.render(ctx);
+          
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = 'grey';
+          
+          ctx.save();
+          ctx.translate(priv.gridX * 16, priv.gridY * 16);
+          priv.selected.render(ctx);
+          
+          if(priv.ship.isValid(priv.gridX, priv.gridY)) {
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+          } else {
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+          }
+          
+          ctx.fillRect(0, 0, priv.selected.w * 16, priv.selected.h * 16);
+          ctx.restore();
+          
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(priv.ship.x - 4, priv.ship.y - 4);
+          ctx.lineTo(priv.ship.x - 4, priv.ship.y + priv.ship.h + 4);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(priv.ship.x - 4, priv.ship.y + priv.ship.h + 4);
+          ctx.lineTo(priv.ship.x + priv.ship.w + 4, priv.ship.y + priv.ship.h + 4);
+          ctx.stroke();
+          ctx.textAlign = 'right';
+          ctx.fillText(priv.ship.h * 4 + 'm', priv.ship.x - 8, priv.ship.y + priv.ship.h / 2 + 4);
+          ctx.textAlign = 'center';
+          ctx.fillText(priv.ship.w * 4 + 'm', priv.ship.x + priv.ship.w / 2, priv.ship.y + priv.ship.h + 16);
+          ctx.beginPath();
+          ctx.arc(priv.ship.x + priv.ship.comx * 16, priv.ship.y + priv.ship.comy * 16, 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
           ctx.restore();
         };
         
