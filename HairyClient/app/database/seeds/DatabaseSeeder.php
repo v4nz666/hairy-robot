@@ -21,6 +21,6 @@ class UserTableSeeder extends Seeder {
 
 class SpacePartTableSeeder extends Seeder {
   public function run() {
-    SpacePart::create(['name' => 'Hull', 'desc' => 'A 64x64m&sup2; section of hull', 'mass' => 1]);
+    SpacePart::create(['name' => 'Hull', 'desc' => 'A 64x64m&sup2; section of hull', 'mass' => 1, 'render' => 'ctx.fillStyle=\'white\';ctx.strokeStyle=\'grey\';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,16);ctx.lineTo(16,16);ctx.lineTo(16,0);ctx.closePath();ctx.fill();ctx.stroke();']);
   }
 }
