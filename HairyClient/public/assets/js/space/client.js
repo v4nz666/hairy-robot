@@ -383,6 +383,7 @@ function Client() {
       var tickRate = 1000 / frameRate;
       
       // Hook our events
+      $(document).bind     ('contextmenu', function() { return false; });
       $(document).keydown  ($.proxy(this.guis.keydown  , this.guis));
       $(document).keyup    ($.proxy(this.guis.keyup    , this.guis));
       $(document).keypress ($.proxy(this.guis.keypress , this.guis));
