@@ -207,14 +207,14 @@ function GUI(ctx) {
         ret |= this.onmouseup(ev, ret);
       }
       
-      ret |= this.click();
+      ret |= this.click(ev);
       
       return ret;
     },
     
-    click: function() {
+    click: function(ev) {
       if(this.onclick !== null) {
-        return this.onclick();
+        return this.onclick(ev);
       }
     },
     
