@@ -8,6 +8,6 @@ class SpacePart extends Eloquent {
   }
   
   public function attribs() {
-    return $this->hasMany('SpacePartAttribs');
+    return $this->hasMany('SpacePartAttrib');
   }
 }
