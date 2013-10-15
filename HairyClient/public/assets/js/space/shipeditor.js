@@ -1,7 +1,6 @@
 function ShipEditor(ctx) {
   return {
     ship: null,
-    part: null,
     selected: null,
     
     create: function(ctx) {
@@ -9,24 +8,8 @@ function ShipEditor(ctx) {
       
       var me = GUI(ctx);
       me.init = function() {
-        $.ajax({
-          url: '/games/store/parts',
-          dataType: 'json',
-        }).done(function(data) {
-          priv.part = data;
-          
-          for(var i = 0; i < priv.part.length; i++) {
-            var item = lstParts.items().push(priv.part[i].name + ' - ' + priv.part[i].desc);
-            item.part = priv.part[i];
-            item.onselect = itemsel;
-          }
-          
-          priv.ship.addPart(0, 0, priv.part[0]);
-        }).fail(function() {
-          console.log('Failed to get parts');
-        });
-        
         priv.ship = Ship();
+        priv.ship.addPart(0, 0, stat.part[0]);
         
         var itemsel = function(item) {
           priv.selected = item.part;
@@ -38,6 +21,12 @@ function ShipEditor(ctx) {
         
         var lstParts = List(this);
         lstParts.w = fraInfo.w;
+        
+        for(var i = 0; i < stat.part.length; i++) {
+          var item = lstParts.items().push(stat.part[i].name + ' - ' + stat.part[i].desc);
+          item.part = stat.part[i];
+          item.onselect = itemsel;
+        }
         
         this.controls.add(fraInfo);
         this.controls.add(lstParts);
