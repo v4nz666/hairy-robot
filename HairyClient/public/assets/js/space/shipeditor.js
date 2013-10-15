@@ -84,9 +84,9 @@ function ShipEditor(ctx) {
           ctx.lineTo(priv.ship.x + priv.ship.w + 4, priv.ship.y + priv.ship.h + 4);
           ctx.stroke();
           ctx.textAlign = 'right';
-          ctx.fillText(priv.ship.h * 4 + 'm', priv.ship.x - 8, priv.ship.y + priv.ship.h / 2 + 4);
+          ctx.fillText(priv.ship.h + 'm', priv.ship.x - 8, priv.ship.y + priv.ship.h / 2 + 4);
           ctx.textAlign = 'center';
-          ctx.fillText(priv.ship.w * 4 + 'm', priv.ship.x + priv.ship.w / 2, priv.ship.y + priv.ship.h + 16);
+          ctx.fillText(priv.ship.w + 'm', priv.ship.x + priv.ship.w / 2, priv.ship.y + priv.ship.h + 16);
           ctx.beginPath();
           ctx.arc(priv.ship.x + priv.ship.comx * 16, priv.ship.y + priv.ship.comy * 16, 2, 0, Math.PI * 2);
           ctx.closePath();
