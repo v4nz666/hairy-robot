@@ -29,29 +29,37 @@ public class Star_System {
   }
   
   private void generatePlanets() {
-    this.planets = new Planet[_rand.nextInt(8)];
+    this.planets = new Planet[9];
     
     int fib = 1;
     int last;
     
+    int[] seq = new int[planets.length];
+    
     for (int i = 0; i < planets.length; i++) {
+      seq[i] = fib;
+      
       last = fib;
       fib = fib + last;
-
-      int d = fib * (1500000 + (int)(25000 *_rand.nextFloat())); 
-      
-      planets[i] = new Planet(this, d);
-
     }
+    int maxD = (this._size / 2) - 1000000;
+    System.out.println("Max Distance[" + maxD + "]");
     
+    int div = maxD / seq[seq.length -1];
+    
+    System.out.println("Division size[" + div + "]");
+    
+    for (int i = 0; i < planets.length; i++) {
+      
+      int d = div * seq[i]; 
+      planets[i] = new Planet(this, d);
+    }
   }
   
   public String generateName() { 
     return "Sol";
-    }
-
+  }
   
-
   public void set_name(String _name) {
     this._name = _name;
   }

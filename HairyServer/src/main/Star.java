@@ -30,7 +30,9 @@ public class Star extends Entity {
   
   public Star(int id, double x, double y, int size, float mass, int temperature) {
     super(id, x, y, size);
-    System.out.println("Star Coords[" + x + "," + y + "]");
+    System.out.println("Star Coords[" + (int)x + "," + (int)y + "]");
+    System.out.println("Star Size[" + (int)size + "]");
+    
     this._mass = mass;
     this._temperature = temperature;
   }
