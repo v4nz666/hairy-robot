@@ -126,6 +126,10 @@ function ShipEditor(ctx) {
               }
               
               break;
+            
+            case 3:
+              priv.ship.removePart(x - priv.startX, y - priv.startY);
+              break;
           }
         };
       }

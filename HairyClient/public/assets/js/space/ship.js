@@ -93,6 +93,51 @@ function Ship() {
           }
         },
         
+        removePart: function(x, y) {
+          if(this.parts.length === 1) { return false; }
+          
+          var part = this.partAt(x, y);
+          if(part !== null) {
+            if(this.parts.length !== 2) {
+              if(part.up !== null) {
+                if(part.up.up === null && part.up.left === null && part.up.right === null) {
+                  console.log('You can\'t remove that part.');
+                  return;
+                }
+              }
+              
+              if(part.down !== null) {
+                if(part.down.down === null && part.down.left === null && part.down.right === null) {
+                  console.log('You can\'t remove that part.');
+                  return;
+                }
+              }
+              
+              if(part.left !== null) {
+                if(part.left.up === null && part.left.down === null && part.left.left === null) {
+                  console.log('You can\'t remove that part.');
+                  return;
+                }
+              }
+              
+              if(part.right !== null) {
+                if(part.right.up === null && part.right.down === null && part.right.right === null) {
+                  console.log('You can\'t remove that part.');
+                  return;
+                }
+              }
+            }
+            
+            this.parts.splice(this.parts.indexOf(part), 1);
+            this.cacheCenterOfMass();
+            
+            if(part.up    !== null) { part.up.down    = null; }
+            if(part.down  !== null) { part.down.up    = null; }
+            if(part.left  !== null) { part.left.right = null; }
+            if(part.right !== null) { part.right.left = null; }
+          }
+        },
+        
         isValid: function(x, y) {
           if(this.parts.length === 0) { return true; }
           
