@@ -212,9 +212,9 @@ function GUI(ctx) {
       return ret;
     },
     
-    click: function(ev) {
+    click: function(ev, ret) {
       if(this.onclick !== null) {
-        return this.onclick(ev);
+        return this.onclick(ev, ret);
       }
     },
     
