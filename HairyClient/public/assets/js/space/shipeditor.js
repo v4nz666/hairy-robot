@@ -96,7 +96,9 @@ function ShipEditor(ctx) {
           ctx.restore();
         };
         
-        this.onmousemove = function(ev) {
+        this.onmousemove = function(ev, ret) {
+          if(ret) return;
+          
           priv.mouseX = ev.offsetX - priv.halfW;
           priv.mouseY = ev.offsetY - priv.halfH;
           
@@ -114,7 +116,9 @@ function ShipEditor(ctx) {
           }
         };
         
-        this.onclick = function(ev) {
+        this.onclick = function(ev, ret) {
+          if(ret) return;
+          
           var x = priv.gridX;
           var y = priv.gridY;
           
