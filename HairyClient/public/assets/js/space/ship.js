@@ -136,8 +136,8 @@ function Ship() {
           
           for(i = 0; i < this.parts.length; i++) {
             part = this.parts[i];
-            sumMassTimesCoMX += part.part.mass * (part.part.w / 2 + part.x);
-            sumMassTimesCoMY += part.part.mass * (part.part.h / 2 + part.y);
+            sumMassTimesCoMX += part.part.mass * (0.5 + part.x);
+            sumMassTimesCoMY += part.part.mass * (0.5 + part.y);
             sumMass += part.part.mass;
           }
           
