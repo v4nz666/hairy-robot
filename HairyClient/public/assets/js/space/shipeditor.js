@@ -29,6 +29,14 @@ function ShipEditor(ctx) {
         fraInfo.w = 250;
         fraInfo.h = 150;
         
+        var btnToJSON = Button(this);
+        btnToJSON.text('To JSON');
+        btnToJSON.onclick = function(ev) {
+          console.log(priv.ship.partsJSON());
+        }
+        
+        fraInfo.controls.add(btnToJSON);
+        
         var lstParts = List(this);
         lstParts.w = fraInfo.w;
         

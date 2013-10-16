@@ -10,7 +10,7 @@ $.ajax({
   url: '/games/store/parts',
   dataType: 'json',
 }).done(function(data) {
-  console.log('Got parts');
+  console.log('Got parts [', data, ']');
   
   var draw = function(ctx, render) {
     eval(this.render);
@@ -41,6 +41,21 @@ function Ship() {
         
         init: function() {
           
+        },
+        
+        partsJSON: function() {
+          var parts = [];
+          
+          for(var i = 0; i < this.parts.length; i++) {
+            var part = this.parts[i];
+            parts.push({
+              id: part.part.id,
+              x: part.x,
+              y: part.y
+            });
+          }
+          
+          return JSON.stringify(parts);
         },
         
         render: function(ctx) {
