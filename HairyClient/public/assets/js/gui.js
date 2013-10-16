@@ -207,7 +207,7 @@ function GUI(ctx) {
         ret |= this.onmouseup(ev, ret);
       }
       
-      ret |= this.click(ev);
+      ret |= this.click(ev, ret);
       
       return ret;
     },
