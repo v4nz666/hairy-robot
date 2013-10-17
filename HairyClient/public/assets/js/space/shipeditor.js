@@ -25,6 +25,9 @@ function ShipEditor(ctx) {
           priv.selected = item.part;
         };
         
+        var lstShips = List(this);
+        lstShips.w = 250;
+        
         var fraInfo = Frame(this);
         fraInfo.w = 250;
         fraInfo.h = 150;
@@ -40,10 +43,12 @@ function ShipEditor(ctx) {
         
         lstParts.items().selected(lstParts.items().first());
         
+        this.controls.add(lstShips);
         this.controls.add(fraInfo);
         this.controls.add(lstParts);
         
         this.onresize = function() {
+          lstShips.h = ctx.canvas.height;
           fraInfo.x = ctx.canvas.width - lstParts.w;
           lstParts.x = fraInfo.x;
           lstParts.y = fraInfo.h;
