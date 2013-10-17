@@ -3,8 +3,15 @@
 namespace Games\Space;
 
 class StorageController extends \Controller {
+  public function __construct() {
+    $this->beforeFilter('auth');
+  }
+  
   public function parts() {
-    $allParts = \SpacePart::with('infos', 'attribs')->get()->toJSON();
-    return $allParts;
+    return \SpacePart::with('infos', 'attribs')->get()->toJSON();
+  }
+  
+  public function ships() {
+    return \Auth::user()->spaceUser->ships->toJSON();
   }
 }
