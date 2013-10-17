@@ -19,7 +19,7 @@ function ShipEditor(ctx) {
       var me = GUI(ctx);
       me.init = function() {
         priv.ship = Ship();
-        priv.ship.addPart(0, 0, stat.part[0]);
+        priv.ship.addPart(0, 0, stat.parts[0]);
         
         var itemsel = function(item) {
           priv.selected = item.part;
@@ -35,9 +35,9 @@ function ShipEditor(ctx) {
         var lstParts = List(this);
         lstParts.w = fraInfo.w;
         
-        for(var i = 0; i < stat.part.length; i++) {
-          var item = lstParts.items().push(stat.part[i].name + ' - ' + stat.part[i].desc);
-          item.part = stat.part[i];
+        for(var i = 0; i < stat.parts.length; i++) {
+          var item = lstParts.items().push(stat.parts[i].name + ' - ' + stat.parts[i].desc);
+          item.part = stat.parts[i];
           item.onselect = itemsel;
         }
         
