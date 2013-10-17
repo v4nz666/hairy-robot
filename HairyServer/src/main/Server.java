@@ -20,7 +20,7 @@ public class Server {
   private static Server _instance = new Server();
   public static Server instance() { return _instance; }
   
-  public static Star_System star_system = new Star_System();
+  public static StarSystem star_system = new StarSystem();
   
   public static final int spread = 15;
   public static final int bulletSize = 1;
@@ -272,7 +272,7 @@ public class Server {
     }
   }
 
-  public static Star_System getCurrentSystem(User user) {
+  public static StarSystem getCurrentSystem(User user) {
     return star_system;
   }
 }

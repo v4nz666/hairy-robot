@@ -11,7 +11,7 @@ public class Star extends Entity {
   public float getMass() { return this._mass; }
   public int getTemp() { return this._temperature; }
   
-  public static final Star Generate(Star_System system) {
+  public static final Star Generate(StarSystem system) {
     
     int x = system.getSize() / 2;
     int y = system.getSize() / 2;

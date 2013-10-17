@@ -5,14 +5,14 @@ import java.util.Random;
 public class Planet extends Entity {
   private static Random _rand = new Random();
   
-  private Star_System _system;
+  private StarSystem _system;
   
   private int _mass;
   private int _distance;
   
   private Moon[] _moons;
   
-  public Planet(Star_System _system, int d) {
+  public Planet(StarSystem _system, int d) {
     super(-1,0,0,0);
     this._system = _system;
     this._distance = d;
