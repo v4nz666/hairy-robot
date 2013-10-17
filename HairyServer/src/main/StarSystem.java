@@ -20,8 +20,8 @@ public class StarSystem {
     this._name = generateName();
     System.out.println("Generating System[" + this._name + "]");
     
-    // 2^27 x 32m/coordinate ~= 1/1000 scale our Solar system
-    _size = (int)Math.pow(2, 27);
+    // 290759680 x 32m/coordinate ~= 1/1000 scale our Solar system
+    _size = 512 * 567890;
     System.out.println("System Size[" + (long)_size * 32 + "m][" + _size + "px]");
     
     this.star = Star.Generate(this);
