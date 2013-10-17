@@ -9,6 +9,7 @@ Route::put('/register',                  'AuthController@register');
 Route::group(['prefix' => 'games'], function() {
   Route::group(['prefix' => 'space'], function() {
     Route::get('/store/parts',   ['as' => 'games_space_store_parts', 'uses' => 'games\space\StorageController@parts']);
+    Route::get('/store/ships',   ['as' => 'games_space_store_ships', 'uses' => 'games\space\StorageController@ships']);
     Route::get('/{ip?}/{port?}', ['as' => 'games_space',             'uses' => 'games\space\GameController@home']);
   });
 });
