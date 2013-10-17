@@ -7,7 +7,7 @@ stat = {
 };
 
 $.ajax({
-  url: '/games/store/parts',
+  url: '/games/space/store/parts',
   dataType: 'json',
 }).done(function(data) {
   console.log('Got parts [', data, ']');
