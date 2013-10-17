@@ -1,26 +1,45 @@
 stat = {
-  part: [],
+  vars: [],
   
-  loaded: function() {
-    return part.length !== 0;
+  create: function() {
+    var priv = this;
+    
+    return {
+      loaded: function() {
+        for(var i = 0; i < priv.vars.length; i++) {
+          if(typeof stat[priv.vars[i]] === 'undefined') {
+            return false;
+          }
+        }
+        
+        return true;
+      },
+      
+      load: function(type, cb) {
+        $.ajax({
+          url: '/games/space/store/' + type,
+          dataType: 'json'
+        }).done(function(data) {
+          console.log('Got ' + type + '[', data, ']');
+          stat[type] = data;
+          priv.vars.push(data);
+          if(typeof cb !== 'undefined') { cb(); }
+        }).fail(function() {
+          console.log('Failed to get ' + type);
+        });
+      }
+    }
   }
-};
+}.create();
 
-$.ajax({
-  url: '/games/space/store/parts',
-  dataType: 'json',
-}).done(function(data) {
-  console.log('Got parts [', data, ']');
-  
+stat.load('parts', function() {
   var draw = function(ctx, render) {
     eval(this.render);
   }
   
-  stat.part = data;
-  
-  for(var i = 0; i < stat.part.length; i++) {
-    stat.part[i].draw = draw;
+  for(var i = 0; i < stat.parts.length; i++) {
+    stat.parts[i].draw = draw;
   }
-}).fail(function() {
-  console.log('Failed to get parts');
 });
+
+stat.load('ships');
