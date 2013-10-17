@@ -28,26 +28,11 @@ function MainMenu(ctx) {
           this.guis.push(ShipEditor(this.ctx));
         }, this);
         
-        var btnParts = Button(this);
-        btnParts.x = 10;
-        btnParts.y = 50;
-        btnParts.w = 180;
-        btnParts.text('Get Parts');
-        btnParts.onclick = function() {
-          $.ajax({
-            url: '/games/store/parts',
-            dataType: 'json',
-          })
-            .done(function(data) { console.log(data); })
-            .fail(function() { console.log('Failed to get parts'); });
-        }
-        
         var fraMenu = Frame(this);
         fraMenu.w = 200;
         fraMenu.h = 100;
         fraMenu.controls.add(btnPlay);
         fraMenu.controls.add(btnEdit);
-        fraMenu.controls.add(btnParts);
         
         this.controls.add(fraMenu);
         this.onresize = $.proxy(function() {
