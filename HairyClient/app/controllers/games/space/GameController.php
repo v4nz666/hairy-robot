@@ -1,8 +1,8 @@
 <?php
 
-namespace Games;
+namespace Games\Space;
 
-class SpaceController extends \Controller {
+class GameController extends \Controller {
   public function __construct() {
     $this->beforeFilter('auth');
     $this->beforeFilter('csrf', ['on' => ['post', 'put', 'delete']]);

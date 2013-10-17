@@ -31,9 +31,9 @@ class AuthController extends Controller {
       $user->save();
       Auth::login($user);
       
-      return Redirect::action('HomeController@home');
+      return Redirect::route('home');
     } else {
-      return Redirect::action('HomeController@home')->withInput(Input::only('username'))->withErrors($validator);
+      return Redirect::route('home')->withInput(Input::only('username'))->withErrors($validator);
     }
   }
   
@@ -45,17 +45,17 @@ class AuthController extends Controller {
     
     if($validator->passes()) {
       if(Auth::attempt(Input::only('username', 'password'))) {
-        return Redirect::action('HomeController@home');
+        return Redirect::route('home');
       } else {
-        return Redirect::action('HomeController@home')->withInput(Input::only('username'))->withErrors(['username' => 'Something went wrong']);
+        return Redirect::route('home')->withInput(Input::only('username'))->withErrors(['username' => 'Something went wrong']);
       }
     }
     
-    return Redirect::action('HomeController@home')->withInput(Input::only('username'))->withErrors($validator);
+    return Redirect::route('home')->withInput(Input::only('username'))->withErrors($validator);
   }
   
   public function logout() {
     Auth::logout();
-    return Redirect::action('HomeController@home');
+    return Redirect::route('home');
   }
 }

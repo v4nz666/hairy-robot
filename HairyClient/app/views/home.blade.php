@@ -8,7 +8,7 @@
   
   <body>
     @if(Auth::guest())
-      {{ Form::open(['action' => 'AuthController@login', 'method' => 'put']) }}
+      {{ Form::open(['route' => 'login', 'method' => 'put']) }}
       
       <div class="form-block">
         {{ Form::text('username', Input::old('username'), ['placeholder' => Lang::get('auth.username'), 'autofocus' => 'autofocus']) }}
@@ -28,11 +28,10 @@
       
       {{ Form::submit(Lang::get('auth.login')) }}
       {{ Form::close() }}
-      {{ HTML::linkAction('HomeController@register', Lang::get('home.register')) }}
+      {{ HTML::linkRoute('register', Lang::get('home.register')) }}
     @else
-      <p>{{ HTML::linkAction('AuthController@logout', Lang::get('auth.logout')) }}</p>
-      <p>{{ HTML::linkAction('games\SpaceController@home', Lang::get('games.space')) }}</p>
-      <p>{{ HTML::linkAction('games\SpaceController@build', Lang::get('games.space_build')) }}</p>
+      <p>{{ HTML::linkRoute('logout', Lang::get('auth.logout')) }}</p>
+      <p>{{ HTML::linkRoute('games_space', Lang::get('games.space')) }}</p>
     @endif
   </body>
 </html>

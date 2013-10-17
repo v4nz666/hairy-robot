@@ -8,6 +8,7 @@
     {{ HTML::script('assets/js/socket.io.min.js') }}
     {{ HTML::script('assets/js/helper.js') }}
     {{ HTML::script('assets/js/gui.js') }}
+    {{ HTML::script('assets/js/space/static.js') }}
     {{ HTML::script('assets/js/space/mainmenu.js') }}
     {{ HTML::script('assets/js/space/game.js') }}
     {{ HTML::script('assets/js/space/ship.js') }}
