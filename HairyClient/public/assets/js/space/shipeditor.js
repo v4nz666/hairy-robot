@@ -28,6 +28,11 @@ function ShipEditor(ctx) {
         var lstShips = List(this);
         lstShips.w = 250;
         
+        for(var i = 0; i < stat.ships.length; i++) {
+          var item = lstShips.items().push(stat.ships[i].name);
+          item.ship = stat.ships[i];
+        }
+        
         var fraInfo = Frame(this);
         fraInfo.w = 250;
         fraInfo.h = 150;
