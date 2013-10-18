@@ -13,7 +13,7 @@ function ShipEditor(ctx) {
     gridX: 0,
     gridY: 0,
     
-    create: function(ctx) {
+    create: function() {
       var priv = this;
       
       var me = GUI(ctx);
@@ -151,5 +151,5 @@ function ShipEditor(ctx) {
       me.init();
       return me;
     }
-  }.create(ctx);
+  }.create();
 }
