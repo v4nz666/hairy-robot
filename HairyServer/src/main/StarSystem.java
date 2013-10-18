@@ -39,7 +39,6 @@ public class StarSystem {
     this.planets = new Planet[9];
     
     int fib = 1;
-    int last;
     int i, j;
     // Distance of the farthest planet (1000000km from the outer edge)
     int maxD = (this._size / 2) - 1000000;
@@ -50,9 +49,7 @@ public class StarSystem {
     // +1 for asteroid belt 
     for (i = 0; i < planets.length + 1; i++) {
       seq[i] = fib;
-      
-      last = fib;
-      fib = fib + last;
+      fib = ( i > 0 ) ? fib + seq[i - 1] : fib + 1;
     }
     
     int div = maxD / seq[seq.length -1];
