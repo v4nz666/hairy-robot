@@ -582,6 +582,7 @@ function Label(gui) {
           return _text;
         } else {
           _text = text;
+          w = this.gui.ctx.measureText(_text).width;
           h = getTextHeight(this.gui.ctx.font).ascent;
         }
       };
