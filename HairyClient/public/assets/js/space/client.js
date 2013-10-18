@@ -399,7 +399,29 @@ function Client() {
       }, this), 1000);
       
       this.resize();
-      this.initMenu();
+      
+      stat.load([
+        {
+          type: 'parts',
+          cb: function() {
+            var draw = function(ctx, render) {
+              eval(this.render);
+            }
+            
+            for(var i = 0; i < stat.parts.length; i++) {
+              stat.parts[i].draw = draw;
+            }
+          }
+        },
+        
+        {
+          type: 'ships'
+        }
+      ]);
+
+      stat.onload($.proxy(function() {
+        this.initMenu();
+      }, this));
     },
     
     setStatus: function(status) {
