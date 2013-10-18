@@ -714,6 +714,9 @@ function List(gui) {
     create: function() {
       var priv = this;
       var me = Control(gui);
+      me.backcolour = 'gray';
+      me.bordercolour = 'white';
+      
       var items = {
         first: function() {
           return priv.item[0];
