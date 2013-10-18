@@ -1,45 +1,71 @@
 stat = {
   vars: [],
+  onload: null,
+  
+  checkonload: function() {
+    if(this.onload !== null) {
+      if(stat.loaded()) {
+        this.onload();
+      }
+    }
+  },
   
   create: function() {
     var priv = this;
     
     return {
-      loaded: function() {
-        for(var i = 0; i < priv.vars.length; i++) {
-          if(typeof stat[priv.vars[i]] === 'undefined') {
-            return false;
-          }
-        }
-        
-        return true;
+      onload: function(cb) {
+        priv.onload = cb;
+        priv.checkonload();
       },
       
-      load: function(type, cb) {
-        $.ajax({
-          url: '/games/space/store/' + type,
-          dataType: 'json'
-        }).done(function(data) {
-          console.log('Got ' + type + '[', data, ']');
-          stat[type] = data;
-          priv.vars.push(data);
-          if(typeof cb !== 'undefined') { cb(); }
-        }).fail(function() {
-          console.log('Failed to get ' + type);
-        });
+      loaded: function() {
+        return priv.vars.length === 0;
+      },
+      
+      load: function(types) {
+        for(var i = 0; i < types.length; i++) {
+          stat[types[i].type] = null;
+          priv.vars.push(types[i].type);
+          
+          $.ajax({
+            url: '/games/space/store/' + types[i].type,
+            dataType: 'json',
+            idx: i
+          }).done(function(data) {
+            console.log('Got ' + types[this.idx].type + '[', data, ']');
+            stat[types[this.idx].type] = data;
+            priv.vars.splice(priv.vars.indexOf(data), 1);
+            if(typeof types[this.idx].cb !== 'undefined') { types[this.idx].cb(); }
+            priv.checkonload();
+          }).fail(function() {
+            console.log('Failed to get ' + types[this.idx].types);
+          });
+        }
       }
     }
   }
 }.create();
 
-stat.load('parts', function() {
-  var draw = function(ctx, render) {
-    eval(this.render);
-  }
+stat.load([
+  {
+    type: 'parts',
+    cb: function() {
+      var draw = function(ctx, render) {
+        eval(this.render);
+      }
+      
+      for(var i = 0; i < stat.parts.length; i++) {
+        stat.parts[i].draw = draw;
+      }
+    }
+  },
   
-  for(var i = 0; i < stat.parts.length; i++) {
-    stat.parts[i].draw = draw;
+  {
+    type: 'ships'
   }
-});
+]);
 
-stat.load('ships');
+stat.onload(function() {
+  console.log('test');
+});
