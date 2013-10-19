@@ -719,6 +719,10 @@ function List(gui) {
       me.bordercolour = 'white';
       
       var items = {
+        length: function() {
+          return priv.item.length;
+        },
+        
         first: function() {
           return priv.item[0];
         },
