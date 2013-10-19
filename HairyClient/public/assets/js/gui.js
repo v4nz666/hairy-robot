@@ -4,6 +4,7 @@ function GUIs() {
     
     push: function(gui) {
       gui.guis = this;
+      gui.init();
       gui.resize();
       this.guis.push(gui);
     },
