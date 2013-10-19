@@ -1,6 +1,6 @@
 function MainMenu(ctx) {
   return {
-    create: function(ctx) {
+    create: function() {
       var priv = this;
       
       var me = GUI(ctx);
@@ -25,7 +25,7 @@ function MainMenu(ctx) {
         btnEdit.text('Edit Ships');
         btnEdit.onclick = $.proxy(function(ev) {
           btnEdit.gui.pop();
-          this.guis.push(ShipEditor(this.ctx));
+          this.guis.push(ShipEditor(ctx));
         }, this);
         
         var fraMenu = Frame(this);
@@ -41,8 +41,7 @@ function MainMenu(ctx) {
         }, this);
       }
       
-      me.init();
       return me;
     }
-  }.create(ctx);
+  }.create();
 }

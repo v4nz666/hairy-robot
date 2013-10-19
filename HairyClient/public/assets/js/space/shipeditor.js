@@ -148,7 +148,6 @@ function ShipEditor(ctx) {
         };
       }
       
-      me.init();
       return me;
     }
   }.create();

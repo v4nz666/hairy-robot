@@ -8,7 +8,7 @@ function Game(ctx, socket) {
     messages: [],
     maxMessages: 255,
     
-    create: function(ctx, socket) {
+    create: function() {
       var priv = this;
       
       var me = GUI(ctx);
@@ -84,8 +84,7 @@ function Game(ctx, socket) {
         priv.fraChat.h = priv.txtChat.y;
       }, this);
       
-      me.init();
       return me;
     }
-  }.create(ctx, socket);
+  }.create();
 }
