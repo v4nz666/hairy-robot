@@ -577,14 +577,18 @@ function Label(gui) {
       var me = Control(gui);
       me.textAlign = 'center';
       me.textBaseline = 'middle';
+      me.autosize = true;
       
       me.text = function(text) {
         if(typeof text === 'undefined') {
           return _text;
         } else {
           _text = text;
-          w = this.gui.ctx.measureText(_text).width;
-          h = getTextHeight(this.gui.ctx.font).ascent;
+          
+          if(me.autosize) {
+            w = this.gui.ctx.measureText(_text).width;
+            h = getTextHeight(this.gui.ctx.font).ascent;
+          }
         }
       };
       
