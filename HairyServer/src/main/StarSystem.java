@@ -49,10 +49,10 @@ public class StarSystem {
     // +1 for asteroid belt 
     for (i = 0; i < planets.length + 1; i++) {
       seq[i] = fib;
-      fib = ( i > 0 ) ? fib + seq[i - 1] : fib + 1;
+      fib = ( i > 0 ) ? fib + seq[i-1] : fib + 1;
     }
     
-    int div = maxD / seq[seq.length -1];
+    int div = maxD / seq[seq.length-1];
     
     for (i = 0; i < planets.length; i++) {
       

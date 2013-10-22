@@ -149,35 +149,49 @@ function Client() {
       var screenX;
       var screenY;
       
+      this.renderCelestial(this.system.star, 'star');
+      
       for (i in this.system.planets) {
         var p = this.system.planets[i];
         
-        screenX = (p.x - this.offsetX) / this.zoomLevel;
-        screenY = (p.y - this.offsetY) / this.zoomLevel;
+        this.renderCelestial(p, 'planet');
         
-        if(!this.onscreen(p, screenX, screenY)) {
-          continue;
+        for (j in p.moons) {
+          var m = p.moons[j];
+            this.renderCelestial(m, 'moon');
         }
-        
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(screenX, screenY, (p.size) / this.zoomLevel, 0, this.PIx2);
-        ctx.fillStyle = 'blue';
-        ctx.fill();
-        ctx.restore();
       }
+    },
+    
+    renderCelestial: function(c, type) {
+      switch (type) {
+        case 'planet' :
+          var color = 'blue';
+        break;
+        case 'moon' :
+          var color = 'green';
+        break;
+        case 'star' :
+          var color = 'yellow';
+        break;
+        
+      }
+      var ctx = this.ctx;
       
-      screenX = (this.system.star.x - this.offsetX) / this.zoomLevel;
-      screenY = (this.system.star.y - this.offsetY) / this.zoomLevel;
+      screenX = (c.x - this.offsetX) / this.zoomLevel;
+      screenY = (c.y - this.offsetY) / this.zoomLevel;
+        
+      if(!this.onscreen(c, screenX, screenY)) {
+        return;
+      }
       
       ctx.save();
       ctx.beginPath();
-      ctx.arc(screenX, screenY, this.system.star.size / this.zoomLevel, 0, this.PIx2);
-      ctx.fillStyle = 'yellow';
+      ctx.arc(screenX, screenY, (c.size) / this.zoomLevel, 0, this.PIx2);
+      ctx.fillStyle = color;
       ctx.fill();
       ctx.restore();
     },
-    
     renderBullets: function() {
       var ctx = this.ctx;
       var screenX;
