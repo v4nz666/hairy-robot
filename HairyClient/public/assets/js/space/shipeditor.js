@@ -150,17 +150,18 @@ function ShipEditor(ctx) {
         };
         
         this.showAddShip = function() {
-          var name = Textbox(this);
+          var msg = Message(this.ctx, 'Pick a name for your ship:');
+          
+          var name = Textbox(msg);
           name.w = 110;
           name.y = 20;
           
-          var okay = Button(this);
+          var okay = Button(msg);
           okay.text('=>');
           okay.w = 40;
           okay.x = name.w;
           okay.y = 20;
           
-          var msg = Message(this.ctx, 'Pick a name for your ship:');
           this.guis.push(msg);
           
           msg.addcontrol(name);

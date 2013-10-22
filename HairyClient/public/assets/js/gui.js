@@ -258,13 +258,8 @@ function GUI(ctx) {
         ret = true;
       }
       
-      console.log(this);
-      console.log(this.focus);
-      
       if(this.onkeypress !== null) {
-        console.log(ret);
-        //ret = ret || this.onkeypress(ev, ret);
-        console.log(ret);
+        ret = ret || this.onkeypress(ev, ret);
       }
       
       return ret;
