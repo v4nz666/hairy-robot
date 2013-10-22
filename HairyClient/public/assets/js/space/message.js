@@ -27,6 +27,14 @@ function Message(ctx, text) {
         this.addcontrol = function(control) {
           f.controls.add(control);
         };
+        
+        this.onmousemove = function(ev) { return true; }
+        this.onmousedown = function(ev) { return true; }
+        this.onmouseup   = function(ev) { return true; }
+        this.onclick     = function()   { return true; }
+        this.onkeydown   = function(ev) { return true; }
+        this.onkeyup     = function(ev) { return true; }
+        this.onkeypress  = function(ev) { return true; }
       };
       
       return me;
