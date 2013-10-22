@@ -23,6 +23,10 @@ function Message(ctx, text) {
           f.x = (ctx.canvas.width  - f.w) / 2;
           f.y = (ctx.canvas.height - f.h) / 2;
         };
+        
+        this.addcontrol = function(control) {
+          f.controls.add(control);
+        };
       };
       
       return me;
