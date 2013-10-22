@@ -5,36 +5,36 @@ function Message(ctx, text) {
       
       var me = GUI(ctx);
       me.init = function() {
-        var l = Label(this);
+        var l = Label(me);
         l.textAlign = 'center';
         l.textBaseline = 'middle';
         l.autosize = false;
         l.text(text);
         l.w = 150;
         
-        var f = Frame(this);
+        var f = Frame(me);
         f.w = l.w;
         f.h = 50;
         f.controls.add(l);
         
-        this.controls.add(f);
+        me.controls.add(f);
         
-        this.onresize = function() {
+        me.onresize = function() {
           f.x = (ctx.canvas.width  - f.w) / 2;
           f.y = (ctx.canvas.height - f.h) / 2;
         };
         
-        this.addcontrol = function(control) {
+        me.addcontrol = function(control) {
           f.controls.add(control);
         };
         
-        this.onmousemove = function(ev) { return true; }
-        this.onmousedown = function(ev) { return true; }
-        this.onmouseup   = function(ev) { return true; }
-        this.onclick     = function()   { return true; }
-        this.onkeydown   = function(ev) { return true; }
-        this.onkeyup     = function(ev) { return true; }
-        this.onkeypress  = function(ev) { return true; }
+        me.onmousemove = function(ev, ret) { return true; }
+        me.onmousedown = function(ev, ret) { return true; }
+        me.onmouseup   = function(ev, ret) { return true; }
+        me.onclick     = function(ev, ret) { return true; }
+        me.onkeydown   = function(ev, ret) { return true; }
+        me.onkeyup     = function(ev, ret) { return true; }
+        me.onkeypress  = function(ev, ret) { return true; }
       };
       
       return me;

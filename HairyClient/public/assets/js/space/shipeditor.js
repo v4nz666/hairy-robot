@@ -147,7 +147,7 @@ function ShipEditor(ctx) {
           }
         };
         
-        if(lstShips.items().length() === 0) {
+        this.showAddShip = function() {
           var name = Textbox(this);
           name.w = 110;
           name.y = 20;
@@ -163,6 +163,10 @@ function ShipEditor(ctx) {
           
           msg.addcontrol(name);
           msg.addcontrol(okay);
+        };
+        
+        if(lstShips.items().length() === 0) {
+          this.showAddShip();
         }
       }
       
