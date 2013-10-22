@@ -4,6 +4,8 @@ function Message(ctx, text) {
       var priv = this;
       
       var me = GUI(ctx);
+      me.name = 'message';
+      
       me.init = function() {
         var l = Label(me);
         l.textAlign = 'center';

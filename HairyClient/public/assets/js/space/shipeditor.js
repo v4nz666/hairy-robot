@@ -17,6 +17,8 @@ function ShipEditor(ctx) {
       var priv = this;
       
       var me = GUI(ctx);
+      me.name = 'shipeditor';
+      
       me.init = function() {
         priv.ship = Ship();
         priv.ship.addPart(0, 0, stat.parts[0]);

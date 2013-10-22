@@ -75,6 +75,7 @@ function GUIs() {
 
 function GUI(ctx) {
   return {
+    name: 'generic',
     ctx: ctx,
     guis: null,
     controls: new ControlStack(null),
