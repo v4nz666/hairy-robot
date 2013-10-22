@@ -20,14 +20,11 @@ function ShipEditor(ctx) {
       me.name = 'shipeditor';
       
       me.init = function() {
-        priv.ship = Ship();
-        priv.ship.addPart(0, 0, stat.parts[0]);
-        
         var itemsel = function(item) {
           priv.selected = item.part;
         };
         
-        var lstShips = List(this);
+        var lstShips = List(me);
         lstShips.w = 250;
         
         for(var i = 0; i < stat.ships.length; i++) {
@@ -35,11 +32,11 @@ function ShipEditor(ctx) {
           item.ship = stat.ships[i];
         }
         
-        var fraInfo = Frame(this);
+        var fraInfo = Frame(me);
         fraInfo.w = 250;
         fraInfo.h = 150;
         
-        var lstParts = List(this);
+        var lstParts = List(me);
         lstParts.w = fraInfo.w;
         
         for(var i = 0; i < stat.parts.length; i++) {
@@ -50,11 +47,11 @@ function ShipEditor(ctx) {
         
         lstParts.items().selected(lstParts.items().first());
         
-        this.controls.add(lstShips);
-        this.controls.add(fraInfo);
-        this.controls.add(lstParts);
+        me.controls.add(lstShips);
+        me.controls.add(fraInfo);
+        me.controls.add(lstParts);
         
-        this.onresize = function() {
+        me.onresize = function() {
           lstShips.h = ctx.canvas.height;
           fraInfo.x = ctx.canvas.width - lstParts.w;
           lstParts.x = fraInfo.x;
@@ -65,7 +62,7 @@ function ShipEditor(ctx) {
           priv.halfH = ctx.canvas.height / 2;
         };
         
-        this.onrender = function() {
+        var onrender = function() {
           ctx.save();
           ctx.translate(priv.halfW, priv.halfH);
           priv.ship.render(ctx);
@@ -108,7 +105,7 @@ function ShipEditor(ctx) {
           ctx.restore();
         };
         
-        this.onmousemove = function(ev, ret) {
+        me.onmousemove = function(ev, ret) {
           if(ret) return;
           
           priv.mouseX = ev.offsetX - priv.halfW;
@@ -128,7 +125,7 @@ function ShipEditor(ctx) {
           }
         };
         
-        this.onclick = function(ev, ret) {
+        me.onclick = function(ev, ret) {
           if(ret) return;
           
           var x = priv.gridX;
@@ -149,8 +146,8 @@ function ShipEditor(ctx) {
           }
         };
         
-        this.showAddShip = function() {
-          var msg = Message(this.ctx, 'Pick a name for your ship:');
+        me.showAddShip = function() {
+          var msg = Message(me.ctx, 'Pick a name for your ship:');
           
           var name = Textbox(msg);
           name.w = 110;
@@ -161,15 +158,21 @@ function ShipEditor(ctx) {
           okay.w = 40;
           okay.x = name.w;
           okay.y = 20;
+          okay.onclick = function(ev) {
+            priv.ship = Ship();
+            priv.ship.addPart(0, 0, stat.parts[0]);
+            me.onrender = onrender;
+            msg.pop();
+          };
           
-          this.guis.push(msg);
+          me.guis.push(msg);
           
           msg.addcontrol(name);
           msg.addcontrol(okay);
         };
         
         if(lstShips.items().length() === 0) {
-          this.showAddShip();
+          me.showAddShip();
         }
       }
       
