@@ -28,6 +28,7 @@ function Client() {
     
     gridSize: 512,
     zoomLevel: 1,
+    zoomSpeed: 1,
     maxZoom: 64,
     
     clear: function(clr) {
@@ -670,7 +671,7 @@ function Client() {
     },
     
     zoomOut: function() {
-      var newZoom = this.zoomLevel * 2;
+      var newZoom = this.zoomLevel + this.zoomSpeed;
       
       if ( newZoom <= this.maxZoom ) {
         this.setZoom(newZoom);
@@ -678,7 +679,7 @@ function Client() {
     },
     
     zoomIn: function() {
-      var newZoom = this.zoomLevel / 2;
+      var newZoom = this.zoomLevel - this.zoomSpeed;
       
       if ( newZoom >= 1 ) {
         this.setZoom(newZoom);
