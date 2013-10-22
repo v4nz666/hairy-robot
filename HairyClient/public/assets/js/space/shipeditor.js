@@ -36,6 +36,25 @@ function ShipEditor(ctx) {
         fraInfo.w = 250;
         fraInfo.h = 150;
         
+        var btnSave = Button(me);
+        btnSave.text('Save');
+        btnSave.onclick = function(ev) {
+          $.ajax({
+            type: 'POST',
+            url: '/games/space/store/saveship',
+            data: {
+              _method: 'PUT',
+              name: priv.ship.name,
+              json: priv.ship.partsJSON()
+            },
+            dataType: 'json'
+          }).done(function(data) {
+            console.log('Got [', data, ']');
+          }).fail(function() {
+            console.log('Failed to save ship');
+          });
+        };
+        
         var lstParts = List(me);
         lstParts.w = fraInfo.w;
         
@@ -49,6 +68,7 @@ function ShipEditor(ctx) {
         
         me.controls.add(lstShips);
         me.controls.add(fraInfo);
+        me.controls.add(btnSave);
         me.controls.add(lstParts);
         
         me.onresize = function() {
@@ -57,6 +77,8 @@ function ShipEditor(ctx) {
           lstParts.x = fraInfo.x;
           lstParts.y = fraInfo.h;
           lstParts.h = ctx.canvas.height - fraInfo.h;
+          btnSave.x = lstParts.x - btnSave.w - 4;
+          btnSave.y = ctx.canvas.height - btnSave.h - 4;
           
           priv.halfW = ctx.canvas.width  / 2;
           priv.halfH = ctx.canvas.height / 2;
@@ -160,6 +182,7 @@ function ShipEditor(ctx) {
           okay.y = 20;
           okay.onclick = function(ev) {
             priv.ship = Ship();
+            priv.ship.name = name.text();
             priv.ship.addPart(0, 0, stat.parts[0]);
             me.onrender = onrender;
             msg.pop();
