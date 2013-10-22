@@ -146,6 +146,24 @@ function ShipEditor(ctx) {
               break;
           }
         };
+        
+        if(lstShips.items().length() === 0) {
+          var name = Textbox(this);
+          name.w = 110;
+          name.y = 20;
+          
+          var okay = Button(this);
+          okay.text('=>');
+          okay.w = 40;
+          okay.x = name.w;
+          okay.y = 20;
+          
+          var msg = Message(this.ctx, 'Pick a name for your ship:');
+          this.guis.push(msg);
+          
+          msg.addcontrol(name);
+          msg.addcontrol(okay);
+        }
       }
       
       return me;
