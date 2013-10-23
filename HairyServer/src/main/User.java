@@ -188,7 +188,6 @@ public class User extends Entity {
   
   public class Params {
     public int getId() { return id; }
-    // Let the user know the size of the world she'll be playing in
     public StarSystem getSystem() { return Server.star_system; }
   }
   
