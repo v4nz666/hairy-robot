@@ -495,6 +495,7 @@ function Client() {
       user.shields = data.shields;
       user.gun = data.gun;
       this.user[user.id] = user;
+      this.me = user;
       this.gotchat({id: 'Server', msg: user.name + ' has joined the game!'});
     },
     
@@ -572,8 +573,6 @@ function Client() {
     setParams: function(data){
       console.log('setting client/world[', data, ']');
       this.system = data.system;
-      this.me = this.user[data.id];
-      console.log('Set id[', this.me.id, ']');
     },
     
     stats: function(stats) {
