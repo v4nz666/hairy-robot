@@ -24,8 +24,8 @@ public class Planet extends Entity {
     
     this.x = mid + Math.cos(theta * Math.PI / 180) * d;
     this.y = mid - Math.sin(theta * Math.PI / 180) * d;
-    System.out.println("Planet: size [" + this.size + "] at[" + theta + "]degrees " + 
-        "[" + (int)this.x + ", " + (int)this.y + "]");
+    System.out.println("Planet: size [" + this.size + "] th[" + theta + "]" + 
+        "d[" + d + "]" + "x,y[" + (int)this.x + ", " + (int)this.y + "]");
     generateMoons(this);
     
   }
