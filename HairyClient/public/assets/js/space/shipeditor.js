@@ -46,8 +46,7 @@ function ShipEditor(ctx) {
               _method: 'PUT',
               name: priv.ship.name,
               json: priv.ship.partsJSON()
-            },
-            dataType: 'json'
+            }
           }).done(function(data) {
             console.log('Got [', data, ']');
           }).fail(function() {
