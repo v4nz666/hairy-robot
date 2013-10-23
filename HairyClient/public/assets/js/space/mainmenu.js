@@ -4,6 +4,7 @@ function MainMenu(ctx) {
       var priv = this;
       
       var me = GUI(ctx);
+      me.name = 'mainmenu';
       
       me.onplay = null;
       me.init = function() {

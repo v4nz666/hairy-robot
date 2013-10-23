@@ -12,6 +12,7 @@ function Game(ctx, socket) {
       var priv = this;
       
       var me = GUI(ctx);
+      me.name = 'game';
       
       me.init = function() {
         priv.txtChat = new Textbox(this);

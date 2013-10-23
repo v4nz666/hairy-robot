@@ -17,15 +17,14 @@ function ShipEditor(ctx) {
       var priv = this;
       
       var me = GUI(ctx);
+      me.name = 'shipeditor';
+      
       me.init = function() {
-        priv.ship = Ship();
-        priv.ship.addPart(0, 0, stat.parts[0]);
-        
         var itemsel = function(item) {
           priv.selected = item.part;
         };
         
-        var lstShips = List(this);
+        var lstShips = List(me);
         lstShips.w = 250;
         
         for(var i = 0; i < stat.ships.length; i++) {
@@ -33,11 +32,30 @@ function ShipEditor(ctx) {
           item.ship = stat.ships[i];
         }
         
-        var fraInfo = Frame(this);
+        var fraInfo = Frame(me);
         fraInfo.w = 250;
         fraInfo.h = 150;
         
-        var lstParts = List(this);
+        var btnSave = Button(me);
+        btnSave.text('Save');
+        btnSave.onclick = function(ev) {
+          $.ajax({
+            type: 'POST',
+            url: '/games/space/store/saveship',
+            data: {
+              _method: 'PUT',
+              name: priv.ship.name,
+              json: priv.ship.partsJSON()
+            },
+            dataType: 'json'
+          }).done(function(data) {
+            console.log('Got [', data, ']');
+          }).fail(function() {
+            console.log('Failed to save ship');
+          });
+        };
+        
+        var lstParts = List(me);
         lstParts.w = fraInfo.w;
         
         for(var i = 0; i < stat.parts.length; i++) {
@@ -48,22 +66,25 @@ function ShipEditor(ctx) {
         
         lstParts.items().selected(lstParts.items().first());
         
-        this.controls.add(lstShips);
-        this.controls.add(fraInfo);
-        this.controls.add(lstParts);
+        me.controls.add(lstShips);
+        me.controls.add(fraInfo);
+        me.controls.add(btnSave);
+        me.controls.add(lstParts);
         
-        this.onresize = function() {
+        me.onresize = function() {
           lstShips.h = ctx.canvas.height;
           fraInfo.x = ctx.canvas.width - lstParts.w;
           lstParts.x = fraInfo.x;
           lstParts.y = fraInfo.h;
           lstParts.h = ctx.canvas.height - fraInfo.h;
+          btnSave.x = lstParts.x - btnSave.w - 4;
+          btnSave.y = ctx.canvas.height - btnSave.h - 4;
           
           priv.halfW = ctx.canvas.width  / 2;
           priv.halfH = ctx.canvas.height / 2;
         };
         
-        this.onrender = function() {
+        var onrender = function() {
           ctx.save();
           ctx.translate(priv.halfW, priv.halfH);
           priv.ship.render(ctx);
@@ -106,7 +127,7 @@ function ShipEditor(ctx) {
           ctx.restore();
         };
         
-        this.onmousemove = function(ev, ret) {
+        me.onmousemove = function(ev, ret) {
           if(ret) return;
           
           priv.mouseX = ev.offsetX - priv.halfW;
@@ -126,7 +147,7 @@ function ShipEditor(ctx) {
           }
         };
         
-        this.onclick = function(ev, ret) {
+        me.onclick = function(ev, ret) {
           if(ret) return;
           
           var x = priv.gridX;
@@ -147,26 +168,34 @@ function ShipEditor(ctx) {
           }
         };
         
-        this.showAddShip = function() {
-          var name = Textbox(this);
+        me.showAddShip = function() {
+          var msg = Message(me.ctx, 'Pick a name for your ship:');
+          
+          var name = Textbox(msg);
           name.w = 110;
           name.y = 20;
           
-          var okay = Button(this);
+          var okay = Button(msg);
           okay.text('=>');
           okay.w = 40;
           okay.x = name.w;
           okay.y = 20;
+          okay.onclick = function(ev) {
+            priv.ship = Ship();
+            priv.ship.name = name.text();
+            priv.ship.addPart(0, 0, stat.parts[0]);
+            me.onrender = onrender;
+            msg.pop();
+          };
           
-          var msg = Message(this.ctx, 'Pick a name for your ship:');
-          this.guis.push(msg);
+          me.guis.push(msg);
           
           msg.addcontrol(name);
           msg.addcontrol(okay);
         };
         
         if(lstShips.items().length() === 0) {
-          this.showAddShip();
+          me.showAddShip();
         }
       }
       

@@ -75,6 +75,7 @@ function GUIs() {
 
 function GUI(ctx) {
   return {
+    name: 'generic',
     ctx: ctx,
     guis: null,
     controls: new ControlStack(null),
@@ -257,13 +258,8 @@ function GUI(ctx) {
         ret = true;
       }
       
-      console.log(this);
-      console.log(this.focus);
-      
       if(this.onkeypress !== null) {
-        console.log(ret);
-        //ret = ret || this.onkeypress(ev, ret);
-        console.log(ret);
+        ret = ret || this.onkeypress(ev, ret);
       }
       
       return ret;
