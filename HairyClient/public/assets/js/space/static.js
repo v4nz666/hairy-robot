@@ -6,6 +6,7 @@ stat = {
     if(this.onload !== null) {
       if(stat.loaded()) {
         this.onload();
+        this.onload = null;
       }
     }
   },
