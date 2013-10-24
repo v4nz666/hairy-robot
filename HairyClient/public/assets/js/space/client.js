@@ -146,53 +146,33 @@ function Client() {
     },
     
     renderCelestials: function() {
-      var ctx = this.ctx;
-      var screenX;
-      var screenY;
-      
-      this.renderCelestial(this.system.star, 'star');
-      
-      for (i in this.system.planets) {
-        var p = this.system.planets[i];
-        
-        this.renderCelestial(p, 'planet');
-        
-        for (j in p.moons) {
-          var m = p.moons[j];
-            this.renderCelestial(m, 'moon');
-        }
-      }
+      this.renderCelestial(this.system.star);
     },
     
-    renderCelestial: function(c, type) {
-      switch (type) {
-        case 'planet' :
-          var color = 'blue';
-        break;
-        case 'moon' :
-          var color = 'green';
-        break;
-        case 'star' :
-          var color = 'yellow';
-        break;
-        
-      }
+    renderCelestial: function(c) {
       var ctx = this.ctx;
       
       screenX = (c.x - this.offsetX) / this.zoomLevel;
       screenY = (c.y - this.offsetY) / this.zoomLevel;
+      
+      if(this.onscreen(c, screenX, screenY)) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, c.size / this.zoomLevel, 0, this.PIx2);
+        ctx.fillStyle = c.colour;
+        ctx.fill();
+        ctx.restore();
         
-      if(!this.onscreen(c, screenX, screenY)) {
         return;
       }
       
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, (c.size) / this.zoomLevel, 0, this.PIx2);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.restore();
+      for(i in c.celestial) {
+        if(i === 'length') { continue; }
+        var p = c.celestial[i];
+        this.renderCelestial(p);
+      }
     },
+    
     renderBullets: function() {
       var ctx = this.ctx;
       var screenX;
