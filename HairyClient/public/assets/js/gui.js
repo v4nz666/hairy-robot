@@ -725,6 +725,11 @@ function List(gui) {
       me.bordercolour = 'white';
       
       var items = {
+        clear: function() {
+          priv.item = [];
+          priv.selected = null;
+        },
+        
         length: function() {
           return priv.item.length;
         },
