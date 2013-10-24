@@ -45,6 +45,8 @@ public abstract class Celestial extends Entity {
     return _celestial.toArray(_celestialToArray);
   }
   
+  public abstract String getColour();
+  
   public boolean addCelestial(Celestial c) {
     return _celestial.add(c);
   }
