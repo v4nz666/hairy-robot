@@ -3,6 +3,11 @@ package space.celestials;
 import java.util.Random;
 
 public class Star extends Celestial {
+  @Override
+  public String toString() {
+    return "Star " + super.toString();
+  }
+  
   private static Random _rand = new Random();
   
   public double getMass() { return _mass; }

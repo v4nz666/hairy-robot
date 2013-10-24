@@ -1,6 +1,11 @@
 package space.celestials;
 
 public class AsteroidBelt extends Celestial {
+  @Override
+  public String toString() {
+    return "Belt " + super.toString();
+  }
+  
   public static AsteroidBelt generate(StarSystem system, Celestial parent, double distance) {
     return new AsteroidBelt(system, parent, distance, 0, 0, 0);
   }

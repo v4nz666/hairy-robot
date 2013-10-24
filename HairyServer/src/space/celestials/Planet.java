@@ -3,6 +3,11 @@ package space.celestials;
 import java.util.Random;
 
 public class Planet extends Celestial {
+  @Override
+  public String toString() {
+    return "Planet " + super.toString();
+  }
+  
   private static Random _rand = new Random();
   
   public static Planet generate(StarSystem system, Celestial parent, double distance) {

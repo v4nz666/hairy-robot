@@ -3,6 +3,11 @@ package space.celestials;
 import java.util.Random;
 
 public class Moon extends Celestial {
+  @Override
+  public String toString() {
+    return "Moon " + super.toString();
+  }
+  
   private static Random _rand = new Random(); 
   
   public static Moon generate(StarSystem system, Celestial parent, double distance) {
