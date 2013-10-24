@@ -5,8 +5,6 @@ import java.util.Random;
 public class Planet extends Celestial {
   private static Random _rand = new Random();
   
-  public Moon[] moon;
-  
   public static Planet generate(StarSystem system, Celestial parent, double distance) {
     int scale = _rand.nextInt(10);
     int div;
@@ -43,10 +41,9 @@ public class Planet extends Celestial {
   private void generateMoons() {
     int n = 1 + _rand.nextInt(Math.max(1, (size / 3000)));
     
-    moon = new Moon[n];
     for(int i = 0; i < n; i++) {
       double d = Math.max(size * 3, size * i) + (size * i / 2);
-      moon[i] = Moon.generate(_system, this, d);
+      addCelestial(Moon.generate(_system, this, d));
     }
   }
 }
