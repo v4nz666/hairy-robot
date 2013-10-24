@@ -167,10 +167,10 @@ public class User extends Entity {
     
     if(_isFiring) fire();
     
-    int xmin = size;
-    int ymin = xmin;
-    int xmax = Server.star_system.getSize() - xmin;
-    int ymax = Server.star_system.getSize() - ymin;
+    double xmin = size;
+    double ymin = xmin;
+    double xmax = Server.star_system.getSize() - xmin;
+    double ymax = Server.star_system.getSize() - ymin;
     
     if(x < xmin) { x = xmin; vx = 0; }
     if(x > xmax) { x = xmax; vx = 0; }
