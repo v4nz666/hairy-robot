@@ -6,6 +6,11 @@ import java.util.Random;
 import main.Entity;
 
 public abstract class Celestial extends Entity {
+  @Override
+  public String toString() {
+    return "Celestial @ (" + x + ", " + y + "), size: " + size + ", dist: " + _distance + ", mass: " + _mass + ", temp: " + _temp + " (" + super.toString() + ")";
+  }
+  
   private static Random _rand = new Random();
   
   protected ArrayList<Celestial> _celestial = new ArrayList<>();
@@ -32,6 +37,8 @@ public abstract class Celestial extends Entity {
     
     x = px + Math.cos(theta * Math.PI / 180) * distance;
     y = py - Math.sin(theta * Math.PI / 180) * distance;
+    
+    System.out.println(this);
   }
   
   public Celestial[] getCelestial() {
