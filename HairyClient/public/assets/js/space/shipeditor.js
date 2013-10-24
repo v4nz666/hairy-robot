@@ -198,6 +198,9 @@ function ShipEditor(ctx) {
         };
         
         me.refreshships = function() {
+          var msg = Message(me.ctx, 'Loading...');
+          me.guis.push(msg);
+          
           stat.load([{type: 'ships', cb: function() {
             lstShips.items().clear();
             
@@ -211,6 +214,8 @@ function ShipEditor(ctx) {
             } else {
               me.showAddShip();
             }
+            
+            msg.pop();
           }}]);
         };
         
