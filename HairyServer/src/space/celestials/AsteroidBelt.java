@@ -1,7 +1,5 @@
 package space.celestials;
 
-import main.Asteroid;
-
 public class AsteroidBelt extends Celestial {
   public static AsteroidBelt generate(StarSystem system, Celestial parent, double distance) {
     return new AsteroidBelt(system, parent, distance, 0, 0, 0);
