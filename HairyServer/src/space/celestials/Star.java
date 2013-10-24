@@ -23,11 +23,5 @@ public class Star extends Celestial {
   
   private Star(StarSystem system, Celestial parent, double distance, int size, float mass, int temp) {
     super(system, parent, distance, size, mass, temp);
-    
-    System.out.println("Star Coords[" + x + "," + y + "]");
-    System.out.println("Star Size[" + (int)size + "]");
-    
-    _mass = mass;
-    _temp = temp;
   }
 }

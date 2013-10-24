@@ -32,9 +32,6 @@ public class Planet extends Celestial {
   
   private Planet(StarSystem system, Celestial parent, double distance, int size, float mass, int temp) {
     super(system, parent, distance, size, mass, temp);
-    
-    System.out.println("Planet: size [" + size + "] d[" + distance + "]" + "x,y[" + x + ", " + y + "]");
-    
     generateMoons();
   }
   
