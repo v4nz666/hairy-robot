@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import space.celestials.StarSystem;
 import space.game.Bullet;
 import sql.SQL;
 

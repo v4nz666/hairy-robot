@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import space.celestials.StarSystem;
 import space.game.Bullet;
 import space.physics.Sandbox;
 import sql.MySQL;

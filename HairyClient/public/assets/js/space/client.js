@@ -474,6 +474,7 @@ function Client() {
       // Register setParams handler and send login
       this.socket.on('adduser',   $.proxy(this.addUser, this));
       this.socket.on('setParams', $.proxy(function(data) {
+        console.log(data);
         this.setParams(data);
         this.setStatus('');
       }, this));
