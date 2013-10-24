@@ -7,7 +7,7 @@ public class Planet extends Celestial {
   
   public Moon[] moon;
   
-  public static Planet generate(StarSystem system, double distance) {
+  public static Planet generate(StarSystem system, Celestial parent, double distance) {
     int scale = _rand.nextInt(10);
     int div;
     double d = distance;
@@ -29,11 +29,11 @@ public class Planet extends Celestial {
     int size = (int)((d / div) + (d / (div * 3) * _rand.nextFloat() - d / (div * 6)));
     
     //TODO: Mass/temp
-    return new Planet(system, distance, size, 0, 0);
+    return new Planet(system, parent, distance, size, 0, 0);
   }
   
-  private Planet(StarSystem system, double distance, int size, float mass, int temp) {
-    super(system, distance, size, mass, temp);
+  private Planet(StarSystem system, Celestial parent, double distance, int size, float mass, int temp) {
+    super(system, parent, distance, size, mass, temp);
     
     System.out.println("Planet: size [" + size + "] d[" + distance + "]" + "x,y[" + x + ", " + y + "]");
     
@@ -45,7 +45,8 @@ public class Planet extends Celestial {
     
     moon = new Moon[n];
     for(int i = 0; i < n; i++) {
-      moon[i] = new Moon(_system, this, i + 1);
+      double d = Math.max(size * 3, size * i) + (size * i / 2);
+      moon[i] = Moon.generate(_system, this, d);
     }
   }
 }
