@@ -15,4 +15,8 @@ public class AsteroidBelt extends Celestial {
   }
 
   //private Asteroid[] _asteroids;
+  
+  public String getColour() {
+    return "gray";
+  }
 }

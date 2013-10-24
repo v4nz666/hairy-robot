@@ -29,4 +29,8 @@ public class Star extends Celestial {
   private Star(StarSystem system, Celestial parent, double distance, int size, float mass, int temp) {
     super(system, parent, distance, size, mass, temp);
   }
+  
+  public String getColour() {
+    return "yellow";
+  }
 }

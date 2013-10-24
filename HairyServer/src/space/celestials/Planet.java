@@ -48,4 +48,8 @@ public class Planet extends Celestial {
       addCelestial(Moon.generate(_system, this, d));
     }
   }
+  
+  public String getColour() {
+    return "blue";
+  }
 }
