@@ -751,9 +751,9 @@ function List(gui) {
             f.h = 40;
           }
           
-          f.onselected = null;
+          f.onselect = null;
           f.onclick = function() {
-            this.selected(f);
+            items.selected(f);
           }
           
           var l = Label(gui);
