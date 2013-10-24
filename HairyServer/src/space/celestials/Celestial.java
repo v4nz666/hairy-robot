@@ -9,6 +9,7 @@ public abstract class Celestial extends Entity {
   private static Random _rand = new Random();
   
   protected ArrayList<Celestial> _celestial = new ArrayList<>();
+  private Celestial[] _celestialToArray = new Celestial[0];
   
   protected StarSystem _system;
   protected Celestial _parent;
@@ -31,6 +32,10 @@ public abstract class Celestial extends Entity {
     
     x = px + Math.cos(theta * Math.PI / 180) * distance;
     y = py - Math.sin(theta * Math.PI / 180) * distance;
+  }
+  
+  public Celestial[] getCelestial() {
+    return _celestial.toArray(_celestialToArray);
   }
   
   public boolean addCelestial(Celestial c) {
