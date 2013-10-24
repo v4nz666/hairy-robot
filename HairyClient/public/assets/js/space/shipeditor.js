@@ -127,7 +127,7 @@ function ShipEditor(ctx) {
         };
         
         me.onmousemove = function(ev, ret) {
-          if(ret) return;
+          if(ret  || priv.ship === null) return;
           
           priv.mouseX = ev.offsetX - priv.halfW;
           priv.mouseY = ev.offsetY - priv.halfH;
@@ -147,7 +147,7 @@ function ShipEditor(ctx) {
         };
         
         me.onclick = function(ev, ret) {
-          if(ret) return;
+          if(ret || priv.ship === null) return;
           
           var x = priv.gridX;
           var y = priv.gridY;
