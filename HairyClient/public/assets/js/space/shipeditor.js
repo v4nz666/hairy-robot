@@ -27,11 +27,6 @@ function ShipEditor(ctx) {
         var lstShips = List(me);
         lstShips.w = 250;
         
-        for(var i = 0; i < stat.ships.length; i++) {
-          var item = lstShips.items().push(stat.ships[i].name);
-          item.ship = stat.ships[i];
-        }
-        
         var fraInfo = Frame(me);
         fraInfo.w = 250;
         fraInfo.h = 150;
@@ -193,9 +188,24 @@ function ShipEditor(ctx) {
           msg.addcontrol(okay);
         };
         
-        if(lstShips.items().length() === 0) {
-          me.showAddShip();
-        }
+        me.refreshships = function() {
+          stat.load([{type: 'ships', cb: function() {
+            lstShips.items().clear();
+            
+            if(stat.ships.length !== 0) {
+              for(var i = 0; i < stat.ships.length; i++) {
+                var item = lstShips.items().push(stat.ships[i].name);
+                item.ship = stat.ships[i];
+              }
+              
+              lstParts.items().selected(lstParts.items().first());
+            } else {
+              me.showAddShip();
+            }
+          }}]);
+        };
+        
+        me.refreshships();
       }
       
       return me;
