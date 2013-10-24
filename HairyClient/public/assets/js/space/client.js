@@ -474,7 +474,6 @@ function Client() {
       // Register setParams handler and send login
       this.socket.on('adduser',   $.proxy(this.addUser, this));
       this.socket.on('setParams', $.proxy(function(data) {
-        console.log(data);
         this.setParams(data);
         this.setStatus('');
       }, this));
@@ -529,7 +528,6 @@ function Client() {
               break;
             
             case 84:
-              console.log(guiGame);
               guiGame.showchat();
               ev.preventDefault();
               break;
@@ -566,8 +564,6 @@ function Client() {
       this.socket.on('brem',    $.proxy(this.brem, this));
       
       this.inGame = true;
-      
-      console.log(this);
     },
     
     setParams: function(data){
