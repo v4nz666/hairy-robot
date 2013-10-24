@@ -18,7 +18,7 @@ public class StarSystem {
     _size = 512 * 567890;
     System.out.println("System Size[" + (long)_size * 32 + "m][" + _size + "px]");
     
-    star = Star.generate(this, 0);
+    star = Star.generate(this, null, 0);
     initOrbits();
   }
   
@@ -49,9 +49,9 @@ public class StarSystem {
     for(i = 0; i < count; i++) {
       double d = div * seq[i];
       if(i != 3) {
-        star.addCelestial(Planet.generate(this, d));
+        star.addCelestial(Planet.generate(this, star, d));
       } else {
-        star.addCelestial(new AsteroidBelt(this, d));
+        star.addCelestial(AsteroidBelt.generate(this, star, d));
       }
     }
   }
