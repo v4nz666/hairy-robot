@@ -31,6 +31,12 @@ function ShipEditor(ctx) {
         fraInfo.w = 250;
         fraInfo.h = 150;
         
+        var btnRefresh = Button(me);
+        btnRefresh.text('Refresh');
+        btnRefresh.onclick = function(ev) {
+          me.refreshships();
+        };
+        
         var btnSave = Button(me);
         btnSave.text('Save');
         btnSave.onclick = function(ev) {
@@ -62,6 +68,7 @@ function ShipEditor(ctx) {
         
         me.controls.add(lstShips);
         me.controls.add(fraInfo);
+        me.controls.add(btnRefresh);
         me.controls.add(btnSave);
         me.controls.add(lstParts);
         
@@ -73,6 +80,8 @@ function ShipEditor(ctx) {
           lstParts.h = ctx.canvas.height - fraInfo.h;
           btnSave.x = lstParts.x - btnSave.w - 4;
           btnSave.y = ctx.canvas.height - btnSave.h - 4;
+          btnRefresh.x = btnSave.x - btnRefresh.w - 4;
+          btnRefresh.y = btnSave.y;
           
           priv.halfW = ctx.canvas.width  / 2;
           priv.halfH = ctx.canvas.height / 2;
