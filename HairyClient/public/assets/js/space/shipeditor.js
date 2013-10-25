@@ -197,6 +197,10 @@ function ShipEditor(ctx) {
           msg.addcontrol(okay);
         };
         
+        var selectship = function(item) {
+          priv.ship = item.ship;
+        };
+        
         me.refreshships = function() {
           var msg = Message(me.ctx, 'Loading...');
           me.guis.push(msg);
@@ -208,6 +212,7 @@ function ShipEditor(ctx) {
               for(var i = 0; i < stat.ships.length; i++) {
                 var item = lstShips.items().push(stat.ships[i].name);
                 item.ship = stat.ships[i];
+                item.onselect = selectship;
               }
               
               lstParts.items().selected(lstParts.items().first());
