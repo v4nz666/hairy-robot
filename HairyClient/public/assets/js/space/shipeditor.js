@@ -55,6 +55,7 @@ function ShipEditor(ctx) {
             data: jsondata
           }).done(function(data) {
             console.log('Got [', data, ']');
+            me.refreshships();
           }).fail(function() {
             console.log('Failed to save ship');
           });
