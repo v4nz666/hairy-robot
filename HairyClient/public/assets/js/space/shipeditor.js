@@ -37,17 +37,22 @@ function ShipEditor(ctx) {
           me.refreshships();
         };
         
+        var btnNew = Button(me);
+        btnNew.text('New');
+        btnNew.onclick = function(ev) {
+          me.showAddShip();
+        };
+        
         var btnSave = Button(me);
         btnSave.text('Save');
         btnSave.onclick = function(ev) {
+          var jsondata = priv.ship.serialize();
+          jsondata._method = 'PUT';
+          
           $.ajax({
             type: 'POST',
             url: '/games/space/store/saveship',
-            data: {
-              _method: 'PUT',
-              name: priv.ship.name,
-              json: priv.ship.serialize()
-            }
+            data: jsondata
           }).done(function(data) {
             console.log('Got [', data, ']');
           }).fail(function() {
@@ -69,6 +74,7 @@ function ShipEditor(ctx) {
         me.controls.add(lstShips);
         me.controls.add(fraInfo);
         me.controls.add(btnRefresh);
+        me.controls.add(btnNew);
         me.controls.add(btnSave);
         me.controls.add(lstParts);
         
@@ -82,6 +88,9 @@ function ShipEditor(ctx) {
           btnSave.y = ctx.canvas.height - btnSave.h - 4;
           btnRefresh.x = btnSave.x - btnRefresh.w - 4;
           btnRefresh.y = btnSave.y;
+          
+          btnNew.x = lstShips.x + lstShips.w + 4;
+          btnNew.y = btnSave.y;
           
           priv.halfW = ctx.canvas.width  / 2;
           priv.halfH = ctx.canvas.height / 2;

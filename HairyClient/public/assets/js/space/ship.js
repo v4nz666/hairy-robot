@@ -4,6 +4,7 @@ function Ship() {
       var priv = this;
       
       var me = {
+        id: null,
         name: '',
         x: 0,
         y: 0,
@@ -29,7 +30,11 @@ function Ship() {
             });
           }
           
-          return JSON.stringify(parts);
+          return JSON.stringify({
+            id: me.id,
+            name: me.name,
+            json: parts
+          });
         },
         
         deserialize: function(data) {
