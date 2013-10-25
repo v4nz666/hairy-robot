@@ -418,6 +418,12 @@ function Control(gui) {
         onkeypress: null,
         onrender: null,
         
+        remove: function() {
+          if(me.contParent !== null) {
+            me.contParent.controls.remove(me);
+          }
+        },
+        
         root: function() {
           if(me.contParent !== null) {
             return me.contParent.root();
