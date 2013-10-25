@@ -16,7 +16,7 @@ function Ship() {
           
         },
         
-        partsJSON: function() {
+        serialize: function() {
           var parts = [];
           
           for(var i = 0; i < this.parts.length; i++) {
