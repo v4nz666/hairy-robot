@@ -736,6 +736,10 @@ function List(gui) {
       
       var items = {
         clear: function() {
+          for(var i = 0; i < priv.item.length; i++) {
+            priv.item[i].remove();
+          }
+          
           priv.item = [];
           priv.selected = null;
         },
