@@ -198,7 +198,9 @@ function ShipEditor(ctx) {
         };
         
         var selectship = function(item) {
-          priv.ship = item.ship;
+          priv.ship = Ship();
+          priv.ship.deserialize(item.ship);
+          me.onrender = onrender;
         };
         
         me.refreshships = function() {
