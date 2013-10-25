@@ -285,7 +285,7 @@ function GUI(ctx) {
     allX: function(control) {
       var x = control.x;
       if(control.contParent !== null) {
-        x += allX(control.contParent);
+        x += this.allX(control.contParent);
       }
       
       return x;
@@ -294,7 +294,7 @@ function GUI(ctx) {
     allY: function(control) {
       var y = control.y;
       if(control.contParent !== null) {
-        y += allY(control.contParent);
+        y += this.allY(control.contParent);
       }
       
       return y;
