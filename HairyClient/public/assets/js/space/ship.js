@@ -30,18 +30,19 @@ function Ship() {
             });
           }
           
-          return JSON.stringify({
+          return {
             id: me.id,
             name: me.name,
-            json: parts
-          });
+            json: JSON.stringify(parts)
+          };
         },
         
         deserialize: function(data) {
-          data.json = JSON.parse(data.json);
+          var json = JSON.parse(data.json);
+          me.id = data.id;
           me.name = data.name;
-          for(var i = 0; i < data.json.length; i++) {
-            me.addPart(data.json[i].x, data.json[i].y, stat.parts[data.json[i].id - 1]);
+          for(var i = 0; i < json.length; i++) {
+            me.addPart(json[i].x, json[i].y, stat.parts[json[i].id - 1]);
           }
         },
         

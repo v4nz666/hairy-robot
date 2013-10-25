@@ -6,7 +6,7 @@ function GUIs() {
       gui.guis = this;
       gui.init();
       gui.resize();
-      this.guis.push(gui);
+      this.guis.unshift(gui);
     },
     
     pop: function(gui) {

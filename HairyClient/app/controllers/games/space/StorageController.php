@@ -26,7 +26,12 @@ class StorageController extends \Controller {
     if($validator->fails()) {
       return var_dump($validator->messages());
     } else {
-      $ship = new \SpaceShip;
+      $ship = \SpaceShip::find(\Input::get('id'));
+      
+      if($ship === null) {
+        $ship = new \SpaceShip;
+      }
+      
       $ship->space_user_id = \Auth::user()->spaceUser->id;
       $ship->name = \Input::get('name');
       $ship->json = \Input::get('json');
