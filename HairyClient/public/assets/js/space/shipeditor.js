@@ -87,11 +87,10 @@ function ShipEditor(ctx) {
           lstParts.h = ctx.canvas.height - fraInfo.h;
           btnSave.x = lstParts.x - btnSave.w - 4;
           btnSave.y = ctx.canvas.height - btnSave.h - 4;
-          btnRefresh.x = btnSave.x - btnRefresh.w - 4;
-          btnRefresh.y = btnSave.y;
-          
-          btnNew.x = lstShips.x + lstShips.w + 4;
+          btnNew.x = btnSave.x - btnNew.w - 4;
           btnNew.y = btnSave.y;
+          btnRefresh.x = lstShips.x + lstShips.w + 4;
+          btnRefresh.y = btnSave.y;
           
           priv.halfW = ctx.canvas.width  / 2;
           priv.halfH = ctx.canvas.height / 2;
