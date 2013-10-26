@@ -226,7 +226,7 @@ function ShipEditor(ctx) {
                 item.onselect = selectship;
               }
               
-              lstParts.items().selected(lstParts.items().first());
+              lstShips.items().selected(lstShips.items().first());
             } else {
               me.showAddShip();
             }
