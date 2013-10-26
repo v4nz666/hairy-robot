@@ -46,7 +46,7 @@ function ShipEditor(ctx) {
         var btnSave = Button(me);
         btnSave.text('Save');
         btnSave.onclick = function(ev) {
-          var msgsaving = Message(me.ctx, 'Saving...');
+          var msgsaving = Message(me.ctx, 'Saving ship ' + priv.ship.name + '...');
           me.guis.push(msgsaving);
           
           var jsondata = priv.ship.serialize();
@@ -220,7 +220,7 @@ function ShipEditor(ctx) {
         };
         
         me.refreshships = function() {
-          var msg = Message(me.ctx, 'Loading...');
+          var msg = Message(me.ctx, 'Refreshing ship list...');
           me.guis.push(msg);
           
           stat.load([{type: 'ships', cb: function() {
