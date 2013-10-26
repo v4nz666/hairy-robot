@@ -46,6 +46,9 @@ function ShipEditor(ctx) {
         var btnSave = Button(me);
         btnSave.text('Save');
         btnSave.onclick = function(ev) {
+          var msgsaving = Message(me.ctx, 'Saving...');
+          me.guis.push(msgsaving);
+          
           var jsondata = priv.ship.serialize();
           jsondata._method = 'PUT';
           
@@ -54,9 +57,13 @@ function ShipEditor(ctx) {
             url: '/games/space/store/saveship',
             data: jsondata
           }).done(function(data) {
+            msgsaving.pop();
             console.log('Got [', data, ']');
             me.refreshships();
           }).fail(function() {
+            msgsaving.pop();
+            msgsaving = Message(me.ctx, 'Failed to save ship.');
+            me.guis.push(msgsaving);
             console.log('Failed to save ship');
           });
         };
