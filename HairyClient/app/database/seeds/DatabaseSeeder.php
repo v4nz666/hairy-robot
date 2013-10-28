@@ -41,7 +41,7 @@ class SpacePartTypeTableSeeder extends Seeder {
 
 class SpacePartTableSeeder extends Seeder {
   public function run() {
-    $parts = [['Hull', SpacePartType::first()->id, 'A 16x16m&sup2; section of hull', 1, 'ctx.fillStyle=\'white\';ctx.strokeStyle=\'grey\';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,16);ctx.lineTo(16,16);ctx.lineTo(16,0);ctx.closePath();ctx.fill();ctx.stroke();', 1000]];
+    $parts = [['Hull', SpacePartType::first()->id, 'A 16x16m² section of hull', 1, 'ctx.fillStyle=\'white\';ctx.strokeStyle=\'grey\';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,16);ctx.lineTo(16,16);ctx.lineTo(16,0);ctx.closePath();ctx.fill();ctx.stroke();', 1000]];
     
     foreach($parts as $part) {
       SpacePart::create(['name' => $part[0], 'space_part_type_id' => $part[1], 'desc' => $part[2], 'mass' => $part[3], 'render' => $part[4], 'cost' => $part[5]]);
