@@ -193,7 +193,6 @@ function GUI(ctx) {
         ev.pageY -= ally;
         ev.which = this.mousedownbutton;
         
-        console.log(this.mousedowncontrol);
         this.mousedowncontrol.mouseup(ev);
         this.mousedowncontrol.click();
         this.mousedowncontrol = null;
