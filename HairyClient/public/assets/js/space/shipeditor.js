@@ -25,7 +25,7 @@ function ShipEditor(ctx) {
         };
         
         var lstShips = List(me);
-        lstShips.w = 250;
+        lstShips.w = 150;
         
         var fraInfo = Frame(me);
         fraInfo.w = 250;
