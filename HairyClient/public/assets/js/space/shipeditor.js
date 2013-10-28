@@ -207,7 +207,7 @@ function ShipEditor(ctx) {
           okay.onclick = function(ev) {
             priv.ship = Ship();
             priv.ship.name = name.text();
-            priv.ship.addPart(0, 0, stat.parts[0]);
+            priv.ship.addPart(0, 0, lstParts.items().first().part);
             me.onrender = onrender;
             msg.pop();
           };
