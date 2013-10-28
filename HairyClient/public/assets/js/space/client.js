@@ -411,11 +411,18 @@ function Client() {
     
     initMenu: function() {
       var menu = MainMenu(this.ctx);
+      
       menu.onplay   = $.proxy(function() {
+        var msg = Message(this.ctx, 'Connecting...');
+        this.guis.push(msg);
+        
         this.socket = io.connect(ip + ':' + port, {'reconnect': false});
         this.socket.on('connect', $.proxy(function() {
+          msg.text('Logging in...');
+          
           this.socket.on('adduser',   $.proxy(this.addUser, this));
           this.socket.on('setParams', $.proxy(function(data) {
+            msg.pop();
             menu.pop();
             this.initGame();
             this.setParams(data);
