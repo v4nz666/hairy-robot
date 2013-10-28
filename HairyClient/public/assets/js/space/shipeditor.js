@@ -4,6 +4,8 @@ function ShipEditor(ctx) {
     selected: null,
     hover: null,
     
+    types: [],
+    
     halfW: 0,
     halfH: 0,
     mouseX: 0,
@@ -71,14 +73,6 @@ function ShipEditor(ctx) {
         var lstParts = List(me);
         lstParts.w = fraInfo.w;
         
-        for(var i = 0; i < stat.parts.length; i++) {
-          var item = lstParts.items().push(stat.parts[i].name + ' - ' + stat.parts[i].desc);
-          item.part = stat.parts[i];
-          item.onselect = itemsel;
-        }
-        
-        lstParts.items().selected(lstParts.items().first());
-        
         me.controls.add(lstShips);
         me.controls.add(fraInfo);
         me.controls.add(btnRefresh);
@@ -90,8 +84,17 @@ function ShipEditor(ctx) {
           lstShips.h = ctx.canvas.height;
           fraInfo.x = ctx.canvas.width - lstParts.w;
           lstParts.x = fraInfo.x;
-          lstParts.y = fraInfo.h;
-          lstParts.h = ctx.canvas.height - fraInfo.h;
+          
+          var h = 0;
+          for(var i = 0; i < priv.types.length; i++) {
+            priv.types[i].w = lstParts.w / priv.types.length;
+            priv.types[i].x = lstParts.x + priv.types[i].w * i;
+            priv.types[i].y = fraInfo.h;
+            h = priv.types[i].h;
+          }
+          
+          lstParts.y = fraInfo.h + h;
+          lstParts.h = ctx.canvas.height - fraInfo.h - h;
           btnSave.x = lstParts.x - btnSave.w - 4;
           btnSave.y = ctx.canvas.height - btnSave.h - 4;
           btnNew.x = btnSave.x - btnNew.w - 4;
@@ -111,18 +114,20 @@ function ShipEditor(ctx) {
           ctx.fillStyle = 'white';
           ctx.strokeStyle = 'grey';
           
-          ctx.save();
-          ctx.translate(priv.gridX * 16, priv.gridY * 16);
-          priv.selected.draw(ctx);
-          
-          if(priv.ship.isValid(priv.gridX - priv.startX, priv.gridY - priv.startY)) {
-            ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
-          } else {
-            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+          if(priv.selected !== null) {
+            ctx.save();
+            ctx.translate(priv.gridX * 16, priv.gridY * 16);
+            priv.selected.draw(ctx);
+            
+            if(priv.ship.isValid(priv.gridX - priv.startX, priv.gridY - priv.startY)) {
+              ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+            } else {
+              ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            }
+            
+            ctx.fillRect(0, 0, 16, 16);
+            ctx.restore();
           }
-          
-          ctx.fillRect(0, 0, 16, 16);
-          ctx.restore();
           
           ctx.save();
           ctx.beginPath();
@@ -242,7 +247,80 @@ function ShipEditor(ctx) {
           }}]);
         };
         
+        me.showparts = function(type) {
+          var msg = Message(me.ctx, 'Getting parts...');
+          me.guis.push(msg);
+          
+          if(typeof type === 'undefined') { type = ''; }
+          
+          $.ajax({
+            url: '/games/space/store/parts/' + type,
+            dataType: 'json'
+          }).done(function(data) {
+            console.log('Got parts [', data, ']');
+            
+            var draw = function(ctx, render) {
+              eval(this.render);
+            }
+            
+            lstParts.items().clear();
+            
+            for(var i = 0; i < data.length; i++) {
+              var item = lstParts.items().push(data[i].name + ' - ' + data[i].desc);
+              data[i].draw = draw;
+              item.part = data[i];
+              item.onselect = itemsel;
+            }
+            
+            lstParts.items().selected(lstParts.items().first());
+            
+            msg.pop();
+          }).fail(function() {
+            console.log('Failed to get parts');
+          });
+        };
+        
+        me.showtypes = function() {
+          var msg = Message(me.ctx, 'Getting part types...');
+          me.guis.push(msg);
+          
+          $.ajax({
+            url: '/games/space/store/types',
+            dataType: 'json'
+          }).done(function(data) {
+            console.log('Got types [', data, ']');
+            
+            var button = Button(me);
+            button.text('All');
+            button.onclick = me.showparts;
+            
+            me.controls.add(button);
+            priv.types.push(button);
+            
+            for(var i = 0; i < data.length; i++) {
+              var button = Button(me);
+              button.text(data[i].name);
+              button.type = data[i].id;
+              button.onclick = $.proxy(function() {
+                me.showparts(this.type);
+              }, button);
+              
+              me.controls.add(button);
+              priv.types.push(button);
+            }
+            
+            me.resize();
+            
+            priv.types[0].onclick();
+            
+            msg.pop();
+          }).fail(function() {
+            console.log('Failed to get part types');
+          });
+        };
+        
         me.refreshships();
+        me.showtypes();
       }
       
       return me;
