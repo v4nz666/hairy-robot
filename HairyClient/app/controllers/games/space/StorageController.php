@@ -7,6 +7,10 @@ class StorageController extends \Controller {
     $this->beforeFilter('auth');
   }
   
+  public function types() {
+    return \SpacePartType::all()->toJSON();
+  }
+  
   public function parts($type = null) {
     if($type === null) {
       return \SpacePart::with('infos', 'attribs')->get()->toJSON();
