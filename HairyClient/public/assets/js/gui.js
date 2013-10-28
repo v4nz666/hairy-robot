@@ -193,6 +193,7 @@ function GUI(ctx) {
         ev.pageY -= ally;
         ev.which = this.mousedownbutton;
         
+        console.log(this.mousedowncontrol);
         this.mousedowncontrol.mouseup(ev);
         this.mousedowncontrol.click();
         this.mousedowncontrol = null;
@@ -311,8 +312,8 @@ function ControlStack(owner) {
     size: 0,
     
     hittest: function(x, y) {
-      if(this.last !== null) {
-        return this.last.hittest(x, y);
+      if(this.first !== null) {
+        return this.first.hittest(x, y);
       }
       
       return null;
@@ -466,8 +467,8 @@ function Control(gui) {
             }
           }
           
-          if(me.contNext !== null) {
-            return me.contNext.hittest(x, y);
+          if(me.contPrev !== null) {
+            return me.contPrev.hittest(x, y);
           }
           
           return null;
