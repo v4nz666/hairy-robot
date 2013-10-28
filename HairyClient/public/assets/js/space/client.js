@@ -380,29 +380,7 @@ function Client() {
       }, this), 1000);
       
       this.resize();
-      
-      stat.load([
-        {
-          type: 'parts',
-          cb: function() {
-            var draw = function(ctx, render) {
-              eval(this.render);
-            }
-            
-            for(var i = 0; i < stat.parts.length; i++) {
-              stat.parts[i].draw = draw;
-            }
-          }
-        },
-        
-        {
-          type: 'ships'
-        }
-      ]);
-
-      stat.onload($.proxy(function() {
-        this.initMenu();
-      }, this));
+      this.initMenu();
     },
     
     gotchat: function(msg) {
