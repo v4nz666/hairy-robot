@@ -29,8 +29,10 @@ stat = {
           stat[types[i].type] = null;
           priv.vars.push(types[i].type);
           
+          var url = '/games/space/store/' + typeof types[i].url === 'undefined' ? types[i].type, types[i].url;
+          
           $.ajax({
-            url: '/games/space/store/' + types[i].type,
+            url: url,
             dataType: 'json',
             idx: i
           }).done(function(data) {
