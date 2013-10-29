@@ -42,7 +42,7 @@ function Ship() {
           me.id = data.id;
           me.name = data.name;
           for(var i = 0; i < json.length; i++) {
-            me.addPart(json[i].x, json[i].y, stat.parts[json[i].id - 1]);
+            me.addPart(json[i].x, json[i].y, stat.parts[json[i].id - stat.parts[0].id]);
           }
         },
         
