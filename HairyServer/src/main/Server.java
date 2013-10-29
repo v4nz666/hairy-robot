@@ -97,7 +97,6 @@ public class Server {
               return;
             case "/stop":
               user.stop();
-              _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
               return;
 
           }
