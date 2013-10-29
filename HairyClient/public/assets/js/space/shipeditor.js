@@ -275,6 +275,11 @@ function ShipEditor(ctx) {
             lstParts.items().selected(lstParts.items().first());
             
             msg.pop();
+            
+            if(typeof priv.firstload === 'undefined') {
+              priv.firstload = false;
+              me.refreshships();
+            }
           }).fail(function() {
             console.log('Failed to get parts');
           });
@@ -319,7 +324,6 @@ function ShipEditor(ctx) {
           });
         };
         
-        me.refreshships();
         me.showtypes();
       }
       
