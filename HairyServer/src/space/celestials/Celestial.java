@@ -8,7 +8,7 @@ import main.Entity;
 public abstract class Celestial extends Entity {
   @Override
   public String toString() {
-    return "Celestial @ (" + x + ", " + y + "), size: " + size + ", dist: " + _distance + ", mass: " + _mass + ", temp: " + _temp + " (" + super.toString() + ")";
+    return "Celestial @ (" + (int)x + ", " + (int)y + "), size: " + size + ", dist: " + _distance + ", mass: " + _mass + ", temp: " + _temp + " (" + super.toString() + ")";
   }
   
   private static Random _rand = new Random();
@@ -21,6 +21,7 @@ public abstract class Celestial extends Entity {
   protected double _distance;
   protected double _mass;
   protected double _temp;
+  protected double _theta;
   
   public Celestial(StarSystem system, Celestial parent, double distance, int size, double mass, double temp) {
     super(-1, 0, 0, size);
@@ -29,14 +30,12 @@ public abstract class Celestial extends Entity {
     _distance = distance;
     _mass = mass;
     _temp = temp;
-    
-    // Select a random spot in the orbit to generate at
-    int theta = _rand.nextInt(360);
+    _theta = _rand.nextDouble() * 360;
     double px = _parent != null ? _parent.x : _system.getSize() / 2;
     double py = _parent != null ? _parent.y : _system.getSize() / 2;
     
-    x = px + Math.cos(theta * Math.PI / 180) * distance;
-    y = py - Math.sin(theta * Math.PI / 180) * distance;
+    x = px + Math.cos(_theta * Math.PI / 180) * distance;
+    y = py - Math.sin(_theta * Math.PI / 180) * distance;
     
     System.out.println(this);
   }
@@ -45,7 +44,11 @@ public abstract class Celestial extends Entity {
     return _celestial.toArray(_celestialToArray);
   }
   
-  public abstract String getColour();
+  public abstract String getFill();
+  
+  public String getStroke() {
+    return null;
+  }
   
   public boolean addCelestial(Celestial c) {
     return _celestial.add(c);

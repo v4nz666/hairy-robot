@@ -49,7 +49,7 @@ public class Planet extends Celestial {
     }
   }
   
-  public String getColour() {
+  public String getFill() {
     return "blue";
   }
 }

@@ -29,7 +29,7 @@ function Client() {
     gridSize: 512,
     zoomLevel: 1,
     zoomSpeed: 1,
-    maxZoom: 64,
+    maxZoom: 640,
     
     clear: function(clr) {
       if(typeof clr === 'undefined') {
@@ -158,9 +158,31 @@ function Client() {
       if(this.onscreen(c, screenX, screenY)) {
         ctx.save();
         ctx.beginPath();
-        ctx.arc(screenX, screenY, c.size / this.zoomLevel, 0, this.PIx2);
-        ctx.fillStyle = c.colour;
-        ctx.fill();
+        
+        if ( ! c.points ) {
+          ctx.arc(screenX, screenY, c.size / this.zoomLevel, 0, this.PIx2);
+        } else {
+          for (i = 0; i < c.points.length; i++) {
+            var point = c.points[i];
+            if ( i == 0 ) {
+                ctx.moveTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
+            } else {
+                ctx.lineTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
+            }
+          }
+        }
+        ctx.closePath();
+        
+        if (c.stroke) {
+          ctx.strokeStyle = c.stroke;
+          ctx.stroke();
+        }
+        
+        if (c.fill) {
+          ctx.fillStyle = c.fill;
+          ctx.fill();
+        }
+        
         ctx.restore();
         
         return;

@@ -30,7 +30,7 @@ public class Star extends Celestial {
     super(system, parent, distance, size, mass, temp);
   }
   
-  public String getColour() {
+  public String getFill() {
     return "yellow";
   }
 }

@@ -61,4 +61,5 @@ public abstract class Entity {
     x += vx;
     y += vy;
   }
+
 }
