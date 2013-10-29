@@ -377,6 +377,21 @@ function Client() {
     },
     
     init: function() {
+      stat.load([
+        {
+          type: 'parts',
+          cb: function() {
+            var draw = function(ctx, render) {
+              eval(this.render);
+            }
+            
+            for(var i = 0; i < stat.parts.length; i++) {
+              stat.parts[i].draw = draw;
+            }
+          }
+        }
+      ]);
+      
       this.canvas = $('#canvas')[0];
       this.ctx = canvas.getContext('2d');
       
