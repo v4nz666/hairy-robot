@@ -95,6 +95,10 @@ public class Server {
               user.setGun(space.data.guns.Gun.getGunRandom());
               _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
               return;
+            case "/stop":
+              user.stop();
+              return;
+
           }
         }
         

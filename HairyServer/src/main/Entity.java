@@ -61,5 +61,8 @@ public abstract class Entity {
     x += vx;
     y += vy;
   }
-
+  
+  public void stop() {
+    vx = vy = acc = 0;
+  }
 }
