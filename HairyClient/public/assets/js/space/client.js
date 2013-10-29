@@ -172,8 +172,6 @@ function Client() {
         }
         
         ctx.restore();
-        
-        return;
       }
       
       for(i in c.celestial) {
@@ -646,7 +644,7 @@ function Client() {
     },
     
     onscreen: function(entity, screenX, screenY) {
-      var size = entity.size * this.zoomLevel;
+      var size = entity.size / this.zoomLevel;
       var w = this.canvas.width;
       var h = this.canvas.height;
       
