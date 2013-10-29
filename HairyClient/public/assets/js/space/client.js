@@ -11,8 +11,6 @@ function Client() {
     bullets: [],
     effects: [],
     
-    status: '',
-    
     keys: 0,
     
     ticks: 0,
@@ -49,16 +47,6 @@ function Client() {
       this.ctx.restore();
       this.ticks++;
       this.fpsTicks++;
-    },
-    
-    renderMenu: function() {
-      if(this.status.length !== 0) {
-        this.ctx.fillStyle = 'white';
-        this.ctx.fontAlign = 'center';
-        this.ctx.fontBaseline = 'middle';
-        this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-        this.ctx.fillText(this.status, 0, 0);
-      }
     },
     
     renderGame: function() {
@@ -391,8 +379,6 @@ function Client() {
     },
     
     init: function() {
-      this.setStatus('Initialising...');
-      
       this.canvas = $('#canvas')[0];
       this.ctx = canvas.getContext('2d');
       
@@ -416,33 +402,7 @@ function Client() {
       }, this), 1000);
       
       this.resize();
-      
-      stat.load([
-        {
-          type: 'parts',
-          cb: function() {
-            var draw = function(ctx, render) {
-              eval(this.render);
-            }
-            
-            for(var i = 0; i < stat.parts.length; i++) {
-              stat.parts[i].draw = draw;
-            }
-          }
-        },
-        
-        {
-          type: 'ships'
-        }
-      ]);
-
-      stat.onload($.proxy(function() {
-        this.initMenu();
-      }, this));
-    },
-    
-    setStatus: function(status) {
-      this.status = status;
+      this.initMenu();
     },
     
     gotchat: function(msg) {
@@ -451,10 +411,25 @@ function Client() {
     
     initMenu: function() {
       var menu = MainMenu(this.ctx);
-      menu.onrender = $.proxy(this.renderMenu, this);
+      
       menu.onplay   = $.proxy(function() {
-        menu.pop();
-        this.initGame();
+        var msg = Message(this.ctx, 'Connecting...');
+        this.guis.push(msg);
+        
+        this.socket = io.connect(ip + ':' + port, {'reconnect': false});
+        this.socket.on('connect', $.proxy(function() {
+          msg.text('Logging in...');
+          
+          this.socket.on('adduser',   $.proxy(this.addUser, this));
+          this.socket.on('setParams', $.proxy(function(data) {
+            msg.pop();
+            menu.pop();
+            this.initGame();
+            this.setParams(data);
+          }, this));
+          
+          this.socket.emit('login', {name: name, auth: auth});
+        }, this));
       }, this);
       
       this.guis.push(menu);
@@ -463,25 +438,6 @@ function Client() {
       var auth = $('input[name=auth]').val();
       var ip   = $('input[name=ip]').val();
       var port = $('input[name=port]').val();
-      
-      this.setStatus('Connecting...');
-      this.socket = io.connect(ip + ':' + port, {'reconnect': false});
-      this.socket.on('connect', $.proxy(function() {
-        this.login(name, auth);
-      }, this));
-    },
-    
-    login: function(name, auth) {
-      this.setStatus('Logging in...');
-      // Register setParams handler and send login
-      this.socket.on('adduser',   $.proxy(this.addUser, this));
-      this.socket.on('setParams', $.proxy(function(data) {
-        this.setParams(data);
-        this.setStatus('');
-      }, this));
-      
-      this.socket.emit('login', {name: name, auth: auth});
-      this.setStatus('Logged in...');
     },
     
     addUser: function(data) {

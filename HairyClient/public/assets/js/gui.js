@@ -6,7 +6,7 @@ function GUIs() {
       gui.guis = this;
       gui.init();
       gui.resize();
-      this.guis.push(gui);
+      this.guis.unshift(gui);
     },
     
     pop: function(gui) {
@@ -284,8 +284,8 @@ function GUI(ctx) {
     
     allX: function(control) {
       var x = control.x;
-      if(control.contParent != null) {
-        x += allX(control.contParent);
+      if(control.contParent !== null) {
+        x += this.allX(control.contParent);
       }
       
       return x;
@@ -293,8 +293,8 @@ function GUI(ctx) {
     
     allY: function(control) {
       var y = control.y;
-      if(control.contParent != null) {
-        y += allY(control.contParent);
+      if(control.contParent !== null) {
+        y += this.allY(control.contParent);
       }
       
       return y;
@@ -311,8 +311,8 @@ function ControlStack(owner) {
     size: 0,
     
     hittest: function(x, y) {
-      if(this.last !== null) {
-        return this.last.hittest(x, y);
+      if(this.first !== null) {
+        return this.first.hittest(x, y);
       }
       
       return null;
@@ -320,7 +320,7 @@ function ControlStack(owner) {
     
     // Add a control to the list
     add: function(control) {
-      control.parent = this.owner;
+      control.contParent = this.owner;
       
       if(this.first !== null) {
         control.contNext = null;
@@ -388,8 +388,8 @@ function Control(gui) {
     create: function() {
       var _visible = true;
       
-      return {
-        controls: new ControlStack(this),
+      var me = {
+        controls: null,
         contParent: null,
         contNext: null,
         contPrev: null,
@@ -418,12 +418,18 @@ function Control(gui) {
         onkeypress: null,
         onrender: null,
         
+        remove: function() {
+          if(me.contParent !== null) {
+            me.contParent.controls.remove(me);
+          }
+        },
+        
         root: function() {
-          if(this.contParent !== null) {
-            return this.contParent.root();
+          if(me.contParent !== null) {
+            return me.contParent.root();
           }
           
-          return this;
+          return me;
         },
         
         visible: function(visible) {
@@ -435,33 +441,33 @@ function Control(gui) {
             _visible = visible;
             
             if(!visible && focus) {
-              this.gui.setfocus(this.contParent);
+              me.gui.setfocus(me.contParent);
             }
           }
         },
         
         setfocus: function() {
-          if(!this.focus) {
-            this.focus = true;
-            this.gui.setfocus(this);
+          if(!me.focus) {
+            me.focus = true;
+            me.gui.setfocus(me);
           }
         },
         
         hittest: function(x, y) {
-          if(_visible && this.acceptinput) {
-            var c = this.controls.hittest(x - this.x, y - this.y);
+          if(_visible && me.acceptinput) {
+            var c = me.controls.hittest(x - me.x, y - me.y);
             if(c !== null) {
               return c;
             }
             
-            if(x >= this.x && x <= this.x + this.w &&
-               y >= this.y && y <= this.y + this.h) {
-              return this;
+            if(x >= me.x && x <= me.x + me.w &&
+               y >= me.y && y <= me.y + me.h) {
+              return me;
             }
           }
           
-          if(this.contNext !== null) {
-            return this.contNext.hittest(x, y);
+          if(me.contPrev !== null) {
+            return me.contPrev.hittest(x, y);
           }
           
           return null;
@@ -470,11 +476,11 @@ function Control(gui) {
         renderPre: function(ctx) {
           if(_visible) {
             ctx.save();
-            ctx.translate(this.x, this.y);
+            ctx.translate(me.x, me.y);
             
-            if(this.backcolour !== null) {
-              ctx.fillStyle = this.backcolour;
-              ctx.fillRect(0, 0, this.w, this.h);
+            if(me.backcolour !== null) {
+              ctx.fillStyle = me.backcolour;
+              ctx.fillRect(0, 0, me.w, me.h);
             }
             
             return true;
@@ -484,11 +490,11 @@ function Control(gui) {
         },
         
         renderPost: function(ctx) {
-          this.controls.render(ctx);
+          me.controls.render(ctx);
           
-          if(this.bordercolour !== null) {
-            ctx.strokeStyle = this.bordercolour;
-            ctx.strokeRect(0.5, 0.5, this.w, this.h);
+          if(me.bordercolour !== null) {
+            ctx.strokeStyle = me.bordercolour;
+            ctx.strokeRect(0.5, 0.5, me.w, me.h);
           }
           
           ctx.restore();
@@ -496,65 +502,69 @@ function Control(gui) {
         
         renderControl: function(ctx) { },
         render: function(ctx) {
-          if(this.renderPre(ctx)) {
-            this.renderControl(ctx);
+          if(me.renderPre(ctx)) {
+            me.renderControl(ctx);
             
-            if(this.onrender !== null) {
-              this.onrender(ctx);
+            if(me.onrender !== null) {
+              me.onrender(ctx);
             }
             
-            this.renderPost(ctx);
+            me.renderPost(ctx);
           }
           
-          if(this.contNext !== null) {
-            this.contNext.render(ctx);
+          if(me.contNext !== null) {
+            me.contNext.render(ctx);
           }
         },
         
         gotfocus: function() {
-          if(this.ongotfocus !== null) { this.ongotfocus(); }
+          if(me.ongotfocus !== null) { me.ongotfocus(); }
         },
         
         lostfocus: function() {
-          if(this.onlostfocus !== null) { this.onlostfocus(); }
+          if(me.onlostfocus !== null) { me.onlostfocus(); }
         },
         
         mousein: function() {
-          if(this.onmousein !== null) { this.onmousein(); }
+          if(me.onmousein !== null) { me.onmousein(); }
         },
         
         mouseout: function() {
-          if(this.onmouseout !== null) { this.onmouseout(); }
+          if(me.onmouseout !== null) { me.onmouseout(); }
         },
         
         mousemove: function(ev) {
-          if(this.onmousemove !== null) { this.onmousemove(ev); }
+          if(me.onmousemove !== null) { me.onmousemove(ev); }
         },
         
         mousedown: function(ev) {
-          if(this.onmousedown !== null) { this.onmousedown(ev); }
+          if(me.onmousedown !== null) { me.onmousedown(ev); }
         },
         
         mouseup: function(ev) {
-          if(this.onmouseup !== null) { this.onmouseup(ev); }
+          if(me.onmouseup !== null) { me.onmouseup(ev); }
         },
         
         click: function() {
-          if(this.onclick !== null) { this.onclick(); }
+          if(me.onclick !== null) { me.onclick(); }
         },
         
         keydown: function(ev) {
-          if(this.onkeydown !== null) { this.onkeydown(ev); }
+          if(me.onkeydown !== null) { me.onkeydown(ev); }
         },
         
         keyup: function(ev) {
-          if(this.onkeyup !== null) { this.onkeyup(ev); }
+          if(me.onkeyup !== null) { me.onkeyup(ev); }
         },
         
         keypress: function(ev) {
-          if(this.onkeypress !== null) { this.onkeypress(ev); }
+          if(me.onkeypress !== null) { me.onkeypress(ev); }
         }
       }
+      
+      me.controls = new ControlStack(me);
+      
+      return me;
     }
   }.create();
 }
@@ -726,6 +736,10 @@ function List(gui) {
       
       var items = {
         clear: function() {
+          for(var i = 0; i < priv.item.length; i++) {
+            priv.item[i].remove();
+          }
+          
           priv.item = [];
           priv.selected = null;
         },

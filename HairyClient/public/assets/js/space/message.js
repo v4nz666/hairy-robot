@@ -14,6 +14,8 @@ function Message(ctx, text) {
         l.text(text);
         l.w = 150;
         
+        me.text = l.text;
+        
         var f = Frame(me);
         f.w = l.w;
         f.h = 50;
