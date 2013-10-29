@@ -42,7 +42,7 @@ function Ship() {
           me.id = data.id;
           me.name = data.name;
           for(var i = 0; i < json.length; i++) {
-            me.addPart(json[i].x, json[i].y, stat.parts[json[i].id - stat.parts[0].id]);
+            me.addPart(json[i].x, json[i].y, stat.parts[json[i].id - stat.parts[0].id], true);
           }
         },
         
@@ -62,8 +62,8 @@ function Ship() {
           ctx.restore();
         },
         
-        addPart: function(x, y, part) {
-          if(this.isValid(x, y)) {
+        addPart: function(x, y, part, force) {
+          if(this.isValid(x, y) || force) {
             for(i = 0; i < this.parts.length; i++) {
               var p = this.parts[i];
               
