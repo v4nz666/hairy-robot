@@ -554,6 +554,7 @@ function Client() {
     },
     setSystem: function(data){
       this.system = data.system;
+      this.setZoom(this.zoomLevel);
       console.log('Set system[', this.system, ']');
     },
     stats: function(stats) {
