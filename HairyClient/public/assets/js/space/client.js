@@ -143,13 +143,13 @@ function Client() {
     },
     
     renderCelestial: function(c) {
-      var ctx = this.ctx;
-      
       screenX = (c.x - this.offsetX) / this.zoomLevel;
       screenY = (c.y - this.offsetY) / this.zoomLevel;
       
       if(this.onscreen(c, screenX, screenY)) {
         this.cpf++;
+        
+        var ctx = this.ctx;
         
         ctx.save();
         ctx.beginPath();
