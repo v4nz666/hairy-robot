@@ -71,14 +71,14 @@ public class User extends Entity {
   private boolean _turnRight;
   private boolean _isFiring;
   
-  private Params _params = new Params();
+  private Params    _params       = new Params();
   private SysParams _systemParams = new SysParams();
-  private Stats  _stats  = new Stats();
-  private Update _update = new Update();
-  private Add    _add    = new Add();
-  private Remove _remove = new Remove();
-  private Hit    _hit    = new Hit();
-  private Kill   _kill   = new Kill();
+  private Stats     _stats        = new Stats();
+  private Update    _update       = new Update();
+  private Add       _add          = new Add();
+  private Remove    _remove       = new Remove();
+  private Hit       _hit          = new Hit();
+  private Kill      _kill         = new Kill();
   
   private User(SocketIOClient socket, int dbID, String name, double x, double y, int size) {
     super(Server.getID(), x, y, size);
