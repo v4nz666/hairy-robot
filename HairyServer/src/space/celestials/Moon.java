@@ -21,6 +21,12 @@ public class Moon extends Celestial {
     super(system, parent, distance, size, mass, temp);
   }
   
+  @Override
+  public String getType() {
+    return "moon";
+  }
+  
+  @Override
   public String getFill() {
     return "gray";
   }

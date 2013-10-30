@@ -21,6 +21,11 @@ public class Asteroid  extends Celestial{
   private Asteroid(StarSystem system, double distance, int size) {
     super(system, system.star, distance, size, 0, 0);
   }
+  
+  @Override
+  public String getType() {
+    return "asteroid";
+  }
 
   @Override
   public String getFill() {

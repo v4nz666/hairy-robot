@@ -49,6 +49,12 @@ public class Planet extends Celestial {
     }
   }
   
+  @Override
+  public String getType() {
+    return "planet";
+  }
+  
+  @Override
   public String getFill() {
     return "blue";
   }

@@ -46,6 +46,7 @@ public abstract class Celestial extends Entity {
     return _celestial.toArray(_celestialToArray);
   }
   
+  public abstract String getType();
   public abstract String getFill();
   
   public String getStroke() {

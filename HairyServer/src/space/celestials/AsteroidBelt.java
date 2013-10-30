@@ -73,6 +73,11 @@ public class AsteroidBelt extends Celestial {
   }
   
   @Override
+  public String getType() {
+    return "belt";
+  }
+  
+  @Override
   public String getFill() {
     return null;
   }
@@ -81,7 +86,4 @@ public class AsteroidBelt extends Celestial {
   public String getStroke() {
     return null;
   }
-  
-  
-  
 }
