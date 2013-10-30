@@ -61,7 +61,7 @@ public class AsteroidBelt extends Celestial {
       double aX = Math.cos(th) * this._distance; 
       double aY = Math.sin(th) * this._distance; 
       
-      System.out.println("Th[" + th + "]aX[" + aX + "]aY[" + aY + "]"); 
+      //System.out.println("Th[" + th + "]aX[" + aX + "]aY[" + aY + "]"); 
       
       this.addCelestial(Asteroid.generate(this._system, this._distance/*TODO +/- */, aX, aY, size, points));
       

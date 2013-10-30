@@ -37,7 +37,9 @@ public abstract class Celestial extends Entity {
     x = px + Math.cos(_theta * Math.PI / 180) * distance;
     y = py - Math.sin(_theta * Math.PI / 180) * distance;
     
-    System.out.println(this);
+    if(!(this instanceof Asteroid)) {
+      System.out.println(this);
+    }
   }
   
   public Celestial[] getCelestial() {
