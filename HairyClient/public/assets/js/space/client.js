@@ -16,6 +16,7 @@ function Client() {
     ticks: 0,
     fps: 0,
     fpsTicks: 0,
+    cpf: 0,
     
     toRads: Math.PI / 180,
     toDegs: 180 / Math.PI,
@@ -47,6 +48,7 @@ function Client() {
       this.ctx.restore();
       this.ticks++;
       this.fpsTicks++;
+      this.cpf = 0;
     },
     
     renderGame: function() {
@@ -145,6 +147,8 @@ function Client() {
       screenY = (c.y - this.offsetY) / this.zoomLevel;
       
       if(this.onscreen(c, screenX, screenY)) {
+        this.cpf++;
+        
         ctx.save();
         ctx.beginPath();
         
@@ -343,6 +347,7 @@ function Client() {
       this.ctx.fillText('Grid-X:   ' + this.gridOffsetX  + ' Grid-Y:   ' + this.gridOffsetY, 4, 60);
       this.ctx.fillText('X-Scr:    ' + this.me.onscreenX + ' Y-Scr:    ' + this.me.onscreenY, 4, 72);
       this.ctx.fillText('Zoom:     ' + this.zoomLevel, 4, 84);
+      this.ctx.fillText('CPF:      ' + this.cpf, 4, 96);
       
       this.ctx.restore();
       
