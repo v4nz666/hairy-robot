@@ -181,10 +181,8 @@ function Client() {
         ctx.restore();
       }
       
-      for(i in c.celestial) {
-        if(i === 'length') { continue; }
-        var p = c.celestial[i];
-        this.renderCelestial(p);
+      for(var i = 0; i < c.celestial.length; i++) {
+        this.renderCelestial(c.celestial[i]);
       }
     },
     
