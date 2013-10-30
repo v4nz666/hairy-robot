@@ -96,6 +96,9 @@ function Client() {
       
       this.gridOffsetX = Math.floor((this.offsetX  / this.zoomLevel) % this.gridSize);
       this.gridOffsetY = Math.floor((this.offsetY  / this.zoomLevel) % this.gridSize);
+      
+      this.offsetXScaled = this.offsetX / this.zoomLevel;
+      this.offsetYScaled = this.offsetY / this.zoomLevel;
     },
     
     renderBackground: function() {
@@ -143,19 +146,19 @@ function Client() {
     },
     
     renderCelestial: function(c) {
-      screenX = (c.x - this.offsetX) / this.zoomLevel;
-      screenY = (c.y - this.offsetY) / this.zoomLevel;
-      
-      if(this.onscreen(c, screenX, screenY)) {
+      if(this.onscreen2(c)) {
         this.cpf++;
         
         var ctx = this.ctx;
+        
+        var screenX = c.xScaled - this.offsetXScaled;
+        var screenY = c.yScaled - this.offsetYScaled;
         
         ctx.save();
         ctx.beginPath();
         
         if ( ! c.points ) {
-          ctx.arc(screenX, screenY, c.size / this.zoomLevel, 0, this.PIx2);
+          ctx.arc(screenX, screenY, c.size, 0, this.PIx2);
         } else {
           for (i = 0; i < c.points.length; i++) {
             var point = c.points[i];
@@ -665,18 +668,49 @@ function Client() {
     
     setZoom: function(zoomLevel) {
       this.zoomLevel = zoomLevel;
+      this.scalecelestial(this.system.star);
     },
     
-    onscreen: function(entity, screenX, screenY) {
+    onscreen: function(entity, screenX, screenY, scaled) {
       var size = entity.size / this.zoomLevel;
       var w = this.canvas.width;
       var h = this.canvas.height;
+      
+      if(scaled) {
+        screenX /= this.zoomLevel;
+        screenY /= this.zoomLevel;
+      }
       
       return !(
         screenX + (size) < 0 || // Right edge is left of canvas
         screenX - (size) > w || // Left edge is right of canvas
         screenY + (size) < 0 || // Top edge is below canvas
         screenY - (size) > h);  // Bottom edge is above canvas
+    },
+    
+    onscreen2: function(entity) {
+      var size = entity.sizeScaled;
+      var w = this.canvas.width;
+      var h = this.canvas.height;
+      
+      var screenX = entity.xScaled - this.offsetXScaled;
+      var screenY = entity.yScaled - this.offsetYScaled;
+      
+      return !(
+        screenX + size < 0 || // Right edge is left of canvas
+        screenX - size > w || // Left edge is right of canvas
+        screenY + size < 0 || // Top edge is below canvas
+        screenY - size > h);  // Bottom edge is above canvas
+    },
+    
+    scalecelestial: function(c) {
+      c.sizeScaled = c.size / this.zoomLevel;
+      c.xScaled = c.x / this.zoomLevel;
+      c.yScaled = c.y / this.zoomLevel;
+      
+      for(var i = 0; i < c.celestial.length; i++) {
+        this.scalecelestial(c.celestial[i]);
+      }
     }
   }
 }
