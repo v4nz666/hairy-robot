@@ -28,7 +28,7 @@ function Client() {
     gridSize: 512,
     zoomLevel: 1,
     zoomSpeed: 1,
-    maxZoom: 640,
+    maxZoom: 65536,
     
     clear: function(clr) {
       if(typeof clr === 'undefined') {
@@ -99,6 +99,8 @@ function Client() {
     },
     
     renderBackground: function() {
+      if ( this.zoomLevel > this.gridSize ) { return; }
+      
       var ctx = this.ctx;
       
       ctx.save();
