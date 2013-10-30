@@ -186,6 +186,8 @@ public class Server {
     
     System.out.println("New user added " + user.id);
     socket.sendEvent("setParams", user.serializeParams());
+    
+    socket.sendEvent("setSystem", user.serializeSystem());
   }
   
   private void removeUser(SocketIOClient socket) {

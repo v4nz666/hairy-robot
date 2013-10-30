@@ -72,6 +72,7 @@ public class User extends Entity {
   private boolean _isFiring;
   
   private Params _params = new Params();
+  private SysParams _systemParams = new SysParams();
   private Stats  _stats  = new Stats();
   private Update _update = new Update();
   private Add    _add    = new Add();
@@ -87,6 +88,7 @@ public class User extends Entity {
   }
   
   public Params       serializeParams() { return _params; }
+  public SysParams    serializeSystem() { return _systemParams; }
   public Stats        serializeStats()  { return _stats;  }
   public Update       serializeUpdate() { return _update; }
   public Add          serializeAdd()    { return _add;    }
@@ -189,6 +191,9 @@ public class User extends Entity {
   
   public class Params {
     public int getId() { return id; }
+  }
+  
+  public class SysParams {
     public StarSystem getSystem() { return Server.star_system; }
   }
   
@@ -234,5 +239,4 @@ public class User extends Entity {
   public class Kill {
     public int getId() { return id; }
   }
-
 }

@@ -50,6 +50,7 @@ function Client() {
     },
     
     renderGame: function() {
+      if ( ! this.system ) { return; }
       this.physics();
       
       this.calculateOffsets();
@@ -440,6 +441,7 @@ function Client() {
             this.initGame();
             this.setParams(data);
           }, this));
+          this.socket.on('setSystem', $.proxy(this.setSystem, this));
           
           this.socket.emit('login', {name: name, auth: auth});
         }, this));
@@ -539,11 +541,13 @@ function Client() {
     
     setParams: function(data){
       console.log('setting client/world[', data, ']');
-      this.system = data.system;
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
     },
-    
+    setSystem: function(data){
+      this.system = data.system;
+      console.log('Set system[', this.system, ']');
+    },
     stats: function(stats) {
       console.log(stats);
       var user = this.user[stats.id];
