@@ -25,7 +25,6 @@ public class AsteroidBelt extends Celestial {
     double asteroidSpacing = Math.PI * 2 / _asteroidCount;
     for (int i = 0; i < _asteroidCount; i++) {
       th = asteroidSpacing * i;
-      double d = this._distance;
       
       Coord c0 = new Coord(0,0);
       int totalSize = 0;
