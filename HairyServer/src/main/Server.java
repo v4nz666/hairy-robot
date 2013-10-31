@@ -77,7 +77,7 @@ public class Server {
         // Temporary chat commands
         if(data.msg.startsWith("/")) {
           User user = _userMap.get(client);
-          String[] msg = data.msg.split(" ");
+          final String[] msg = data.msg.split(" ");
           switch(msg[0]) {
             case "/warp":
               try {
@@ -95,10 +95,20 @@ public class Server {
               user.setGun(space.data.guns.Gun.getGunRandom());
               _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
               return;
+              
             case "/stop":
               user.stop();
               return;
-
+              
+            case "/zoom":
+              try {
+                //TODO: This is a stupid way of doing it
+                _server.getBroadcastOperations().sendEvent("zoom", new Object() {
+                  public int zoom = Integer.parseInt(msg[1]);
+                });
+              } catch(Exception ex) {
+                client.sendEvent("msg", new Msg("Server", "Usage: zoom n"));
+              }
           }
         }
         

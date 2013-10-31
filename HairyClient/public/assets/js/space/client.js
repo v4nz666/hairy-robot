@@ -543,6 +543,9 @@ function Client() {
       this.socket.on('kill',    $.proxy(this.kill, this));
       this.socket.on('badd',    $.proxy(this.badd, this));
       this.socket.on('brem',    $.proxy(this.brem, this));
+      this.socket.on('zoom',    $.proxy(function(data) {
+        this.setZoom(data.zoom);
+      }, this));
       
       this.inGame = true;
     },
