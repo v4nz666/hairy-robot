@@ -158,7 +158,7 @@ function Client() {
         ctx.beginPath();
         
         if ( ! c.points ) {
-          ctx.arc(screenX, screenY, c.size, 0, this.PIx2);
+          ctx.arc(screenX, screenY, c.sizeScaled, 0, this.PIx2);
         } else {
           for (i = 0; i < c.points.length; i++) {
             var point = c.points[i];
