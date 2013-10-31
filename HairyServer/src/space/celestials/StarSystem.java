@@ -51,7 +51,7 @@ public class StarSystem {
       if(i != 3) {
         star.addCelestial(Planet.generate(this, star, d));
       } else {
-        star.addCelestial(AsteroidBelt.generate(this, star, d));
+        star.addCelestial(AsteroidBelt.generate(this, star, 0, (int)d));
       }
     }
   }

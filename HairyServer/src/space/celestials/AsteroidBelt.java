@@ -12,16 +12,16 @@ public class AsteroidBelt extends Celestial {
   
   private int _asteroidCount;
   
-  public static AsteroidBelt generate(StarSystem system, Celestial parent, double distance) {
-    AsteroidBelt belt = new AsteroidBelt(system, parent, distance, 0, 0, 0);
+  public static AsteroidBelt generate(StarSystem system, Celestial parent, double distance, int size) {
+    AsteroidBelt belt = new AsteroidBelt(system, parent, distance, size, 0, 0);
     belt._initAsteroids();
     return belt;
   }
   
   private void _initAsteroids() {
-    _asteroidCount = (int)_distance / 250;
+    _asteroidCount = (int)size / 250;
     double _freq = 10000;
-    double _amp = this._distance / 100;
+    double _amp = this.size / 100;
     System.out.println("Freq: " + (int)_freq + " Amp: " + _amp );
     
     double th = 0;
@@ -61,7 +61,7 @@ public class AsteroidBelt extends Celestial {
       
       int size = totalSize / numPoints;
       
-      double d = this._distance + _amp * Math.sin(_freq * th); 
+      double d = this.size + _amp * Math.sin(_freq * th); 
       
       double jitterX = _rand.nextDouble() * 0.05 - 0.025;
       double jitterY = _rand.nextDouble() * 0.05 - 0.025;
@@ -72,7 +72,6 @@ public class AsteroidBelt extends Celestial {
       //System.out.println("Th[" + th + "]aX[" + aX + "]aY[" + aY + "]"); 
       
       this.addCelestial(Asteroid.generate(this._system, d, aX, aY, size, points));
-      
     }
   }
 
