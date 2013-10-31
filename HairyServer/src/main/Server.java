@@ -109,6 +109,15 @@ public class Server {
               } catch(Exception ex) {
                 client.sendEvent("msg", new Msg("Server", "Usage: zoom n"));
               }
+              return;
+              
+            case "/angle":
+              try {
+                user.angle = Integer.parseInt(msg[1]);
+              } catch(Exception ex) {
+                client.sendEvent("msg", new Msg("Server", "Usage: angle n"));
+              }
+              return;
           }
         }
         
