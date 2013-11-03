@@ -26,6 +26,8 @@ function Client() {
     offsetY: 0,
     
     gridSize: 512,
+    gridColor:  'rgba(255,255,255,0.1)',
+    
     zoomLevel: 1,
     zoomSpeed: 1,
     maxZoom: 65536,
@@ -102,7 +104,7 @@ function Client() {
     },
     
     renderBackground: function() {
-      if ( this.zoomLevel > this.gridSize ) { return; }
+      if ( this.zoomLevel > 64 ) { return; }
       
       var ctx = this.ctx;
       
@@ -111,13 +113,15 @@ function Client() {
       var _x = 0;
       var c = 1;
       
+      ctx.strokeStyle = this.gridColor;
+      
       while(c * this.gridSize / this.zoomLevel - this.gridOffsetX < ctx.canvas.width) {
         _x = (c * this.gridSize / this.zoomLevel) - this.gridOffsetX;
         ctx.beginPath();
         ctx.moveTo(_x, 0);
         ctx.lineTo(_x, ctx.canvas.height);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgb(32,32,32)';
+        
         ctx.stroke();
         
         c = c + 1;
@@ -132,7 +136,6 @@ function Client() {
         ctx.moveTo(0, _y);
         ctx.lineTo(ctx.canvas.width, _y);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgb(32,32,32)';
         ctx.stroke();
         
         c = c + 1;
@@ -163,9 +166,9 @@ function Client() {
           for (i = 0; i < c.points.length; i++) {
             var point = c.points[i];
             if ( i == 0 ) {
-                ctx.moveTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
+              ctx.moveTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
             } else {
-                ctx.lineTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
+              ctx.lineTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
             }
           }
         }
