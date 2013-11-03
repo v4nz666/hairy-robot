@@ -71,7 +71,7 @@ public class AsteroidBelt extends Celestial {
       
       //System.out.println("Th[" + th + "]aX[" + aX + "]aY[" + aY + "]"); 
       
-      this.addCelestial(Asteroid.generate(this._system, d/*TODO +/- */, aX, aY, size, points));
+      this.addCelestial(Asteroid.generate(this._system, d, aX, aY, size, points));
       
     }
   }
