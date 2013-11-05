@@ -187,8 +187,30 @@ function Client() {
         ctx.restore();
       }
       
-      for(var i = 0; i < c.celestial.length; i++) {
-        this.renderCelestial(c.celestial[i]);
+      if(c.type === 'belt') {
+        var start = Math.atan2(this.me.y - c.y, this.me.x - c.x) * this.toDegs;
+        if(start < 0) start += 360;
+        
+        var scale = Math.round(c.celestial.length / 360);
+        
+        start = Math.floor(start * scale - 50);
+        if(start < 0) {
+          start += c.celestial.length;
+        }
+        
+        var end = (start + 100);
+        
+        for(var i = start; i < end; i++) {
+          if(i < c.celestial.length) {
+            this.renderCelestial(c.celestial[i]);
+          } else {
+            this.renderCelestial(c.celestial[i - start]);
+          }
+        }
+      } else {
+        for(var i = 0; i < c.celestial.length; i++) {
+          this.renderCelestial(c.celestial[i]);
+        }
       }
     },
     
