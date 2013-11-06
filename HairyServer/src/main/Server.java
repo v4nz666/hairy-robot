@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import space.celestials.StarSystem;
+import space.events.Disconnect;
+import space.events.Keys;
+import space.events.Login;
+import space.events.Message;
 import space.game.Bullet;
 import space.physics.Sandbox;
 import sql.MySQL;
@@ -15,7 +19,6 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DataListener;
-import com.corundumstudio.socketio.listener.DisconnectListener;
 
 public class Server {
   private static Server _instance = new Server();
@@ -57,80 +60,10 @@ public class Server {
     config.setPort(9092);
     
     _server = new SocketIOServer(config);
-    _server.addDisconnectListener(new DisconnectListener() {
-      @Override
-      public void onDisconnect(SocketIOClient client) {
-        removeUser(client);
-      }
-    });
-    
-    _server.addEventListener("login", User.Login.class, new DataListener<User.Login>() {
-      @Override
-      public void onData(SocketIOClient client, User.Login data, AckRequest ackSender) {
-        addUser(client, data.name, data.auth);
-      }
-    });
-    
-    _server.addEventListener("msg", Msg.class, new DataListener<Msg>() {
-      @Override
-      public void onData(SocketIOClient client, Msg data, AckRequest ackSender) {
-        // Temporary chat commands
-        if(data.msg.startsWith("/")) {
-          User user = _userMap.get(client);
-          final String[] msg = data.msg.split(" ");
-          switch(msg[0]) {
-            case "/warp":
-              try {
-                double x = Double.parseDouble(msg[1]);
-                double y = Double.parseDouble(msg[2]);
-                user.x = Math.min(Math.max(x, 0), star_system.getSize());
-                user.y = Math.min(Math.max(y, 0), star_system.getSize());
-              } catch(Exception ex) {
-                client.sendEvent("msg", new Msg("Server", "Usage: warp x y"));
-              }
-              
-              return;
-              
-            case "/gun":
-              user.setGun(space.data.guns.Gun.getGunRandom());
-              _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
-              return;
-              
-            case "/stop":
-              user.stop();
-              return;
-              
-            case "/zoom":
-              try {
-                //TODO: This is a stupid way of doing it
-                _server.getBroadcastOperations().sendEvent("zoom", new Object() {
-                  public double zoom = Double.parseDouble(msg[1]);
-                });
-              } catch(Exception ex) {
-                client.sendEvent("msg", new Msg("Server", "Usage: zoom n"));
-              }
-              return;
-              
-            case "/angle":
-              try {
-                user.angle = Integer.parseInt(msg[1]);
-              } catch(Exception ex) {
-                client.sendEvent("msg", new Msg("Server", "Usage: angle n"));
-              }
-              return;
-          }
-        }
-        
-        _server.getBroadcastOperations().sendEvent("msg", new Msg(_userMap.get(client).name, data.msg));
-      }
-    });
-    
-    _server.addEventListener("keys", User.Keys.class, new DataListener<User.Keys>() {
-      @Override
-      public void onData(SocketIOClient client, User.Keys data, AckRequest ackSender) {
-        _userMap.get(client).handleInput(data.keys);
-      }
-    });
+    _server.addDisconnectListener(new Disconnect());
+    _server.addEventListener("login", User.Login.class, new Login());
+    _server.addEventListener("msg", Msg.class, new Message());
+    _server.addEventListener("keys", User.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
     
@@ -183,11 +116,19 @@ public class Server {
     _sql.close();
   }
   
-  private void addUser(SocketIOClient socket, String name, String auth) {
+  public void broadcastEvent(String name, Object packet) {
+    _server.getBroadcastOperations().sendEvent(name, packet);
+  }
+  
+  public User userFromSocket(SocketIOClient socket) {
+    return _userMap.get(socket);
+  }
+  
+  public void addUser(SocketIOClient socket, String name, String auth) {
     User user = null;
     
     try {
-      user = User.getUserIfAuthed(socket, name, auth);
+      user = User.getUserIfAuthed(socket, name, auth, star_system);
     } catch(SQLException e) {
       e.printStackTrace();
       return;
@@ -209,7 +150,7 @@ public class Server {
     socket.sendEvent("setSystem", user.serializeSystem());
   }
   
-  private void removeUser(SocketIOClient socket) {
+  public void removeUser(SocketIOClient socket) {
     User user = _userMap.get(socket);
     
     _userMap.remove(socket);

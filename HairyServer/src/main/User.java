@@ -16,7 +16,7 @@ public class User extends Entity {
   private static PreparedStatement select   = sql.prepareStatement("SELECT * FROM `space_users` WHERE `user_id`=?");
   private static PreparedStatement update   = sql.prepareStatement("UPDATE `space_users` SET `max_life`=?, `max_shields`=?, `max_vel`=?, `life`=?, `shields`=?, `gun`=?, `turn_speed`=?, `size`=?, `colour`=?, `x`=?, `y`=?, `kills`=?, `deaths`=? WHERE id=?");
   
-  public static User getUserIfAuthed(SocketIOClient socket, String name, String auth) throws SQLException {
+  public static User getUserIfAuthed(SocketIOClient socket, String name, String auth, StarSystem system) throws SQLException {
     isAuthed.setString(1, name);
     
     try(ResultSet r = isAuthed.executeQuery()) {
@@ -26,7 +26,7 @@ public class User extends Entity {
           
           try(ResultSet r2 = select.executeQuery()) {
             if(r2.next()) {
-              User user = new User(socket, r2.getInt("id"), name, r2.getDouble("x"), r2.getDouble("y"), r2.getInt("size"));
+              User user = new User(socket, r2.getInt("id"), name, r2.getDouble("x"), r2.getDouble("y"), r2.getInt("size"), system);
               user.maxLife = r2.getInt("max_life");
               user.maxShields = r2.getInt("max_shields");
               user.maxVel = r2.getFloat("max_vel");
@@ -52,6 +52,8 @@ public class User extends Entity {
   public final SocketIOClient socket;
   public final int dbID;
   public final String name;
+  
+  private StarSystem _system;
   
   public int maxLife;
   public int maxShields;
@@ -80,12 +82,15 @@ public class User extends Entity {
   private Hit       _hit          = new Hit();
   private Kill      _kill         = new Kill();
   
-  private User(SocketIOClient socket, int dbID, String name, double x, double y, int size) {
+  private User(SocketIOClient socket, int dbID, String name, double x, double y, int size, StarSystem system) {
     super(Server.getID(), x, y, size);
     this.dbID = dbID;
     this.name = name;
     this.socket = socket;
+    _system = system;
   }
+  
+  public StarSystem system() { return _system; }
   
   public Params       serializeParams() { return _params; }
   public SysParams    serializeSystem() { return _systemParams; }
