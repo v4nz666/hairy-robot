@@ -30,12 +30,6 @@ public class Star extends Celestial {
     super(system, parent, distance, size, mass, temp);
   }
   
-  @Override
-  public String getType() {
-    return "star";
-  }
-  
-  @Override
   public String getFill() {
     return "yellow";
   }

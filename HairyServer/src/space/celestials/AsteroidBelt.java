@@ -79,18 +79,7 @@ public class AsteroidBelt extends Celestial {
     super(system, parent, distance, size, mass, temp);
   }
   
-  @Override
   public String getType() {
-    return "belt";
-  }
-  
-  @Override
-  public String getFill() {
-    return null;
-  }
-  
-  @Override
-  public String getStroke() {
-    return null;
+    return "b";
   }
 }

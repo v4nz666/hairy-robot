@@ -174,20 +174,27 @@ function Client() {
         }
         ctx.closePath();
         
-        if (c.stroke) {
-          ctx.strokeStyle = c.stroke;
+        if(c.type === 'a') {
+          ctx.strokeStyle = '#444444';
           ctx.stroke();
-        }
-        
-        if (c.fill) {
-          ctx.fillStyle = c.fill;
+          ctx.fillStyle = '#333333';
           ctx.fill();
+        } else {
+          if(c.stroke) {
+            ctx.strokeStyle = c.stroke;
+            ctx.stroke();
+          }
+          
+          if(c.fill) {
+            ctx.fillStyle = c.fill;
+            ctx.fill();
+          }
         }
         
         ctx.restore();
       }
       
-      if(c.type === 'belt') {
+      if(c.type === 'b') {
         var start = Math.atan2(this.me.y - c.y, this.me.x - c.x) * this.toDegs;
         if(start < 0) start += 360;
         

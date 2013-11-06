@@ -22,19 +22,8 @@ public class Asteroid  extends Celestial{
     super(system, system.star, distance, size, 0, 0);
   }
   
-  @Override
   public String getType() {
-    return "asteroid";
-  }
-
-  @Override
-  public String getFill() {
-    return "#333333";
-  }
-  
-  @Override
-  public String getStroke() {
-    return "#444444";
+    return "a";
   }
   
   public Coord[] getPoints() {
