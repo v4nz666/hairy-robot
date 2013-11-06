@@ -104,7 +104,7 @@ public class Server {
               try {
                 //TODO: This is a stupid way of doing it
                 _server.getBroadcastOperations().sendEvent("zoom", new Object() {
-                  public int zoom = Integer.parseInt(msg[1]);
+                  public double zoom = Double.parseDouble(msg[1]);
                 });
               } catch(Exception ex) {
                 client.sendEvent("msg", new Msg("Server", "Usage: zoom n"));

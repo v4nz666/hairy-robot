@@ -695,9 +695,9 @@ function Client() {
     },
     
     zoomIn: function() {
-      var newZoom = this.zoomLevel - this.zoomSpeed;
+      var newZoom = Math.max(this.zoomLevel - this.zoomSpeed, 1);
       
-      if ( newZoom >= 1 ) {
+      if ( newZoom != this.zoomLevel ) {
         this.setZoom(newZoom);
       }
     },
