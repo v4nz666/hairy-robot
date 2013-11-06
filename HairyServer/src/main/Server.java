@@ -26,8 +26,6 @@ public class Server {
   
   public static StarSystem star_system = new StarSystem();
   
-  public static final int spread = 15;
-  public static final int bulletSize = 1;
   public final double acc = 1 * 0.0625;
   public final double dec = 0.75 * 0.0625;
   
