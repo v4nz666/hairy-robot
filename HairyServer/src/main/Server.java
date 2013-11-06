@@ -58,7 +58,7 @@ public class Server {
     _server = new SocketIOServer(config);
     _server.addDisconnectListener(new Disconnect());
     _server.addEventListener("login", User.Login.class, new Login());
-    _server.addEventListener("msg", Msg.class, new Message());
+    _server.addEventListener("msg", User.Message.class, new Message());
     _server.addEventListener("keys", User.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
@@ -221,7 +221,7 @@ public class Server {
       killUser(user);
       attacker.kills++;
       
-      _server.getBroadcastOperations().sendEvent("msg", new Msg("Server", user.name + " was killed by " + attacker.name));
+      _server.getBroadcastOperations().sendEvent("msg", new User.Message("Server", user.name + " was killed by " + attacker.name));
     }
     
     removeBullet(bullet);

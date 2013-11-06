@@ -244,4 +244,15 @@ public class User extends Entity {
   public class Kill {
     public int getId() { return id; }
   }
+  
+  public static class Message {
+    public String id;
+    public String msg;
+    
+    public Message() { }
+    public Message(String id, String msg) {
+      this.id = id;
+      this.msg = msg;
+    }
+  }
 }

@@ -1,6 +1,5 @@
 package space.events;
 
-import main.Msg;
 import main.Server;
 import main.User;
 
@@ -8,11 +7,11 @@ import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.listener.DataListener;
 
-public class Message implements DataListener<Msg> {
+public class Message implements DataListener<User.Message> {
   private Server _server = Server.instance();
   
   @Override
-  public void onData(SocketIOClient client, Msg data, AckRequest ackSender) {
+  public void onData(SocketIOClient client, User.Message data, AckRequest ackSender) {
     User user = _server.userFromSocket(client);
     
     // Temporary chat commands
@@ -26,7 +25,7 @@ public class Message implements DataListener<Msg> {
             user.x = Math.min(Math.max(x, 0), user.system().getSize());
             user.y = Math.min(Math.max(y, 0), user.system().getSize());
           } catch(Exception ex) {
-            client.sendEvent("msg", new Msg("Server", "Usage: warp x y"));
+            client.sendEvent("msg", new User.Message("Server", "Usage: warp x y"));
           }
           
           return;
@@ -47,7 +46,7 @@ public class Message implements DataListener<Msg> {
               public double zoom = Double.parseDouble(msg[1]);
             });
           } catch(Exception ex) {
-            client.sendEvent("msg", new Msg("Server", "Usage: zoom n"));
+            client.sendEvent("msg", new User.Message("Server", "Usage: zoom n"));
           }
           return;
           
@@ -55,12 +54,12 @@ public class Message implements DataListener<Msg> {
           try {
             user.angle = Integer.parseInt(msg[1]);
           } catch(Exception ex) {
-            client.sendEvent("msg", new Msg("Server", "Usage: angle n"));
+            client.sendEvent("msg", new User.Message("Server", "Usage: angle n"));
           }
           return;
       }
     }
     
-    _server.broadcastEvent("msg", new Msg(user.name, data.msg));
+    _server.broadcastEvent("msg", new User.Message(user.name, data.msg));
   }
 }
