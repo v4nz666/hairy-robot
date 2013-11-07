@@ -8,6 +8,7 @@ Route::put('/register',                  'AuthController@register');
 
 Route::group(['prefix' => 'games'], function() {
   Route::group(['prefix' => 'space'], function() {
+    Route::get('/store/credits',         ['as' => 'games_space_store_credits',  'uses' => 'games\space\StorageController@credits']);
     Route::get('/store/types',           ['as' => 'games_space_store_types',    'uses' => 'games\space\StorageController@types']);
     Route::get('/store/parts/{type?}',   ['as' => 'games_space_store_parts',    'uses' => 'games\space\StorageController@parts'])->where('type', '[0-9]+');
     Route::get('/store/ships',           ['as' => 'games_space_store_ships',    'uses' => 'games\space\StorageController@ships']);

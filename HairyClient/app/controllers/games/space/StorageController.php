@@ -7,6 +7,10 @@ class StorageController extends \Controller {
     $this->beforeFilter('auth');
   }
   
+  public function credits() {
+    return \Auth::user()->spaceUser->credits;
+  }
+  
   public function types() {
     return \SpacePartType::all()->toJSON();
   }
