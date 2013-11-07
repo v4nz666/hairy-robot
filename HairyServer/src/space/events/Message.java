@@ -30,11 +30,6 @@ public class Message implements DataListener<User.Message> {
           
           return;
           
-        case "/gun":
-          user.setGun(space.data.guns.Gun.getGunRandom());
-          _server.broadcastEvent("stats", user.serializeStats());
-          return;
-          
         case "/stop":
           user.stop();
           return;

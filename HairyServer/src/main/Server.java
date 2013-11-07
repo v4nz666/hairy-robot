@@ -9,7 +9,6 @@ import space.events.Disconnect;
 import space.events.Keys;
 import space.events.Login;
 import space.events.Message;
-import space.game.Bullet;
 import space.physics.Sandbox;
 import sql.MySQL;
 import sql.SQL;
@@ -29,7 +28,6 @@ public class Server {
   
   private ConcurrentLinkedDeque<User> _user = new ConcurrentLinkedDeque<>();
   private HashMap<SocketIOClient, User> _userMap = new HashMap<>();
-  private ConcurrentLinkedDeque<Bullet> _bullet = new ConcurrentLinkedDeque<>();
   
   private SocketIOServer _server;
   private Sandbox _sandbox = new Sandbox();
@@ -45,6 +43,8 @@ public class Server {
   
   private static int _id;
   public static int getID() { return _id++; }
+  
+  public int tps() { return _tps; }
   
   public void start() throws InterruptedException, InstantiationException, IllegalAccessException {
     System.out.println("Initialising...");
@@ -63,16 +63,8 @@ public class Server {
     
     System.out.println("Starting listening thread...");
     
-    space.data.guns.Gun.init();
-    
     _server.start();
     _sandbox.startSandbox();
-    _sandbox.trackCollision(User.class, Bullet.class, new Sandbox.CollisionCallback<User, Bullet>() {
-      @Override
-      public void hit(User entity, Bullet hitBy) {
-        userHit(entity, hitBy);
-      }
-    });
     
     System.out.println("Server running.");
     
@@ -166,32 +158,6 @@ public class Server {
     }
   }
   
-  private void killUser(User victim) {
-    victim.life = victim.maxLife;
-    victim.shields = victim.maxShields;
-    victim.setGun(space.data.guns.Gun.getGunDefault());
-    victim.x = star_system.getSize() / 2;
-    victim.y = star_system.getSize() / 2;
-    victim.vx = 0;
-    victim.vy = 0;
-    victim.angle = 0;
-    victim.deaths++;
-    
-    _server.getBroadcastOperations().sendEvent("stats", victim.serializeStats());
-  }
-  
-  public void addBullet(Bullet bullet) {
-    _bullet.push(bullet);
-    _server.getBroadcastOperations().sendEvent("badd", bullet.serializeForAdd());
-    _sandbox.addToSandbox(bullet);
-  }
-  
-  public void removeBullet(Bullet bullet) {
-    _sandbox.removeFromSandbox(bullet);
-    _bullet.remove(bullet);
-    _server.getBroadcastOperations().sendEvent("brem", bullet.serializeForRem());
-  }
-  
   private void tick(double deltaT) {
     User.Update[] update = new User.Update[_user.size()];
     
@@ -201,30 +167,6 @@ public class Server {
     }
     
     _server.getBroadcastOperations().sendEvent("update", new Update(update));
-  }
-  
-  private void userHit(User user, Bullet bullet) {
-    if(user.shields > 0) {
-      user.shields = Math.max(0, user.shields - bullet.damage);
-    } else {
-      user.life -= bullet.damage;
-    }
-    
-    if(user.life > 0) {
-      _server.getBroadcastOperations().sendEvent("stats", user.serializeStats());
-      _server.getBroadcastOperations().sendEvent("hit", user.serializeHit(bullet));
-    } else {
-      _server.getBroadcastOperations().sendEvent("kill", user.serializeKill());
-      
-      User attacker = bullet.user();
-      
-      killUser(user);
-      attacker.kills++;
-      
-      _server.getBroadcastOperations().sendEvent("msg", new User.Message("Server", user.name + " was killed by " + attacker.name));
-    }
-    
-    removeBullet(bullet);
   }
   
   public static class Update {

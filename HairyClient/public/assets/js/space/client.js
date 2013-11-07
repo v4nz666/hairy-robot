@@ -8,7 +8,6 @@ function Client() {
     
     guis: new GUIs(),
     
-    bullets: [],
     effects: [],
     
     keys: 0,
@@ -55,13 +54,11 @@ function Client() {
     
     renderGame: function() {
       if ( ! this.system ) { return; }
-      this.physics();
       
       this.calculateOffsets();
       
       this.renderBackground();
       this.renderCelestials();
-      this.renderBullets();
       this.renderUsers();
       this.renderEffects();
       this.renderGUI();
@@ -221,48 +218,6 @@ function Client() {
       }
     },
     
-    renderBullets: function() {
-      var ctx = this.ctx;
-      var screenX;
-      var screenY;
-      var screenLastX;
-      var screenLastY;
-      
-      for(i in this.bullets) {
-        if(i === 'length') { continue; }
-        
-        var bullet = this.bullets[i];
-        
-        screenX = (bullet.x - this.offsetX) / this.zoomLevel;
-        screenY = (bullet.y - this.offsetY) / this.zoomLevel;
-        
-        if(!this.onscreen(bullet, screenX, screenY)) {
-          continue;
-        }
-        
-        screenLastX = (bullet.lastX - this.offsetX) / this.zoomLevel;
-        screenLastY = (bullet.lastY - this.offsetY) / this.zoomLevel;
-        
-        ctx.save();
-        ctx.beginPath();
-        
-        if(!screenLastX || !screenLastY) {
-          ctx.arc(screenX, screenY, bullet.size, 0, this.PIx2);
-          ctx.fillStyle = 'white';
-          ctx.fill();
-        } else {
-          ctx.moveTo(screenX, screenY);
-          ctx.lineTo(screenLastX, screenLastY);
-          ctx.lineWidth = bullet.size * 2;
-          ctx.lineCap = 'round';
-          ctx.strokeStyle = 'white';
-          ctx.stroke();
-        }
-        
-        ctx.restore();
-      }
-    },
-    
     renderUsers: function() {
       var screenX = 0;
       var screenY = 0;
@@ -286,7 +241,7 @@ function Client() {
         
         this.ctx.save();
         
-        var size = user.size / this.zoomLevel;
+        var size = 16 / this.zoomLevel;
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = 'white';
         this.ctx.fillText(user.name, screenX, screenY - size);
@@ -294,26 +249,12 @@ function Client() {
         this.ctx.translate(screenX, screenY);
         this.ctx.rotate(user.angle * this.toRads);
         
-        if(user.shields > 0) {
-          this.ctx.beginPath();
-          this.ctx.arc(0, 0, size, 0, this.PIx2);
-          this.ctx.closePath();
-          
-          if(user.shields / user.maxShields > 0.25 || this.ticks > user.lastHit) {
-            this.ctx.fillStyle = 'rgba(0,255,255,' + ((user.shields / user.maxShields) * 100) / 0x139 + ')';
-          } else if(this.ticks <= user.lastHit) {
-            this.ctx.fillStyle = 'rgba(0,255,255,' + (0.5 - (user.shields / user.maxShields)) + ')';
-          }
-          
-          this.ctx.fill();
-        }
-        
         this.ctx.beginPath();
         this.ctx.moveTo( size, 0);
         this.ctx.lineTo(-size, size / 2);
         this.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
         this.ctx.lineTo(size, 0);
-        this.ctx.fillStyle = user.color;
+        this.ctx.fillStyle = '#FF00FF';
         this.ctx.fill();
         
         this.ctx.restore();
@@ -383,31 +324,6 @@ function Client() {
       this.ctx.fillText('X-Scr:    ' + this.me.onscreenX + ' Y-Scr:    ' + this.me.onscreenY, 4, 72);
       this.ctx.fillText('Zoom:     ' + this.zoomLevel, 4, 84);
       this.ctx.fillText('CPF:      ' + this.cpf, 4, 96);
-      
-      this.ctx.restore();
-      
-      var hull    = this.me.life / this.me.maxLife;
-      var shields = this.me.shields / this.me.maxShields;
-      
-      this.ctx.save();
-      this.ctx.translate(this.canvas.width - 4, 4);
-      this.ctx.textAlign = 'right';
-      this.ctx.textBaseline = 'top';
-      this.ctx.strokeStyle = 'white';
-      this.ctx.fillStyle = 'rgb(255, 255, 255)';
-      this.ctx.save();
-      this.ctx.translate(-100, 0);
-      this.ctx.fillStyle = 'rgb(0, 255, 0)';
-      this.ctx.fillRect(0, 0, hull * 100, 12);
-      this.ctx.strokeRect(0, 0, 100, 12);
-      this.ctx.fillStyle = 'rgb(0, 255, 255)';
-      this.ctx.fillRect(0, 14, shields * 100, 12);
-      this.ctx.strokeRect(0, 14, 100, 12);
-      this.ctx.fillStyle = 'rgb(255, 255, 255)';
-      this.ctx.fillText('Hull:', -2, 0);
-      this.ctx.fillText('Shields:', -2, 14);
-      this.ctx.restore();
-      this.ctx.fillText(this.me.gun, 0, 26);
       this.ctx.restore();
     },
     
@@ -500,13 +416,6 @@ function Client() {
       var user = User();
       user.id = data.id;
       user.name = data.name;
-      user.color = data.color;
-      user.size = data.size;
-      user.maxLife = data.maxLife;
-      user.maxShields = data.maxShields;
-      user.life = data.life;
-      user.shields = data.shields;
-      user.gun = data.gun;
       this.user[user.id] = user;
       this.gotchat({id: 'Server', msg: user.name + ' has joined the game!'});
     },
@@ -567,14 +476,9 @@ function Client() {
       
       // Register event handlers
       this.socket.on('msg',     $.proxy(this.gotchat, this));
-      this.socket.on('stats',   $.proxy(this.stats, this));
       this.socket.on('update',  $.proxy(this.update, this));
       this.socket.on('effect',  $.proxy(this.effect, this));
       this.socket.on('remuser', $.proxy(this.remUser, this));
-      this.socket.on('hit',     $.proxy(this.hit, this));
-      this.socket.on('kill',    $.proxy(this.kill, this));
-      this.socket.on('badd',    $.proxy(this.badd, this));
-      this.socket.on('brem',    $.proxy(this.brem, this));
       this.socket.on('zoom',    $.proxy(function(data) {
         this.setZoom(data.zoom);
       }, this));
@@ -592,15 +496,6 @@ function Client() {
       this.setZoom(this.zoomLevel);
       console.log('Set system[', this.system, ']');
     },
-    stats: function(stats) {
-      console.log(stats);
-      var user = this.user[stats.id];
-      user.maxLife = stats.maxLife;
-      user.maxShields = stats.maxShields;
-      user.life = stats.life;
-      user.shields = stats.shields;
-      user.gun = stats.gun;
-    },
     
     update: function(up) {
       for(key in up.usersOnScreen) {
@@ -614,76 +509,6 @@ function Client() {
     effect: function(expl) {
       var expl = Effect(0, expl.x, expl.y, {size: expl.size});
       this.effects.push(expl);
-    },
-    
-    hit: function(hit) {
-      user = this.user[hit.id];
-      user.lastHit = this.ticks + 3;
-      
-      var a = Math.atan2(hit.y - user.y, hit.x - user.x) * this.toDegs;
-      
-      if(user.shields > 0 || user.life === user.maxLife) {
-        this.effects.push(Effect('shieldhit', hit.x, hit.y, {a: a, charge: user.shields / user.maxShields}));
-      } else {
-        this.effects.push(Effect('armourhit', hit.x, hit.y, {a: a}));
-      }
-    },
-    
-    kill: function(kill) {
-      user = this.user[kill.id];
-      this.effects.push(Effect(0, user.x, user.y, {size: 4}));
-    },
-    
-    badd: function(bullet) {
-      this.bullets[bullet.id] = bullet;
-    },
-    
-    brem: function(bullet) {
-      delete this.bullets[bullet.id];
-    },
-    
-    physics: function() {
-      for(i in this.bullets) {
-        if(i === 'length') { continue; }
-        var e = this.bullets[i];
-        
-        if(e.acc != 0) {
-          theta = e.angle * this.toRads;
-          
-          e.vx += Math.cos(theta) * e.acc;
-          e.vy += Math.sin(theta) * e.acc;
-          
-          if(e.vx > e.maxVel) {
-            e.vy *= (e.maxVel / e.vx);
-            e.vx = e.maxVel;
-            e.acc = 0;
-          }
-          
-          if(e.vx < -e.maxVel) {
-            e.vy *= (-e.maxVel / e.vx);
-            e.vx = -e.maxVel;
-            e.acc = 0;
-          }
-          
-          if(e.vy > e.maxVel) {
-            e.vx *= (e.maxVel / e.vy);
-            e.vy = e.maxVel;
-            e.acc = 0;
-          }
-          
-          if(e.vy < -e.maxVel) {
-            e.vx *= (-e.maxVel / e.vy);
-            e.vy = -e.maxVel;
-            e.acc = 0;
-          }
-        }
-        
-        e.lastX = e.x;
-        e.lastY = e.y;
-        
-        e.x += e.vx;
-        e.y += e.vy;
-      }
     },
     
     zoomOut: function() {

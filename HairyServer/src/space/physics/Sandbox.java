@@ -15,6 +15,8 @@ public class Sandbox implements Runnable {
   private ConcurrentLinkedDeque<Entity> _obj = new ConcurrentLinkedDeque<>();
   private ConcurrentLinkedDeque<CollisionTracker<? extends Entity, ? extends Entity>> _collision = new ConcurrentLinkedDeque<>();
   
+  public int tps() { return _tps; }
+  
   public void addToSandbox(Entity m) {
     _obj.add(m);
   }

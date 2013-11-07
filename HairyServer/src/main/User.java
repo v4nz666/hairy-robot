@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import space.celestials.StarSystem;
-import space.game.Bullet;
 import sql.SQL;
 
 import com.corundumstudio.socketio.SocketIOClient;
@@ -14,7 +13,7 @@ public class User extends Entity {
   private static SQL sql = SQL.getInstance();
   private static PreparedStatement isAuthed = sql.prepareStatement("SELECT `id`, `auth` FROM `users` WHERE `username`=?");
   private static PreparedStatement select   = sql.prepareStatement("SELECT * FROM `space_users` WHERE `user_id`=?");
-  private static PreparedStatement update   = sql.prepareStatement("UPDATE `space_users` SET `max_life`=?, `max_shields`=?, `max_vel`=?, `life`=?, `shields`=?, `gun`=?, `turn_speed`=?, `size`=?, `colour`=?, `x`=?, `y`=?, `kills`=?, `deaths`=? WHERE id=?");
+  private static PreparedStatement update   = sql.prepareStatement("UPDATE `space_users` SET `x`=?, `y`=? WHERE id=?");
   
   public static User getUserIfAuthed(SocketIOClient socket, String name, String auth, StarSystem system) throws SQLException {
     isAuthed.setString(1, name);
@@ -26,17 +25,9 @@ public class User extends Entity {
           
           try(ResultSet r2 = select.executeQuery()) {
             if(r2.next()) {
-              User user = new User(socket, r2.getInt("id"), name, r2.getDouble("x"), r2.getDouble("y"), r2.getInt("size"), system);
-              user.maxLife = r2.getInt("max_life");
-              user.maxShields = r2.getInt("max_shields");
-              user.maxVel = r2.getFloat("max_vel");
-              user.life = Math.min(r2.getInt("life"), user.maxLife);
-              user.shields = Math.min(r2.getInt("shields"), user.maxShields);
-              user._gun = new Gun(space.data.guns.Gun.getGunDefault(), space.data.guns.Gun.getGunDefault().getBullets()[0]); //Gun.getGunByName(r2.getString("gun"));
-              user.turnSpeed = r2.getFloat("turn_speed");
-              user.color = r2.getString("colour");
-              user.kills = r2.getInt("kills");
-              user.deaths = r2.getInt("deaths");
+              User user = new User(socket, r2.getInt("id"), name, r2.getDouble("x"), r2.getDouble("y"), 16, system);
+              user.maxVel = 6;
+              user.turnSpeed = 5;
               return user;
             }
           }
@@ -55,19 +46,7 @@ public class User extends Entity {
   
   private StarSystem _system;
   
-  public int maxLife;
-  public int maxShields;
-  
-  public int life;
-  public int shields;
-  
-  public double turnSpeed = 5;
-  public String color;
-  
-  public int kills;
-  public int deaths;
-  
-  private Gun _gun;
+  public double turnSpeed;
   
   private boolean _turnLeft;
   private boolean _turnRight;
@@ -75,12 +54,9 @@ public class User extends Entity {
   
   private Params    _params       = new Params();
   private SysParams _systemParams = new SysParams();
-  private Stats     _stats        = new Stats();
   private Update    _update       = new Update();
   private Add       _add          = new Add();
   private Remove    _remove       = new Remove();
-  private Hit       _hit          = new Hit();
-  private Kill      _kill         = new Kill();
   
   private User(SocketIOClient socket, int dbID, String name, double x, double y, int size, StarSystem system) {
     super(Server.getID(), x, y, size);
@@ -94,16 +70,9 @@ public class User extends Entity {
   
   public Params       serializeParams() { return _params; }
   public SysParams    serializeSystem() { return _systemParams; }
-  public Stats        serializeStats()  { return _stats;  }
   public Update       serializeUpdate() { return _update; }
   public Add          serializeAdd()    { return _add;    }
   public Remove       serializeRemove() { return _remove; }
-  public Hit          serializeHit(Bullet bullet) { _hit._bullet = bullet; return _hit; }
-  public Kill         serializeKill()   { return _kill;   }
-  
-  public void setGun(space.data.guns.Gun gun) {
-    _gun = new Gun(gun, gun.getBullets()[0]);
-  }
   
   public void handleInput(int keys) {
     if(keys != 0) {
@@ -133,7 +102,7 @@ public class User extends Entity {
   }
   
   private void fire() {
-    _gun.fire(this);
+    //TODO: Shoot things
   }
   
   private void thrustersOff() {
@@ -141,20 +110,9 @@ public class User extends Entity {
   }
   
   public void save() throws SQLException {
-    update.setInt(1, maxLife);
-    update.setInt(2, maxShields);
-    update.setDouble(3, maxVel);
-    update.setInt(4, life);
-    update.setInt(5, shields);
-    update.setString(6, ""); //gun.getClass().getName());
-    update.setDouble(7, turnSpeed);
-    update.setInt(8, size);
-    update.setString(9, color);
-    update.setDouble(10, x);
-    update.setDouble(11, y);
-    update.setInt(12, kills);
-    update.setInt(13, deaths);
-    update.setInt(14, dbID);
+    update.setDouble(1, x);
+    update.setDouble(2, y);
+    update.setInt(3, dbID);
     update.execute();
   }
   
@@ -202,15 +160,6 @@ public class User extends Entity {
     public StarSystem getSystem() { return Server.star_system; }
   }
   
-  public class Stats {
-    public int getId() { return id; }
-    public int getMaxLife() { return maxLife; }
-    public int getMaxShields() { return maxShields; }
-    public int getLife() { return life; }
-    public int getShields() { return shields; }
-    public String getGun() { return _gun.gun.getName(); }
-  }
-  
   public class Update {
     public int getId() { return id; }
     public int getX() { return (int)x; }
@@ -221,27 +170,9 @@ public class User extends Entity {
   public class Add {
     public int getId() { return id; }
     public String getName() { return name; }
-    public String getColor() { return color; }
-    public int getSize() { return size; }
-    public int getMaxLife() { return maxLife; }
-    public int getMaxShields() { return maxShields; }
-    public int getLife() { return life; }
-    public int getShields() { return shields; }
-    public String getGun() { return _gun.gun.getName(); }
   }
   
   public class Remove {
-    public int getId() { return id; }
-  }
-  
-  public class Hit {
-    private Bullet _bullet;
-    public int getId() { return id; }
-    public double getX() { return _bullet.x; }
-    public double getY() { return _bullet.y; }
-  }
-  
-  public class Kill {
     public int getId() { return id; }
   }
   
