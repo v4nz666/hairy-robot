@@ -70,8 +70,14 @@ function ShipEditor(ctx) {
           });
         };
         
+        var lblCredits = Label(me);
+        lblCredits.text('0 credits');
+        lblCredits.textAlign = 'left';
+        lblCredits.x = 4;
+        
         var lstParts = List(me);
         lstParts.w = fraInfo.w;
+        lstParts.controls.add(lblCredits);
         
         me.controls.add(lstShips);
         me.controls.add(fraInfo);
@@ -95,6 +101,7 @@ function ShipEditor(ctx) {
           
           lstParts.y = fraInfo.h + h;
           lstParts.h = ctx.canvas.height - fraInfo.h - h;
+          lblCredits.y = lstParts.h - lblCredits.h - 4;
           btnSave.x = lstParts.x - btnSave.w - 4;
           btnSave.y = ctx.canvas.height - btnSave.h - 4;
           btnNew.x = btnSave.x - btnNew.w - 4;
@@ -285,6 +292,22 @@ function ShipEditor(ctx) {
           });
         };
         
+        me.getcredits = function() {
+          var msg = Message(me.ctx, 'Getting credits...');
+          me.guis.push(msg);
+          
+          $.ajax({
+            url: '/games/space/store/credits',
+            dataType: 'json'
+          }).done(function(data) {
+            console.log('Got credits [', data, ']');
+            lblCredits.text(data.credits + ' credits');
+            msg.pop();
+          }).fail(function() {
+            console.log('Failed to get part types');
+          });
+        };
+        
         me.showtypes = function() {
           var msg = Message(me.ctx, 'Getting part types...');
           me.guis.push(msg);
@@ -324,6 +347,7 @@ function ShipEditor(ctx) {
           });
         };
         
+        me.getcredits();
         me.showtypes();
       }
       
