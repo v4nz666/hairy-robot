@@ -31,8 +31,8 @@ public abstract class Celestial extends Entity {
     _mass = mass;
     _temp = temp;
     _theta = _rand.nextDouble() * 360;
-    double px = _parent != null ? _parent.x : _system.getSize() / 2;
-    double py = _parent != null ? _parent.y : _system.getSize() / 2;
+    double px = _parent != null ? _parent.x : 0;
+    double py = _parent != null ? _parent.y : 0;
     
     x = px + Math.cos(_theta * Math.PI / 180) * distance;
     y = py - Math.sin(_theta * Math.PI / 180) * distance;
