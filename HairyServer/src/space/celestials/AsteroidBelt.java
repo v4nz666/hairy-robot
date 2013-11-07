@@ -26,7 +26,7 @@ public class AsteroidBelt extends Celestial {
     
     double th = 0;
     double asteroidSpacing = Math.PI * 2 / _asteroidCount;
-    for (int i = 0; i < _asteroidCount; i++) {
+    for(int i = 0; i < _asteroidCount; i++) {
       th = asteroidSpacing * i;
       
       Coord c0 = new Coord(0,0);
@@ -39,7 +39,7 @@ public class AsteroidBelt extends Celestial {
       double pointSpacing = Math.PI*2 / numPoints;
       Coord[] points = new Coord[numPoints];
       
-      for ( int j = 0; j < numPoints; j++ ) {
+      for(int j = 0; j < numPoints; j++) {
         double _th =  pointSpacing * j;
         double rad = minRadius + _rand.nextDouble() * smoothness - smoothness / 2;
         double x = Math.cos(_th) * rad;
@@ -49,13 +49,12 @@ public class AsteroidBelt extends Celestial {
         Coord c = new Coord(x, y);
         
         // Store the first Coord so we can close the circle properly
-        if ( j == 0 ) {
-          c0 = c;
-        }
-        if ( j == numPoints - 1 ) {
+        if(j == 0) { c0 = c; }
+        if(j == numPoints - 1) {
           c = c0;
           _th = Math.PI * 2;
         }
+        
         points[j] = c;
       }
       

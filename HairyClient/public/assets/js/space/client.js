@@ -25,7 +25,7 @@ function Client() {
     offsetY: 0,
     
     gridSize: 512,
-    gridColor:  'rgba(255,255,255,0.1)',
+    gridColor: 'rgba(255,255,255,0.1)',
     
     zoomLevel: 1,
     zoomSpeed: 1,
@@ -53,7 +53,7 @@ function Client() {
     },
     
     renderGame: function() {
-      if ( ! this.system ) { return; }
+      if(!this.system) { return; }
       
       this.calculateOffsets();
       
@@ -79,7 +79,7 @@ function Client() {
     },
     
     renderBackground: function() {
-      if ( this.zoomLevel > 64 ) { return; }
+      if(this.zoomLevel > 64) { return; }
       
       var ctx = this.ctx;
       
@@ -105,7 +105,7 @@ function Client() {
       var _y = 0;
       c = 1;
       
-      while( (c * this.gridSize / this.zoomLevel) - this.gridOffsetY < ctx.canvas.height ) {
+      while((c * this.gridSize / this.zoomLevel) - this.gridOffsetY < ctx.canvas.height) {
         _y = (c * this.gridSize / this.zoomLevel) - this.gridOffsetY;
         ctx.beginPath();
         ctx.moveTo(0, _y);
@@ -135,12 +135,12 @@ function Client() {
         ctx.save();
         ctx.beginPath();
         
-        if ( ! c.points ) {
+        if(!c.points) {
           ctx.arc(screenX, screenY, c.sizeScaled, 0, this.PIx2);
         } else {
-          for (i = 0; i < c.points.length; i++) {
+          for(i = 0; i < c.points.length; i++) {
             var point = c.points[i];
-            if ( i == 0 ) {
+            if(i === 0) {
               ctx.moveTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
             } else {
               ctx.lineTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
@@ -312,20 +312,15 @@ function Client() {
     },
     
     init: function() {
-      stat.load([
-        {
-          type: 'parts',
-          cb: function() {
-            var draw = function(ctx, render) {
-              eval(this.render);
-            }
-            
-            for(var i = 0; i < stat.parts.length; i++) {
-              stat.parts[i].draw = draw;
-            }
-          }
+      stat.load([{type: 'parts', cb: function() {
+        var draw = function(ctx, render) {
+          eval(this.render);
         }
-      ]);
+        
+        for(var i = 0; i < stat.parts.length; i++) {
+          stat.parts[i].draw = draw;
+        }
+      }}]);
       
       this.canvas = $('#canvas')[0];
       this.ctx = canvas.getContext('2d');
@@ -360,7 +355,7 @@ function Client() {
     initMenu: function() {
       var menu = MainMenu(this.ctx);
       
-      menu.onplay   = $.proxy(function() {
+      menu.onplay = $.proxy(function() {
         var msg = Message(this.ctx, 'Connecting...');
         this.guis.push(msg);
         
@@ -465,14 +460,15 @@ function Client() {
     },
     
     setParams: function(data){
-      console.log('setting client/world[', data, ']');
+      console.log('setting client [', data, ']');
       this.me = this.user[data.id];
       console.log('Set id[', this.me.id, ']');
     },
+    
     setSystem: function(data){
       this.system = data.system;
       this.setZoom(this.zoomLevel);
-      console.log('Set system[', this.system, ']');
+      console.log('Set system [', this.system, ']');
     },
     
     update: function(up) {
@@ -492,7 +488,7 @@ function Client() {
     zoomOut: function() {
       var newZoom = this.zoomLevel + this.zoomSpeed;
       
-      if ( newZoom <= this.maxZoom ) {
+      if(newZoom <= this.maxZoom) {
         this.setZoom(newZoom);
       }
     },
@@ -500,7 +496,7 @@ function Client() {
     zoomIn: function() {
       var newZoom = Math.max(this.zoomLevel - this.zoomSpeed, 1);
       
-      if ( newZoom != this.zoomLevel ) {
+      if(newZoom != this.zoomLevel) {
         this.setZoom(newZoom);
       }
     },
