@@ -8,7 +8,7 @@ class StorageController extends \Controller {
   }
   
   public function credits() {
-    return \Auth::user()->spaceUser->credits;
+    return json_encode(['credits' => \Auth::user()->spaceUser->credits]);
   }
   
   public function types() {
