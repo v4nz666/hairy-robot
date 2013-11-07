@@ -33,8 +33,6 @@ public class Server {
   private Sandbox _sandbox = new Sandbox();
   
   private boolean _running;
-  private long _interval;
-  private int _ticksPerSecond = 60;
   private int _tps = 60;
   
   private SQL _sql;
@@ -68,36 +66,7 @@ public class Server {
     
     System.out.println("Server running.");
     
-    _interval = 1000000000 / _ticksPerSecond;
-    _running = true;
-    
-    long time, timeDelta = _interval;
-    int ticks = 0;
-    long tickTime = System.nanoTime() + 1000000000;
-    while(_running) {
-      time = System.nanoTime();
-      
-      tick(timeDelta / _interval);
-      
-      // Track FPS
-      if(tickTime <= System.nanoTime()) {
-        _tps = ticks;
-        ticks = 0;
-        tickTime = System.nanoTime() + 1000000000;
-        //System.out.println(_tps + " ticks per second");
-      }
-      
-      ticks++;
-      
-      // Sleep each loop if we have extra time
-      timeDelta = System.nanoTime() - time;
-      long timeSleep = _interval - timeDelta;
-      long timeDeltaMS = timeSleep / 1000000;
-      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000);
-      if(timeSleep > 0) {
-        Thread.sleep(timeDeltaMS, timeDeltaNS);
-      }
-    }
+    gameLoop();
     
     _sandbox.stopSandbox();
     _server.stop();
@@ -154,6 +123,39 @@ public class Server {
         user.save();
       } catch(SQLException e) {
         e.printStackTrace();
+      }
+    }
+  }
+  
+  private void gameLoop() throws InterruptedException {
+    int interval = 1000000000 / 60;
+    _running = true;
+    
+    long time, timeDelta = interval;
+    int ticks = 0;
+    long tickTime = System.nanoTime() + 1000000000;
+    while(_running) {
+      time = System.nanoTime();
+      
+      tick(timeDelta / interval);
+      
+      // Track FPS
+      if(tickTime <= System.nanoTime()) {
+        _tps = ticks;
+        ticks = 0;
+        tickTime = System.nanoTime() + 1000000000;
+        //System.out.println(_tps + " ticks per second");
+      }
+      
+      ticks++;
+      
+      // Sleep each loop if we have extra time
+      timeDelta = System.nanoTime() - time;
+      long timeSleep = interval - timeDelta;
+      long timeDeltaMS = timeSleep / 1000000;
+      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000);
+      if(timeSleep > 0) {
+        Thread.sleep(timeDeltaMS, timeDeltaNS);
       }
     }
   }
