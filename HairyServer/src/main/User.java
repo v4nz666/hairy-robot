@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import space.celestials.StarSystem;
+import space.physics.Entity;
 import sql.SQL;
 
 import com.corundumstudio.socketio.SocketIOClient;

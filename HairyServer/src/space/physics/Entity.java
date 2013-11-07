@@ -1,4 +1,4 @@
-package main;
+package space.physics;
 
 public abstract class Entity {
   public final int id;

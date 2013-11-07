@@ -3,7 +3,7 @@ package space.celestials;
 import java.util.ArrayList;
 import java.util.Random;
 
-import main.Entity;
+import space.physics.Entity;
 
 public abstract class Celestial extends Entity {
   @Override

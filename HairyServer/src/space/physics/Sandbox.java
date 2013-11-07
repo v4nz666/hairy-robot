@@ -2,8 +2,6 @@ package space.physics;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import main.Entity;
-
 public class Sandbox implements Runnable {
   private Thread _thread;
   private boolean _running;
