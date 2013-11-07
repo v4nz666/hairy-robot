@@ -132,16 +132,6 @@ public class User extends Entity {
     }
     
     if(_isFiring) fire();
-    
-    double xmin = size;
-    double ymin = xmin;
-    double xmax = Server.star_system.getSize() - xmin;
-    double ymax = Server.star_system.getSize() - ymin;
-    
-    if(x < xmin) { x = xmin; vx = 0; }
-    if(x > xmax) { x = xmax; vx = 0; }
-    if(y < ymin) { y = ymin; vy = 0; }
-    if(y > ymax) { y = ymax; vy = 0; }
   }
   
   public static class Login {
