@@ -201,9 +201,9 @@ function Client() {
       var screenY = 0;
       
       for(key in this.user) {
-        user = this.user[key];
+        if(key === 'length') { continue; }
         
-        if(!user.x || !user.y) { continue; }
+        user = this.user[key];
         
         if(user.id == this.me.id) {
           screenX = this.me.onscreenX;
@@ -232,7 +232,7 @@ function Client() {
         this.ctx.lineTo(-size, size / 2);
         this.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
         this.ctx.lineTo(size, 0);
-        this.ctx.fillStyle = '#FF00FF';
+        this.ctx.fillStyle = 'rgb(255, 0, 255)';
         this.ctx.fill();
         
         this.ctx.restore();
