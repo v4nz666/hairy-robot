@@ -71,8 +71,8 @@ function Client() {
       this.me.onscreenX = Math.floor(this.ctx.canvas.width / 2);
       this.me.onscreenY = Math.floor(this.ctx.canvas.height / 2);
       
-      this.gridOffsetX = Math.floor((this.offsetX  / this.zoomLevel) % this.gridSize);
-      this.gridOffsetY = Math.floor((this.offsetY  / this.zoomLevel) % this.gridSize);
+      this.gridOffsetX = Math.floor((this.offsetX / this.zoomLevel) % this.gridSize);
+      this.gridOffsetY = Math.floor((this.offsetY / this.zoomLevel) % this.gridSize);
       
       this.offsetXScaled = this.offsetX / this.zoomLevel;
       this.offsetYScaled = this.offsetY / this.zoomLevel;
