@@ -1,6 +1,6 @@
 package space.events;
 
-import main.Server;
+import space.Server;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.listener.DisconnectListener;

@@ -1,5 +1,6 @@
 package main;
 
+import space.Server;
 import util.LoggerFactory;
 
 public class Main {

@@ -1,4 +1,4 @@
-package main;
+package space;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -126,15 +126,15 @@ public class Server {
       socket.sendEvent("adduser", u.serializeAdd());
     }
     
-    _server.getBroadcastOperations().sendEvent("adduser", user.serializeAdd());
+    broadcastEvent("adduser", user.serializeAdd());
     
     _user.add(user);
     _userMap.put(socket, user);
     _sandbox.addToSandbox(user);
     
     System.out.println("New user added " + user.id);
-    socket.sendEvent("setParams", user.serializeParams());
     
+    socket.sendEvent("setParams", user.serializeParams());
     socket.sendEvent("setSystem", user.serializeSystem());
   }
   
@@ -145,7 +145,7 @@ public class Server {
     
     if(user != null) {
       System.out.println("Disconnecting " + user.id);
-      _server.getBroadcastOperations().sendEvent("remuser", user.serializeRemove());
+      broadcastEvent("remuser", user.serializeRemove());
       
       _sandbox.removeFromSandbox(user);
       _user.remove(user);
@@ -166,7 +166,7 @@ public class Server {
       update[i++] = user.serializeUpdate();
     }
     
-    _server.getBroadcastOperations().sendEvent("update", new Update(update));
+    broadcastEvent("update", new Update(update));
   }
   
   public static class Update {
