@@ -65,33 +65,11 @@ function Client() {
     },
     
     calculateOffsets: function() {
-      // Near the left edge of the map
-      if(this.me.x <= (this.ctx.canvas.width / 2) * this.zoomLevel ) {
-        this.offsetX = 0;
-        this.me.onscreenX = Math.floor(this.me.x / this.zoomLevel);
-        // Near the right side of the map
-      } else if(this.me.x >= this.system.size - (this.ctx.canvas.width / 2 * this.zoomLevel)) {
-        this.offsetX = this.system.size - this.ctx.canvas.width * this.zoomLevel;
-        this.me.onscreenX = Math.floor(this.ctx.canvas.width - ((this.system.size - this.me.x) / this.zoomLevel));
-      // In the middle
-      } else {
-        this.offsetX = Math.floor(this.me.x - (this.ctx.canvas.width / 2 * this.zoomLevel));
-        this.me.onscreenX = Math.floor(this.ctx.canvas.width / 2);
-      }
+      this.offsetX = Math.floor(this.me.x - (this.ctx.canvas.width / 2 * this.zoomLevel));
+      this.offsetY = Math.floor(this.me.y - (this.ctx.canvas.height / 2 * this.zoomLevel));
       
-      // Near the top of the map
-      if(this.me.y <= (this.ctx.canvas.height / 2) * this.zoomLevel ) {
-        this.offsetY = 0;
-        this.me.onscreenY = Math.floor(this.me.y / this.zoomLevel);
-      // Near the bottom of the map
-      } else if(this.me.y >= this.system.size - ((this.ctx.canvas.height / 2) * this.zoomLevel)) {
-        this.offsetY = this.system.size - this.ctx.canvas.height * this.zoomLevel;
-        this.me.onscreenY = Math.floor(this.ctx.canvas.height- ((this.system.size - this.me.y) / this.zoomLevel));
-      // In the middle of the map
-      } else {
-        this.offsetY = Math.floor(this.me.y - (this.ctx.canvas.height / 2 * this.zoomLevel));
-        this.me.onscreenY = Math.floor(this.ctx.canvas.height / 2);
-      }
+      this.me.onscreenX = Math.floor(this.ctx.canvas.width / 2);
+      this.me.onscreenY = Math.floor(this.ctx.canvas.height / 2);
       
       this.gridOffsetX = Math.floor((this.offsetX  / this.zoomLevel) % this.gridSize);
       this.gridOffsetY = Math.floor((this.offsetY  / this.zoomLevel) % this.gridSize);
