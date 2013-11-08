@@ -1,18 +1,18 @@
 package space.events;
 
 import space.Server;
-import space.User;
+import space.Ship;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.listener.DataListener;
 
-public class Message implements DataListener<User.Message> {
+public class Message implements DataListener<Ship.Message> {
   private Server _server = Server.instance();
   
   @Override
-  public void onData(SocketIOClient client, User.Message data, AckRequest ackSender) {
-    User user = _server.userFromSocket(client);
+  public void onData(SocketIOClient client, Ship.Message data, AckRequest ackSender) {
+    Ship ship = _server.userFromSocket(client).ship();
     
     // Temporary chat commands
     if(data.msg.startsWith("/")) {
@@ -20,18 +20,16 @@ public class Message implements DataListener<User.Message> {
       switch(msg[0]) {
         case "/warp":
           try {
-            double x = Double.parseDouble(msg[1]);
-            double y = Double.parseDouble(msg[2]);
-            user.x = Math.min(Math.max(x, 0), user.system().getSize());
-            user.y = Math.min(Math.max(y, 0), user.system().getSize());
+            ship.x = Double.parseDouble(msg[1]);
+            ship.y = Double.parseDouble(msg[2]);
           } catch(Exception ex) {
-            client.sendEvent("msg", new User.Message("Server", "Usage: warp x y"));
+            client.sendEvent("msg", new Ship.Message("Server", "Usage: warp x y"));
           }
           
           return;
           
         case "/stop":
-          user.stop();
+          ship.stop();
           return;
           
         case "/zoom":
@@ -41,20 +39,20 @@ public class Message implements DataListener<User.Message> {
               public double zoom = Double.parseDouble(msg[1]);
             });
           } catch(Exception ex) {
-            client.sendEvent("msg", new User.Message("Server", "Usage: zoom n"));
+            client.sendEvent("msg", new Ship.Message("Server", "Usage: zoom n"));
           }
           return;
           
         case "/angle":
           try {
-            user.angle = Integer.parseInt(msg[1]);
+            ship.angle = Integer.parseInt(msg[1]);
           } catch(Exception ex) {
-            client.sendEvent("msg", new User.Message("Server", "Usage: angle n"));
+            client.sendEvent("msg", new Ship.Message("Server", "Usage: angle n"));
           }
           return;
       }
     }
     
-    _server.broadcastEvent("msg", new User.Message(user.name, data.msg));
+    _server.broadcastEvent("msg", new Ship.Message(ship.name, data.msg));
   }
 }

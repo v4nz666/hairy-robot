@@ -1,6 +1,8 @@
 package space.celestials;
 
 public class StarSystem {
+  public final int id;
+  
   private String _name;
   private double _size;
   
@@ -9,7 +11,9 @@ public class StarSystem {
   
   public Star star;
   
-  public StarSystem() {
+  public StarSystem(int id) {
+    this.id = id;
+    
     _name = generateName();
     
     System.out.println("Generating System[" + _name + "]");

@@ -1,6 +1,7 @@
 package space;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -21,7 +22,7 @@ public class Server {
   private static Server _instance = new Server();
   public static Server instance() { return _instance; }
   
-  public static StarSystem star_system = new StarSystem();
+  private ArrayList<StarSystem> _system = new ArrayList<>();
   
   public final double acc = 1 * 0.0625;
   public final double dec = 0.75 * 0.0625;
@@ -50,14 +51,16 @@ public class Server {
     _sql = SQL.create(MySQL.class);
     _sql.connect("project1.monoxidedesign.com", "hairydata", "hairydata", "WaRcebYmnz4eSnGs");
     
+    _system.add(new StarSystem(0));
+    
     Configuration config = new Configuration();
     config.setPort(9092);
     
     _server = new SocketIOServer(config);
     _server.addDisconnectListener(new Disconnect());
     _server.addEventListener("login", User.Login.class, new Login());
-    _server.addEventListener("msg", User.Message.class, new Message());
-    _server.addEventListener("keys", User.Keys.class, new Keys());
+    _server.addEventListener("msg", Ship.Message.class, new Message());
+    _server.addEventListener("keys", Ship.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
     
@@ -81,21 +84,15 @@ public class Server {
     return _userMap.get(socket);
   }
   
-  public void addUser(SocketIOClient socket, String name, String auth) {
+  public void addUser(SocketIOClient socket, User.Login data) {
     User user = null;
     
     try {
-      user = User.getUserIfAuthed(socket, name, auth, star_system);
+      user = User.getUserIfAuthed(socket, data);
     } catch(SQLException e) {
       e.printStackTrace();
       return;
     }
-    
-    for(User u : _user) {
-      socket.sendEvent("adduser", u.serializeAdd());
-    }
-    
-    broadcastEvent("adduser", user.serializeAdd());
     
     _user.add(user);
     _userMap.put(socket, user);
@@ -179,7 +176,7 @@ public class Server {
     }
   }
 
-  public static StarSystem getCurrentSystem(User user) {
-    return star_system;
+  public StarSystem system(int index) {
+    return _system.get(index);
   }
 }

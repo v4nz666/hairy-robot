@@ -12,6 +12,6 @@ public class Login implements DataListener<User.Login> {
   
   @Override
   public void onData(SocketIOClient client, User.Login data, AckRequest ackSender) {
-    _server.addUser(client, data.name, data.auth);
+    _server.addUser(client, data);
   }
 }
