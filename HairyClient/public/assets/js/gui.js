@@ -438,11 +438,27 @@ function ControlStack(owner) {
 // a border, containing nested controls, and handling events
 function Control(gui) {
   return {
+    visible: true,
+    
+    controls: null,
+    
+    ongotfocus:  ExecutionStack(),
+    onlostfocus: ExecutionStack(),
+    onmousein:   ExecutionStack(),
+    onmouseout:  ExecutionStack(),
+    onmousemove: ExecutionStack(),
+    onmousedown: ExecutionStack(),
+    onmouseup:   ExecutionStack(),
+    onclick:     ExecutionStack(),
+    onkeydown:   ExecutionStack(),
+    onkeyup:     ExecutionStack(),
+    onkeypress:  ExecutionStack(),
+    onrender:    ExecutionStack(),
+    
     create: function() {
-      var _visible = true;
+      var priv = this;
       
       var me = {
-        controls: null,
         contParent: null,
         contNext: null,
         contPrev: null,
@@ -459,18 +475,19 @@ function Control(gui) {
         backcolour: null,
         bordercolour: null,
         
-        ongotfocus: null,
-        onlostfocus: null,
-        onmousein: null,
-        onmouseout: null,
-        onmousemove: null,
-        onmousedown: null,
-        onmouseup: null,
-        onclick: null,
-        onkeydown: null,
-        onkeyup: null,
-        onkeypress: null,
-        onrender: null,
+        controls:    function() { return priv.controls;    },
+        ongotfocus:  function() { return priv.ongotfocus;  },
+        onlostfocus: function() { return priv.onlostfocus; },
+        onmousein:   function() { return priv.onmousein;   },
+        onmouseout:  function() { return priv.onmouseout;  },
+        onmousemove: function() { return priv.onmousemove; },
+        onmousedown: function() { return priv.onmousedown; },
+        onmouseup:   function() { return priv.onmouseup;   },
+        onclick:     function() { return priv.onclick;     },
+        onkeydown:   function() { return priv.onkeydown;   },
+        onkeyup:     function() { return priv.onkeyup;     },
+        onkeypress:  function() { return priv.onkeypress;  },
+        onrender:    function() { return priv.onrender;    },
         
         remove: function() {
           if(me.contParent !== null) {
@@ -488,11 +505,11 @@ function Control(gui) {
         
         visible: function(visible) {
           if(typeof visible === 'undefined') {
-            return _visible;
+            return priv.visible;
           }
           
-          if(_visible !== visible) {
-            _visible = visible;
+          if(priv.visible !== visible) {
+            priv.visible = visible;
             
             if(!visible && focus) {
               me.gui.setfocus(me.contParent);
@@ -508,8 +525,8 @@ function Control(gui) {
         },
         
         hittest: function(x, y) {
-          if(_visible && me.acceptinput) {
-            var c = me.controls.hittest(x - me.x, y - me.y);
+          if(priv.visible && me.acceptinput) {
+            var c = priv.controls.hittest(x - me.x, y - me.y);
             if(c !== null) {
               return c;
             }
@@ -528,7 +545,7 @@ function Control(gui) {
         },
         
         renderPre: function() {
-          if(_visible) {
+          if(priv.visible) {
             me.ctx.save();
             me.ctx.translate(me.x, me.y);
             
@@ -544,7 +561,7 @@ function Control(gui) {
         },
         
         renderPost: function() {
-          me.controls.render();
+          priv.controls.render();
           
           if(me.bordercolour !== null) {
             me.ctx.strokeStyle = me.bordercolour;
@@ -558,11 +575,7 @@ function Control(gui) {
         render: function() {
           if(me.renderPre()) {
             me.renderControl();
-            
-            if(me.onrender !== null) {
-              me.onrender(me.ctx);
-            }
-            
+            priv.onrender.execute(me.ctx);
             me.renderPost();
           }
           
@@ -616,7 +629,7 @@ function Control(gui) {
         }
       }
       
-      me.controls = new ControlStack(me);
+      priv.controls = new ControlStack(me);
       
       return me;
     }
@@ -838,8 +851,8 @@ function List(gui) {
           l.y = (f.h - l.h) / 2;
           
           f.text = l.text;
-          f.controls.add(l);
-          me.controls.add(f);
+          f.controls().add(l);
+          me.controls().add(f);
           priv.item.push(f);
           
           return f;

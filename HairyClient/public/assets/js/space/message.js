@@ -19,12 +19,12 @@ function Message(ctx, text) {
         var f = Frame(me);
         f.w = l.w;
         f.h = 50;
-        f.controls.add(l);
+        f.controls().add(l);
         
         me.controls().add(f);
         
         me.addcontrol = function(control) {
-          f.controls.add(control);
+          f.controls().add(control);
         };
         
         me.onmousemove().push(function(ev, ret) { return true; });
