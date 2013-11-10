@@ -4,9 +4,6 @@ function Client() {
     canvas: null,
     ctx: null,
     
-    user: [],
-    me: null,
-    
     guis: new GUIs(),
     
     ticks: 0,
