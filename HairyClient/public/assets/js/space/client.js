@@ -56,12 +56,12 @@ function Client() {
           
           // Hook our events
           $(document).bind     ('contextmenu', function() { return false; });
-          $(document).keydown  ($.proxy(priv.guis.keydown  , priv.guis));
-          $(document).keyup    ($.proxy(priv.guis.keyup    , priv.guis));
-          $(document).keypress ($.proxy(priv.guis.keypress , priv.guis));
-          $(document).mousemove($.proxy(priv.guis.mousemove, priv.guis));
-          $(document).mousedown($.proxy(priv.guis.mousedown, priv.guis));
-          $(document).mouseup  ($.proxy(priv.guis.mouseup  , priv.guis));
+          $(document).keydown  (priv.guis.keydown);
+          $(document).keyup    (priv.guis.keyup);
+          $(document).keypress (priv.guis.keypress);
+          $(document).mousemove(priv.guis.mousemove);
+          $(document).mousedown(priv.guis.mousedown);
+          $(document).mouseup  (priv.guis.mouseup);
           $(window)  .resize   (resize);
           
           setInterval(render , 1000 / 60);
