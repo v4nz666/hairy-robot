@@ -24,7 +24,7 @@ function Message(ctx, text) {
         me.controls().add(f);
         
         me.addcontrol = function(control) {
-          f.controls().add(control);
+          f.controls.add(control);
         };
         
         me.onmousemove().push(function(ev, ret) { return true; });
