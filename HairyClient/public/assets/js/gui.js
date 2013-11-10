@@ -348,75 +348,83 @@ function ControlStack(owner) {
     last: null,
     size: 0,
     
-    hittest: function(x, y) {
-      if(this.first !== null) {
-        return this.first.hittest(x, y);
-      }
+    create: function() {
+      var priv = this;
       
-      return null;
-    },
-    
-    // Add a control to the list
-    add: function(control) {
-      control.contParent = this.owner;
+      var me = {
+        hittest: function(x, y) {
+          if(priv.first !== null) {
+            return priv.first.hittest(x, y);
+          }
+          
+          return null;
+        },
+        
+        // Add a control to the list
+        add: function(control) {
+          control.contParent = priv.owner;
+          
+          if(priv.first !== null) {
+            control.contNext = null;
+            control.contPrev = priv.first;
+            priv.first.contNext = control;
+            priv.first = control;
+          } else {
+            control.contNext = null;
+            control.contPrev = null;
+            priv.first = control;
+            priv.last = control;
+          }
+          
+          priv.size++;
+        },
+        
+        // Remove a control from the list
+        remove: function(control) {
+          var c = control.contNext;
+          if(c !== null) {
+            c.contPrev = control.contPrev;
+            if(c.contPrev === null) { priv.last = c; }
+          } else {
+            c = control.contPrev;
+            if(c !== null) { c.contNext = null; }
+            priv.first = c;
+          }
+          
+          c = control.contPrev;
+          if(c !== null) {
+            c.contNext = control.contNext;
+            if(c.contNext === null) { priv.first = c; }
+          } else {
+            c = control.contNext;
+            if(c !== null) { c.contPrev = null; }
+            priv.last = c;
+          }
+          
+          priv.size--;
+        },
+        
+        // De-focus all controls in this list and nested lists
+        killFocus: function() {
+          c = priv.last;
+          while(c !== null) {
+            c.focus = false;
+            c.controls.killFocus();
+            c = c.contNext;
+          }
+        },
+        
+        // Render all controls and nested controls in this list
+        render: function() {
+          if(priv.last !== null) {
+            priv.last.render();
+          }
+        }
+      };
       
-      if(this.first !== null) {
-        control.contNext = null;
-        control.contPrev = this.first;
-        this.first.contNext = control;
-        this.first = control;
-      } else {
-        control.contNext = null;
-        control.contPrev = null;
-        this.first = control;
-        this.last = control;
-      }
-      
-      this.size++;
-    },
-    
-    // Remove a control from the list
-    remove: function(control) {
-      var c = control.contNext;
-      if(c !== null) {
-        c.contPrev = control.contPrev;
-        if(c.contPrev === null) { this.last = c; }
-      } else {
-        c = control.contPrev;
-        if(c !== null) { c.contNext = null; }
-        this.first = c;
-      }
-      
-      c = control.contPrev;
-      if(c !== null) {
-        c.contNext = control.contNext;
-        if(c.contNext === null) { this.first = c; }
-      } else {
-        c = control.contNext;
-        if(c !== null) { c.contPrev = null; }
-        this.last = c;
-      }
-      
-      this.size--;
-    },
-    
-    // De-focus all controls in this list and nested lists
-    killFocus: function() {
-      c = this.last;
-      while(c !== null) {
-        c.focus = false;
-        c.controls.killFocus();
-        c = c.contNext;
-      }
-    },
-    
-    // Render all controls and nested controls in this list
-    render: function() {
-      if(this.last !== null) {
-        this.last.render();
-      }
+      return me;
     }
-  }
+  }.create();
 }
 
 // A generic control capable of drawing a background box,
