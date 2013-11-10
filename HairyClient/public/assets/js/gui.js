@@ -181,13 +181,13 @@ function GUI(ctx, name) {
         setfocus: function(control) {
           if(priv.focus !== null) {
             priv.focus.focus = false;
-            priv.focus.lostfocus();
+            priv.focus.onlostfocus().execute();
           }
           
           priv.focus = control;
           
           if(priv.focus !== null) {
-            priv.focus.gotfocus();
+            priv.focus.ongotfocus().execute();
           }
         },
         
@@ -205,7 +205,7 @@ function GUI(ctx, name) {
             ev.pageX -= allx;
             ev.pageY -= ally;
             ev.which = priv.mousedownbutton;
-            priv.mousedowncontrol.mousemove(ev);
+            priv.mousedowncontrol.onmousemove().execute(ev);
             ev.pageX += allx;
             ev.pageY += ally;
             ev.which = button;
@@ -214,8 +214,8 @@ function GUI(ctx, name) {
             var c = priv.controls.hittest(ev.pageX, ev.pageY);
             
             if(c !== priv.mousemovecontrol) {
-              if(priv.mousemovecontrol !== null) priv.mousemovecontrol.mouseout();
-              if(c                     !== null) c.mousein();
+              if(priv.mousemovecontrol !== null) priv.mousemovecontrol.onmouseout().execute();
+              if(c                     !== null) c.onmousein().execute();
               priv.mousemovecontrol = c;
             }
             
@@ -224,7 +224,7 @@ function GUI(ctx, name) {
               var ally = priv.allY(c);
               ev.pageX -= allx;
               ev.pageY -= ally;
-              c.mousemove(ev);
+              c.onmousemove().execute(ev);
               ev.pageX += allx;
               ev.pageY += ally;
               ret = true;
@@ -249,7 +249,7 @@ function GUI(ctx, name) {
             ev.pageY -= ally;
             
             priv.mousedowncontrol.setfocus();
-            priv.mousedowncontrol.mousedown(ev);
+            priv.mousedowncontrol.onmousedown().execute(ev);
             
             ev.pageX += allx;
             ev.pageY += ally;
@@ -273,8 +273,8 @@ function GUI(ctx, name) {
             ev.pageY -= ally;
             ev.which = priv.mousedownbutton;
             
-            priv.mousedowncontrol.mouseup(ev);
-            priv.mousedowncontrol.click();
+            priv.mousedowncontrol.onmouseup().execute(ev);
+            priv.mousedowncontrol.onclick().execute();
             priv.mousedowncontrol = null;
             priv.mousedownbutton = 0;
             
@@ -295,7 +295,7 @@ function GUI(ctx, name) {
           var ret = false;
           
           if(priv.focus !== null) {
-            priv.focus.keydown(ev);
+            priv.focus.onkeydown().execute(ev);
             ret = true;
           }
           
@@ -308,7 +308,7 @@ function GUI(ctx, name) {
           var ret = false;
           
           if(priv.focus !== null) {
-            priv.focus.keyup(ev);
+            priv.focus.onkeyup().execute(ev);
             ret = true;
           }
           
@@ -321,7 +321,7 @@ function GUI(ctx, name) {
           var ret = false;
           
           if(priv.focus !== null) {
-            priv.focus.keypress(ev);
+            priv.focus.onkeypress().execute(ev);
             ret = true;
           }
           
@@ -582,50 +582,6 @@ function Control(gui) {
           if(me.contNext !== null) {
             me.contNext.render();
           }
-        },
-        
-        gotfocus: function() {
-          if(me.ongotfocus !== null) { me.ongotfocus(); }
-        },
-        
-        lostfocus: function() {
-          if(me.onlostfocus !== null) { me.onlostfocus(); }
-        },
-        
-        mousein: function() {
-          if(me.onmousein !== null) { me.onmousein(); }
-        },
-        
-        mouseout: function() {
-          if(me.onmouseout !== null) { me.onmouseout(); }
-        },
-        
-        mousemove: function(ev) {
-          if(me.onmousemove !== null) { me.onmousemove(ev); }
-        },
-        
-        mousedown: function(ev) {
-          if(me.onmousedown !== null) { me.onmousedown(ev); }
-        },
-        
-        mouseup: function(ev) {
-          if(me.onmouseup !== null) { me.onmouseup(ev); }
-        },
-        
-        click: function() {
-          if(me.onclick !== null) { me.onclick(); }
-        },
-        
-        keydown: function(ev) {
-          if(me.onkeydown !== null) { me.onkeydown(ev); }
-        },
-        
-        keyup: function(ev) {
-          if(me.onkeyup !== null) { me.onkeyup(ev); }
-        },
-        
-        keypress: function(ev) {
-          if(me.onkeypress !== null) { me.onkeypress(ev); }
         }
       }
       
@@ -742,19 +698,15 @@ function Textbox(gui) {
         me.ctx.restore();
       }
       
-      me.keypressSuper = me.keypress;
-      me.keypress = function(ev) {
+      me.onkeypress().push(function(ev) {
         if(ev.which !== 13) {
           var s = _selstart;
           this.text(this.text().substr(0, _selstart) + String.fromCharCode(ev.which) + this.text().substr(_selstart, this.text().length));
           this.selstart(s + 1);
         }
-        
-        this.keypressSuper(ev);
-      }
+      });
       
-      me.keydownSuper = me.keydown;
-      me.keydown = function(ev) {
+      me.onkeydown().push(function(ev) {
         switch(ev.which) {
           case 8:
             if(_selstart > 0) {
@@ -784,7 +736,7 @@ function Textbox(gui) {
         }
         
         this.keydownSuper(ev);
-      }
+      });
       
       return me;
     }
@@ -838,10 +790,17 @@ function List(gui) {
             f.h = 40;
           }
           
-          f.onselect = null;
-          f.onclick = function() {
+          // Why must JavaScript indulge my neuroticism?
+          f.onselect = {
+            create: function() {
+              var e = ExecutionStack();
+              return function() { return e; }
+            }
+          }.create();
+          
+          f.onclick().push(function() {
             items.selected(f);
-          }
+          });
           
           var l = Label(gui);
           l.textAlign = 'left';
@@ -869,10 +828,7 @@ function List(gui) {
           
           priv.selected = selected;
           priv.selected.backcolour = 'green';
-          
-          if(priv.selected.onselect !== null) {
-            priv.selected.onselect(priv.selected);
-          }
+          priv.selected.onselect().execute(priv.selected);
         }
       }
       
