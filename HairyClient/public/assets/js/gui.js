@@ -123,6 +123,8 @@ function GUI(ctx, name) {
     controls: new ControlStack(null),
     focus: null,
     mousedownbutton: 0,
+    mousedownx: -1,
+    mousedowny: -1,
     mousedowntime1: 0,
     mousedowntime2: 0,
     mousedowncontrol: null,
@@ -263,8 +265,14 @@ function GUI(ctx, name) {
           
           ret |= priv.onmousedown.execute(ev, ret);
           
+          if(ev.pageX !== priv.mousedownx || ev.pageY !== priv.mousedowny) {
+            priv.mousedowntime1 = 0;
+          }
+          
           priv.mousedowntime2 = priv.mousedowntime1;
           priv.mousedowntime1 = new Date().getTime();
+          priv.mousedownx = ev.pageX;
+          priv.mousedowny = ev.pageY;
           
           return ret;
         },
