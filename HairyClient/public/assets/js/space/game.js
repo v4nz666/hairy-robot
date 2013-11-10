@@ -23,7 +23,7 @@ function Game(ctx, socket) {
         priv.txtChat.onkeypress = $.proxy(function(ev) {
           if(ev.which === 13) {
             if(priv.txtChat.text().length !== 0) {
-              priv.socket.emit('msg', {msg: priv.txtChat.text()});
+              priv.socket.emit('ms', {msg: priv.txtChat.text()});
               priv.txtChat.text('');
             }
             
