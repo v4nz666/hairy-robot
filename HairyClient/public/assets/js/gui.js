@@ -123,6 +123,8 @@ function GUI(ctx, name) {
     controls: new ControlStack(null),
     focus: null,
     mousedownbutton: 0,
+    mousedowntime1: 0,
+    mousedowntime2: 0,
     mousedowncontrol: null,
     mousemovecontrol: null,
     
@@ -130,6 +132,7 @@ function GUI(ctx, name) {
     onmousedown: ExecutionStack(),
     onmouseup:   ExecutionStack(),
     onclick:     ExecutionStack(),
+    ondblclick:  ExecutionStack(),
     onkeydown:   ExecutionStack(),
     onkeyup:     ExecutionStack(),
     onkeypress:  ExecutionStack(),
@@ -164,6 +167,7 @@ function GUI(ctx, name) {
         onmousedown: function() { return priv.onmousedown; },
         onmouseup:   function() { return priv.onmouseup;   },
         onclick:     function() { return priv.onclick;     },
+        ondblclick:  function() { return priv.ondblclick;  },
         onkeydown:   function() { return priv.onkeydown;   },
         onkeyup:     function() { return priv.onkeyup;     },
         onkeypress:  function() { return priv.onkeypress;  },
@@ -259,6 +263,9 @@ function GUI(ctx, name) {
           
           ret |= priv.onmousedown.execute(ev, ret);
           
+          priv.mousedowntime2 = priv.mousedowntime1;
+          priv.mousedowntime1 = new Date().getTime();
+          
           return ret;
         },
         
@@ -287,6 +294,11 @@ function GUI(ctx, name) {
           
           ret |= priv.onmouseup.execute(ev, ret);
           ret |= priv.onclick.execute(ev, ret);
+          
+          if(priv.mousedowntime1 - priv.mousedowntime2 <= 250) {
+            ret |= priv.ondblclick.execute(ev, ret);
+            priv.mousedowntime1 = 0;
+          }
           
           return ret;
         },

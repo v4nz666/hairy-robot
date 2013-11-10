@@ -31,6 +31,7 @@ function Message(ctx, text) {
         me.onmousedown().push(function(ev, ret) { return true; });
         me.onmouseup  ().push(function(ev, ret) { return true; });
         me.onclick    ().push(function(ev, ret) { return true; });
+        me.ondblclick ().push(function(ev, ret) { return true; });
         me.onkeydown  ().push(function(ev, ret) { return true; });
         me.onkeyup    ().push(function(ev, ret) { return true; });
         me.onkeypress ().push(function(ev, ret) { return true; });
