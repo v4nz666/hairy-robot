@@ -115,9 +115,9 @@ function GUIs() {
   }.create();
 }
 
-function GUI(ctx) {
+function GUI(ctx, name) {
   return {
-    name: 'generic',
+    name: typeof name === 'undefined' ? 'generic' : name,
     ctx: ctx,
     guis: null,
     controls: new ControlStack(null),
