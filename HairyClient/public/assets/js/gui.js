@@ -1,76 +1,118 @@
+function ExecutionStack() {
+  return {
+    stack: [],
+    
+    create: function() {
+      var priv = this;
+      
+      var me = {
+        push: function(fn) {
+          if(typeof fn !== 'function') {
+            return;
+          }
+          
+          priv.stack.push(fn);
+        },
+        
+        pop: function() {
+          priv.stack.pop();
+        },
+        
+        execute: function() {
+          for(var i = 0; i < priv.stack.length; i++) {
+            if(priv.stack[i].apply(this, arguments)) { return true; };
+          }
+          
+          return false;
+        }
+      };
+      
+      return me;
+    }
+  }.create();
+}
+
 function GUIs() {
   return {
     guis: [],
     
-    push: function(gui) {
-      gui.guis = this;
-      gui.init();
-      gui.resize();
-      this.guis.unshift(gui);
-    },
-    
-    pop: function(gui) {
-      if(typeof gui === 'undefined') {
-        this.guis.pop();
-      } else {
-        this.guis.splice(this.guis.indexOf(gui), 1);
-      }
-    },
-    
-    clear: function() {
-      this.guis.length = 0;
-    },
-    
-    render: function() {
-      for(var i = this.guis.length; --i >= 0;) {
-        this.guis[i].render();
-      }
-    },
-    
-    resize: function() {
-      for(var i = 0; i < this.guis.length; i++) {
-        this.guis[i].resize();
-      }
-    },
-    
-    mousemove: function(ev) {
-      for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].mousemove(ev)) break;
-      }
-    },
-    
-    mousedown: function(ev) {
-      for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].mousedown(ev)) break;
-      }
-    },
-    
-    mouseup: function(ev) {
-      for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].mouseup(ev)) break;
-      }
-    },
-    
-    keydown: function(ev) {
-      if(ev.which == 8) { ev.preventDefault(); }
+    create: function() {
+      var priv = this;
       
-      for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].keydown(ev)) break;
-      }
-    },
-    
-    keyup: function(ev) {
-      for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].keyup(ev)) break;
-      }
-    },
-    
-    keypress: function(ev) {
-      for(var i = 0; i < this.guis.length; i++) {
-        if(this.guis[i].keypress(ev)) break;
-      }
+      var me = {
+        push: function(gui) {
+          gui.guis = me;
+          gui.init();
+          gui.resize();
+          priv.guis.unshift(gui);
+        },
+        
+        pop: function(gui) {
+          if(typeof gui === 'undefined') {
+            priv.guis.pop();
+          } else {
+            priv.guis.splice(priv.guis.indexOf(gui), 1);
+          }
+        },
+        
+        clear: function() {
+          priv.guis.length = 0;
+        },
+        
+        render: function() {
+          for(var i = priv.guis.length; --i >= 0;) {
+            priv.guis[i].render();
+          }
+        },
+        
+        resize: function() {
+          for(var i = 0; i < priv.guis.length; i++) {
+            priv.guis[i].resize();
+          }
+        },
+        
+        mousemove: function(ev) {
+          for(var i = 0; i < priv.guis.length; i++) {
+            if(priv.guis[i].mousemove(ev)) break;
+          }
+        },
+        
+        mousedown: function(ev) {
+          for(var i = 0; i < priv.guis.length; i++) {
+            if(priv.guis[i].mousedown(ev)) break;
+          }
+        },
+        
+        mouseup: function(ev) {
+          for(var i = 0; i < priv.guis.length; i++) {
+            if(priv.guis[i].mouseup(ev)) break;
+          }
+        },
+        
+        keydown: function(ev) {
+          if(ev.which == 8) { ev.preventDefault(); }
+          
+          for(var i = 0; i < priv.guis.length; i++) {
+            if(priv.guis[i].keydown(ev)) break;
+          }
+        },
+        
+        keyup: function(ev) {
+          for(var i = 0; i < priv.guis.length; i++) {
+            if(priv.guis[i].keyup(ev)) break;
+          }
+        },
+        
+        keypress: function(ev) {
+          for(var i = 0; i < priv.guis.length; i++) {
+            if(priv.guis[i].keypress(ev)) break;
+          }
+        }
+      };
+      
+      return me;
     }
-  }
+  }.create();
 }
 
 function GUI(ctx) {
@@ -84,15 +126,15 @@ function GUI(ctx) {
     mousedowncontrol: null,
     mousemovecontrol: null,
     
-    onmousemove: null,
-    onmousedown: null,
-    onmouseup: null,
-    onclick: null,
-    onkeydown: null,
-    onkeyup: null,
-    onkeypress: null,
-    onrender: null,
-    onresize: null,
+    onmousemove: ExecutionStack(),
+    onmousedown: ExecutionStack(),
+    onmouseup:   ExecutionStack(),
+    onclick:     ExecutionStack(),
+    onkeydown:   ExecutionStack(),
+    onkeyup:     ExecutionStack(),
+    onkeypress:  ExecutionStack(),
+    onrender:    ExecutionStack(),
+    onresize:    ExecutionStack(),
     
     setfocus: function(control) {
       if(this.focus !== null) {
@@ -147,9 +189,7 @@ function GUI(ctx) {
         }
       }
       
-      if(this.onmousemove !== null) {
-        ret |= this.onmousemove(ev, ret);
-      }
+      ret |= this.onmousemove.execute(ev, ret);
       
       return ret;
     },
@@ -175,9 +215,7 @@ function GUI(ctx) {
         ret = true;
       }
       
-      if(this.onmousedown !== null) {
-        ret |= this.onmousedown(ev, ret);
-      }
+      ret |= this.onmousedown.execute(ev, ret);
       
       return ret;
     },
@@ -205,19 +243,10 @@ function GUI(ctx) {
         ret = true;
       }
       
-      if(this.onmouseup !== null) {
-        ret |= this.onmouseup(ev, ret);
-      }
-      
-      ret |= this.click(ev, ret);
+      ret |= this.onmouseup.execute(ev, ret);
+      ret |= this.onclick.execute(ev, ret);
       
       return ret;
-    },
-    
-    click: function(ev, ret) {
-      if(this.onclick !== null) {
-        return this.onclick(ev, ret);
-      }
     },
     
     keydown: function(ev) {
@@ -228,9 +257,7 @@ function GUI(ctx) {
         ret = true;
       }
       
-      if(this.onkeydown !== null) {
-        ret |= this.onkeydown(ev, ret);
-      }
+      ret |= this.onkeydown.execute(ev, ret);
       
       return ret;
     },
@@ -243,9 +270,7 @@ function GUI(ctx) {
         ret = true;
       }
       
-      if(this.onkeyup !== null) {
-        ret |= this.onkeyup(ev, ret);
-      }
+      ret |= this.onkeyup.execute(ev, ret);
       
       return ret;
     },
@@ -258,28 +283,20 @@ function GUI(ctx) {
         ret = true;
       }
       
-      if(this.onkeypress !== null) {
-        ret = ret || this.onkeypress(ev, ret);
-      }
+      ret = ret || this.onkeypress.execute(ev, ret);
       
       return ret;
     },
     
     render: function() {
       this.ctx.save();
-      
-      if(this.onrender !== null) {
-        this.onrender(this.ctx);
-      }
-      
+      this.onrender.execute(this.ctx);
       this.controls.render(this.ctx);
       this.ctx.restore();
     },
     
     resize: function() {
-      if(this.onresize !== null) {
-        this.onresize();
-      }
+      this.onresize.execute();
     },
     
     allX: function(control) {
