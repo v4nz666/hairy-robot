@@ -62,21 +62,8 @@ function Game(ctx, socket) {
         
         this.controls().add(priv.txtChat);
         this.controls().add(priv.fraChat);
-      }
-      
-      me.showchat = function() {
-        priv.fraChat.backcolour = 'rgba(127, 127, 127, 0.25)';
-        priv.fraChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
-        priv.txtChat.visible(true);
-        priv.txtChat.setfocus();
-      }
-      
-      me.gotchat = function(msg) {
-        while(priv.messages.length >= priv.maxMessages) {
-          priv.messages.shift();
-        }
         
-        priv.messages.push(msg);
+        me.showshiplist();
       }
       
       me.onresize().push(function(w, h) {
@@ -93,6 +80,42 @@ function Game(ctx, socket) {
           }
         }
       });
+      
+      me.showchat = function() {
+        priv.fraChat.backcolour = 'rgba(127, 127, 127, 0.25)';
+        priv.fraChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
+        priv.txtChat.visible(true);
+        priv.txtChat.setfocus();
+      }
+      
+      me.gotchat = function(msg) {
+        while(priv.messages.length >= priv.maxMessages) {
+          priv.messages.shift();
+        }
+        
+        priv.messages.push(msg);
+      }
+      
+      me.showshiplist = function() {
+        var loadingShips = Message(ctx, 'Loading ships...');
+        me.guis().push(loadingShips);
+        
+        stat.load([{type: 'ships', cb: function() {
+          loadingShips.pop();
+          
+          var guiShipList = Message(ctx, 'Please choose your ship:');
+          var lstShip = List(guiShipList);
+          lstShip.y = 20;
+          lstShip.w = 150;
+          
+          for(var i = 0; i < stat.ships.length; i++) {
+            lstShip.items().push(stat.ships[i].name);
+          }
+          
+          me.guis().push(guiShipList);
+          guiShipList.addcontrol(lstShip);
+        }}]);
+      };
       
       return me;
     }
