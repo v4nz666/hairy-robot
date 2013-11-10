@@ -23,22 +23,22 @@ function Message(ctx, text) {
         
         me.controls.add(f);
         
-        me.onresize = function() {
+        me.onresize.push(function() {
           f.x = (ctx.canvas.width  - f.w) / 2;
           f.y = (ctx.canvas.height - f.h) / 2;
-        };
+        });
         
         me.addcontrol = function(control) {
           f.controls.add(control);
         };
         
-        me.onmousemove = function(ev, ret) { return true; }
-        me.onmousedown = function(ev, ret) { return true; }
-        me.onmouseup   = function(ev, ret) { return true; }
-        me.onclick     = function(ev, ret) { return true; }
-        me.onkeydown   = function(ev, ret) { return true; }
-        me.onkeyup     = function(ev, ret) { return true; }
-        me.onkeypress  = function(ev, ret) { return true; }
+        me.onmousemove.push(function(ev, ret) { return true; });
+        me.onmousedown.push(function(ev, ret) { return true; });
+        me.onmouseup  .push(function(ev, ret) { return true; });
+        me.onclick    .push(function(ev, ret) { return true; });
+        me.onkeydown  .push(function(ev, ret) { return true; });
+        me.onkeyup    .push(function(ev, ret) { return true; });
+        me.onkeypress .push(function(ev, ret) { return true; });
       };
       
       return me;

@@ -80,10 +80,10 @@ function Game(ctx, socket) {
         priv.messages.push(msg);
       }
       
-      me.onresize = $.proxy(function(w, h) {
+      me.onresize.push(function(w, h) {
         priv.txtChat.y = ctx.canvas.height - priv.txtChat.h;
         priv.fraChat.h = priv.txtChat.y;
-      }, this);
+      });
       
       return me;
     }
