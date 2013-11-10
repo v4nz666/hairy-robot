@@ -41,7 +41,7 @@ function GUIs() {
       
       var me = {
         push: function(gui) {
-          gui.setguis(me);
+          gui.guis(me);
           gui.init();
           gui.resize();
           priv.guis.unshift(gui);
@@ -158,7 +158,6 @@ function GUI(ctx, name) {
       var priv = this;
       
       var me = {
-        setguis:     function(guis) { priv.guis = guis; },
         context:     function() { return priv.ctx;         },
         controls:    function() { return priv.controls;    },
         onmousemove: function() { return priv.onmousemove; },
@@ -170,6 +169,14 @@ function GUI(ctx, name) {
         onkeypress:  function() { return priv.onkeypress;  },
         onrender:    function() { return priv.onrender;    },
         onresize:    function() { return priv.onresize;    },
+        
+        guis: function(guis) {
+          if(typeof guis === 'undefined') {
+            return priv.guis;
+          } else {
+            priv.guis = guis;
+          }
+        },
         
         setfocus: function(control) {
           if(priv.focus !== null) {
@@ -644,7 +651,7 @@ function Label(gui) {
           _text = text;
           
           if(me.autosize) {
-            w = this.gui.ctx.measureText(_text).width;
+            w = me.ctx.measureText(_text).width;
             h = getTextHeight(me.ctx.font).ascent;
           }
         }
