@@ -24,7 +24,7 @@ class StorageController extends \Controller {
   }
   
   public function ships() {
-    return \Auth::user()->spaceUser->ships->toJSON();
+    return \Auth::user()->ships->toJSON();
   }
   
   public function saveship() {
