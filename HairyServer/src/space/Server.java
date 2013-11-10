@@ -57,7 +57,7 @@ public class Server {
     _server = new SocketIOServer(config);
     _server.addDisconnectListener(new Disconnect());
     _server.addEventListener("lo", User.Login.class, new Login());
-    _server.addEventListener("msg", Ship.Message.class, new Message());
+    _server.addEventListener("msg", User.Message.class, new Message());
     _server.addEventListener("keys", Ship.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
