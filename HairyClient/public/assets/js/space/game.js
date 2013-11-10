@@ -60,8 +60,8 @@ function Game(ctx, socket) {
           ctx.restore();
         }, this);
         
-        this.controls.add(priv.txtChat);
-        this.controls.add(priv.fraChat);
+        this.controls().add(priv.txtChat);
+        this.controls().add(priv.fraChat);
       }
       
       me.showchat = function() {
@@ -79,12 +79,12 @@ function Game(ctx, socket) {
         priv.messages.push(msg);
       }
       
-      me.onresize.push(function(w, h) {
+      me.onresize().push(function(w, h) {
         priv.txtChat.y = ctx.canvas.height - priv.txtChat.h;
         priv.fraChat.h = priv.txtChat.y;
       });
       
-      me.onkeydown.push(function(ev, handled) {
+      me.onkeydown().push(function(ev, handled) {
         if(!handled) {
           if(ev.which === 84) {
             me.showchat();

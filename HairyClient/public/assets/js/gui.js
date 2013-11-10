@@ -41,7 +41,7 @@ function GUIs() {
       
       var me = {
         push: function(gui) {
-          gui.guis = me;
+          gui.setguis(me);
           gui.init();
           gui.resize();
           priv.guis.unshift(gui);
@@ -136,169 +136,6 @@ function GUI(ctx, name) {
     onrender:    ExecutionStack(),
     onresize:    ExecutionStack(),
     
-    setfocus: function(control) {
-      if(this.focus !== null) {
-        this.focus.focus = false;
-        this.focus.lostfocus();
-      }
-      
-      this.focus = control;
-      
-      if(this.focus !== null) {
-        this.focus.gotfocus();
-      }
-    },
-    
-    pop: function() {
-      this.guis.pop(this);
-    },
-    
-    mousemove: function(ev) {
-      var ret = false;
-      
-      if(this.mousedowncontrol !== null) {
-        var allx = this.allX(this.mousedowncontrol);
-        var ally = this.allY(this.mousedowncontrol);
-        var button = ev.which;
-        ev.pageX -= allx;
-        ev.pageY -= ally;
-        ev.which = this.mousedownbutton;
-        this.mousedowncontrol.mousemove(ev);
-        ev.pageX += allx;
-        ev.pageY += ally;
-        ev.which = button;
-        ret = true;
-      } else {
-        var c = this.controls.hittest(ev.pageX, ev.pageY);
-        
-        if(c !== this.mousemovecontrol) {
-          if(this.mousemovecontrol !== null) this.mousemovecontrol.mouseout();
-          if(c                     !== null) c.mousein();
-          this.mousemovecontrol = c;
-        }
-        
-        if(c !== null) {
-          var allx = this.allX(c);
-          var ally = this.allY(c);
-          ev.pageX -= allx;
-          ev.pageY -= ally;
-          c.mousemove(ev);
-          ev.pageX += allx;
-          ev.pageY += ally;
-          ret = true;
-        }
-      }
-      
-      ret |= this.onmousemove.execute(ev, ret);
-      
-      return ret;
-    },
-    
-    mousedown: function(ev) {
-      var ret = false;
-      
-      this.mousedownbutton = ev.which;
-      this.mousedowncontrol = this.controls.hittest(ev.pageX, ev.pageY);
-      
-      if(this.mousedowncontrol !== null) {
-        var allx = this.allX(this.mousedowncontrol);
-        var ally = this.allY(this.mousedowncontrol);
-        ev.pageX -= allx;
-        ev.pageY -= ally;
-        
-        this.mousedowncontrol.setfocus();
-        this.mousedowncontrol.mousedown(ev);
-        
-        ev.pageX += allx;
-        ev.pageY += ally;
-        
-        ret = true;
-      }
-      
-      ret |= this.onmousedown.execute(ev, ret);
-      
-      return ret;
-    },
-    
-    mouseup: function(ev) {
-      var ret = false;
-      
-      if(this.mousedowncontrol !== null) {
-        var allx = this.allX(this.mousedowncontrol);
-        var ally = this.allY(this.mousedowncontrol);
-        var button = ev.which;
-        ev.pageX -= allx;
-        ev.pageY -= ally;
-        ev.which = this.mousedownbutton;
-        
-        this.mousedowncontrol.mouseup(ev);
-        this.mousedowncontrol.click();
-        this.mousedowncontrol = null;
-        this.mousedownbutton = 0;
-        
-        ev.pageX += allx;
-        ev.pageY += ally;
-        ev.which = button;
-        
-        ret = true;
-      }
-      
-      ret |= this.onmouseup.execute(ev, ret);
-      ret |= this.onclick.execute(ev, ret);
-      
-      return ret;
-    },
-    
-    keydown: function(ev) {
-      var ret = false;
-      
-      if(this.focus !== null) {
-        this.focus.keydown(ev);
-        ret = true;
-      }
-      
-      ret |= this.onkeydown.execute(ev, ret);
-      
-      return ret;
-    },
-    
-    keyup: function(ev) {
-      var ret = false;
-      
-      if(this.focus !== null) {
-        this.focus.keyup(ev);
-        ret = true;
-      }
-      
-      ret |= this.onkeyup.execute(ev, ret);
-      
-      return ret;
-    },
-    
-    keypress: function(ev) {
-      var ret = false;
-      
-      if(this.focus !== null) {
-        this.focus.keypress(ev);
-        ret = true;
-      }
-      
-      ret = ret || this.onkeypress.execute(ev, ret);
-      
-      return ret;
-    },
-    
-    render: function() {
-      this.ctx.save();
-      this.onrender.execute(this.ctx);
-      this.controls.render(this.ctx);
-      this.ctx.restore();
-    },
-    
-    resize: function() {
-      this.onresize.execute();
-    },
-    
     allX: function(control) {
       var x = control.x;
       if(control.contParent !== null) {
@@ -315,8 +152,192 @@ function GUI(ctx, name) {
       }
       
       return y;
+    },
+    
+    create: function() {
+      var priv = this;
+      
+      var me = {
+        setguis:     function(guis) { priv.guis = guis; },
+        context:     function() { return priv.ctx;         },
+        controls:    function() { return priv.controls;    },
+        onmousemove: function() { return priv.onmousemove; },
+        onmousedown: function() { return priv.onmousedown; },
+        onmouseup:   function() { return priv.onmouseup;   },
+        onclick:     function() { return priv.onclick;     },
+        onkeydown:   function() { return priv.onkeydown;   },
+        onkeyup:     function() { return priv.onkeyup;     },
+        onkeypress:  function() { return priv.onkeypress;  },
+        onrender:    function() { return priv.onrender;    },
+        onresize:    function() { return priv.onresize;    },
+        
+        setfocus: function(control) {
+          if(priv.focus !== null) {
+            priv.focus.focus = false;
+            priv.focus.lostfocus();
+          }
+          
+          priv.focus = control;
+          
+          if(priv.focus !== null) {
+            priv.focus.gotfocus();
+          }
+        },
+        
+        pop: function() {
+          priv.guis.pop(me);
+        },
+        
+        mousemove: function(ev) {
+          var ret = false;
+          
+          if(priv.mousedowncontrol !== null) {
+            var allx = priv.allX(priv.mousedowncontrol);
+            var ally = priv.allY(priv.mousedowncontrol);
+            var button = ev.which;
+            ev.pageX -= allx;
+            ev.pageY -= ally;
+            ev.which = priv.mousedownbutton;
+            priv.mousedowncontrol.mousemove(ev);
+            ev.pageX += allx;
+            ev.pageY += ally;
+            ev.which = button;
+            ret = true;
+          } else {
+            var c = priv.controls.hittest(ev.pageX, ev.pageY);
+            
+            if(c !== priv.mousemovecontrol) {
+              if(priv.mousemovecontrol !== null) priv.mousemovecontrol.mouseout();
+              if(c                     !== null) c.mousein();
+              priv.mousemovecontrol = c;
+            }
+            
+            if(c !== null) {
+              var allx = priv.allX(c);
+              var ally = priv.allY(c);
+              ev.pageX -= allx;
+              ev.pageY -= ally;
+              c.mousemove(ev);
+              ev.pageX += allx;
+              ev.pageY += ally;
+              ret = true;
+            }
+          }
+          
+          ret |= priv.onmousemove.execute(ev, ret);
+          
+          return ret;
+        },
+        
+        mousedown: function(ev) {
+          var ret = false;
+          
+          priv.mousedownbutton = ev.which;
+          priv.mousedowncontrol = priv.controls.hittest(ev.pageX, ev.pageY);
+          
+          if(priv.mousedowncontrol !== null) {
+            var allx = priv.allX(priv.mousedowncontrol);
+            var ally = priv.allY(priv.mousedowncontrol);
+            ev.pageX -= allx;
+            ev.pageY -= ally;
+            
+            priv.mousedowncontrol.setfocus();
+            priv.mousedowncontrol.mousedown(ev);
+            
+            ev.pageX += allx;
+            ev.pageY += ally;
+            
+            ret = true;
+          }
+          
+          ret |= priv.onmousedown.execute(ev, ret);
+          
+          return ret;
+        },
+        
+        mouseup: function(ev) {
+          var ret = false;
+          
+          if(priv.mousedowncontrol !== null) {
+            var allx = priv.allX(priv.mousedowncontrol);
+            var ally = priv.allY(priv.mousedowncontrol);
+            var button = ev.which;
+            ev.pageX -= allx;
+            ev.pageY -= ally;
+            ev.which = priv.mousedownbutton;
+            
+            priv.mousedowncontrol.mouseup(ev);
+            priv.mousedowncontrol.click();
+            priv.mousedowncontrol = null;
+            priv.mousedownbutton = 0;
+            
+            ev.pageX += allx;
+            ev.pageY += ally;
+            ev.which = button;
+            
+            ret = true;
+          }
+          
+          ret |= priv.onmouseup.execute(ev, ret);
+          ret |= priv.onclick.execute(ev, ret);
+          
+          return ret;
+        },
+        
+        keydown: function(ev) {
+          var ret = false;
+          
+          if(priv.focus !== null) {
+            priv.focus.keydown(ev);
+            ret = true;
+          }
+          
+          ret |= priv.onkeydown.execute(ev, ret);
+          
+          return ret;
+        },
+        
+        keyup: function(ev) {
+          var ret = false;
+          
+          if(priv.focus !== null) {
+            priv.focus.keyup(ev);
+            ret = true;
+          }
+          
+          ret |= priv.onkeyup.execute(ev, ret);
+          
+          return ret;
+        },
+        
+        keypress: function(ev) {
+          var ret = false;
+          
+          if(priv.focus !== null) {
+            priv.focus.keypress(ev);
+            ret = true;
+          }
+          
+          ret = ret || priv.onkeypress.execute(ev, ret);
+          
+          return ret;
+        },
+        
+        render: function() {
+          priv.ctx.save();
+          priv.onrender.execute(priv.ctx);
+          priv.controls.render();
+          priv.ctx.restore();
+        },
+        
+        resize: function() {
+          priv.onresize.execute();
+        }
+      };
+      
+      return me;
     }
-  }
+  }.create();
 }
 
 // A doubly-linked list for nested controls
@@ -390,9 +411,9 @@ function ControlStack(owner) {
     },
     
     // Render all controls and nested controls in this list
-    render: function(ctx) {
+    render: function() {
       if(this.last !== null) {
-        this.last.render(ctx);
+        this.last.render();
       }
     }
   }
@@ -411,6 +432,7 @@ function Control(gui) {
         contNext: null,
         contPrev: null,
         gui: gui,
+        ctx: gui.context(),
         focus: false,
         
         acceptinput: true,
@@ -490,14 +512,14 @@ function Control(gui) {
           return null;
         },
         
-        renderPre: function(ctx) {
+        renderPre: function() {
           if(_visible) {
-            ctx.save();
-            ctx.translate(me.x, me.y);
+            me.ctx.save();
+            me.ctx.translate(me.x, me.y);
             
             if(me.backcolour !== null) {
-              ctx.fillStyle = me.backcolour;
-              ctx.fillRect(0, 0, me.w, me.h);
+              me.ctx.fillStyle = me.backcolour;
+              me.ctx.fillRect(0, 0, me.w, me.h);
             }
             
             return true;
@@ -506,31 +528,31 @@ function Control(gui) {
           return false;
         },
         
-        renderPost: function(ctx) {
-          me.controls.render(ctx);
+        renderPost: function() {
+          me.controls.render();
           
           if(me.bordercolour !== null) {
-            ctx.strokeStyle = me.bordercolour;
-            ctx.strokeRect(0.5, 0.5, me.w, me.h);
+            me.ctx.strokeStyle = me.bordercolour;
+            me.ctx.strokeRect(0.5, 0.5, me.w, me.h);
           }
           
-          ctx.restore();
+          me.ctx.restore();
         },
         
-        renderControl: function(ctx) { },
-        render: function(ctx) {
-          if(me.renderPre(ctx)) {
-            me.renderControl(ctx);
+        renderControl: function() { },
+        render: function() {
+          if(me.renderPre()) {
+            me.renderControl();
             
             if(me.onrender !== null) {
-              me.onrender(ctx);
+              me.onrender(me.ctx);
             }
             
-            me.renderPost(ctx);
+            me.renderPost();
           }
           
           if(me.contNext !== null) {
-            me.contNext.render(ctx);
+            me.contNext.render();
           }
         },
         
@@ -615,20 +637,20 @@ function Label(gui) {
           
           if(me.autosize) {
             w = this.gui.ctx.measureText(_text).width;
-            h = getTextHeight(this.gui.ctx.font).ascent;
+            h = getTextHeight(me.ctx.font).ascent;
           }
         }
       };
       
-      me.renderControl = function(ctx) {
-        ctx.fillStyle = this.forecolour;
-        ctx.textAlign = this.textAlign;
-        ctx.textBaseline = this.textBaseline;
+      me.renderControl = function() {
+        me.ctx.fillStyle = this.forecolour;
+        me.ctx.textAlign = this.textAlign;
+        me.ctx.textBaseline = this.textBaseline;
         
         switch(this.textAlign) {
-          case 'center': ctx.fillText(_text, this.w / 2, this.h / 2); break;
-          case 'right':  ctx.fillText(_text, this.w    , this.h / 2); break;
-          default:       ctx.fillText(_text,          0, this.h / 2); break;
+          case 'center': me.ctx.fillText(_text, this.w / 2, this.h / 2); break;
+          case 'right':  me.ctx.fillText(_text, this.w    , this.h / 2); break;
+          default:       me.ctx.fillText(_text,          0, this.h / 2); break;
         }
       };
       
@@ -658,7 +680,7 @@ function Textbox(gui) {
       me.bordercolour = 'white';
       me.textAlign = 'left';
       me.textW = 0;
-      me.textH = getTextHeight(me.gui.ctx.font).ascent;
+      me.textH = getTextHeight(me.ctx.font).ascent;
       me.selx = 0;
       
       me.textSuper = me.text;
@@ -667,29 +689,29 @@ function Textbox(gui) {
           return this.textSuper(text);
         } else {
           this.textSuper(text);
-          this.textW = this.gui.ctx.measureText(text).width;
-          this.textH = getTextHeight(this.gui.ctx.font).ascent;
+          this.textW = me.ctx.measureText(text).width;
+          this.textH = getTextHeight(me.ctx.font).ascent;
           this.selstart(text.length);
         }
       }
       
       me.selstart = function(selstart) {
         _selstart = constrain(selstart, 0, this.text().length);
-        this.selx = this.gui.ctx.measureText(this.text().substr(0, selstart)).width;
+        this.selx = me.ctx.measureText(this.text().substr(0, selstart)).width;
       }
       
       me.renderControlSuper = me.renderControl;
-      me.renderControl = function(ctx) {
-        ctx.save();
-        ctx.translate(2, 0);
-        this.renderControlSuper(ctx);
+      me.renderControl = function() {
+        me.ctx.save();
+        me.ctx.translate(2, 0);
+        this.renderControlSuper();
         
         if(this.focus) {
-          ctx.fillStyle = this.forecolour;
-          ctx.fillRect(this.selx, (this.h - this.textH) / 2, 1, this.textH);
+          me.ctx.fillStyle = this.forecolour;
+          me.ctx.fillRect(this.selx, (this.h - this.textH) / 2, 1, this.textH);
         }
         
-        ctx.restore();
+        me.ctx.restore();
       }
       
       me.keypressSuper = me.keypress;

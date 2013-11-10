@@ -21,24 +21,23 @@ function Message(ctx, text) {
         f.h = 50;
         f.controls.add(l);
         
-        me.controls.add(f);
+        me.controls().add(f);
         
-        me.onresize.push(function() {
+        me.addcontrol = function(control) {
+          f.controls().add(control);
+        };
+        
+        me.onmousemove().push(function(ev, ret) { return true; });
+        me.onmousedown().push(function(ev, ret) { return true; });
+        me.onmouseup  ().push(function(ev, ret) { return true; });
+        me.onclick    ().push(function(ev, ret) { return true; });
+        me.onkeydown  ().push(function(ev, ret) { return true; });
+        me.onkeyup    ().push(function(ev, ret) { return true; });
+        me.onkeypress ().push(function(ev, ret) { return true; });
+        me.onresize   ().push(function() {
           f.x = (ctx.canvas.width  - f.w) / 2;
           f.y = (ctx.canvas.height - f.h) / 2;
         });
-        
-        me.addcontrol = function(control) {
-          f.controls.add(control);
-        };
-        
-        me.onmousemove.push(function(ev, ret) { return true; });
-        me.onmousedown.push(function(ev, ret) { return true; });
-        me.onmouseup  .push(function(ev, ret) { return true; });
-        me.onclick    .push(function(ev, ret) { return true; });
-        me.onkeydown  .push(function(ev, ret) { return true; });
-        me.onkeyup    .push(function(ev, ret) { return true; });
-        me.onkeypress .push(function(ev, ret) { return true; });
       };
       
       return me;
