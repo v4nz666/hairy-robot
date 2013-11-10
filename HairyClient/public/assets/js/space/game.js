@@ -85,6 +85,16 @@ function Game(ctx, socket) {
         priv.fraChat.h = priv.txtChat.y;
       });
       
+      me.onkeydown.push(function(ev, handled) {
+        if(!handled) {
+          if(ev.which === 84) {
+            me.showchat();
+            ev.preventDefault();
+            return true;
+          }
+        }
+      });
+      
       return me;
     }
   }.create();
