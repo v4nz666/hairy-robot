@@ -10,7 +10,6 @@ import space.events.Disconnect;
 import space.events.Keys;
 import space.events.Login;
 import space.events.Message;
-import space.physics.Sandbox;
 import sql.MySQL;
 import sql.SQL;
 
@@ -31,7 +30,6 @@ public class Server {
   private HashMap<SocketIOClient, User> _userMap = new HashMap<>();
   
   private SocketIOServer _server;
-  private Sandbox _sandbox = new Sandbox();
   
   private boolean _running;
   private int _tps = 60;
@@ -58,20 +56,18 @@ public class Server {
     
     _server = new SocketIOServer(config);
     _server.addDisconnectListener(new Disconnect());
-    _server.addEventListener("login", User.Login.class, new Login());
+    _server.addEventListener("lo", User.Login.class, new Login());
     _server.addEventListener("msg", Ship.Message.class, new Message());
     _server.addEventListener("keys", Ship.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
     
     _server.start();
-    _sandbox.startSandbox();
     
     System.out.println("Server running.");
     
     gameLoop();
     
-    _sandbox.stopSandbox();
     _server.stop();
     _sql.close();
   }
@@ -85,23 +81,18 @@ public class Server {
   }
   
   public void addUser(SocketIOClient socket, User.Login data) {
-    User user = null;
-    
     try {
-      user = User.getUserIfAuthed(socket, data);
+      User user = User.getUserIfAuthed(socket, data);
+      
+      _user.add(user);
+      _userMap.put(socket, user);
+      
+      System.out.println("New user added " + user.id);
+      
+      user.serializeLoginResponse().send();
     } catch(SQLException e) {
       e.printStackTrace();
-      return;
     }
-    
-    _user.add(user);
-    _userMap.put(socket, user);
-    _sandbox.addToSandbox(user);
-    
-    System.out.println("New user added " + user.id);
-    
-    socket.sendEvent("setParams", user.serializeParams());
-    socket.sendEvent("setSystem", user.serializeSystem());
   }
   
   public void removeUser(SocketIOClient socket) {
@@ -111,16 +102,8 @@ public class Server {
     
     if(user != null) {
       System.out.println("Disconnecting " + user.id);
-      broadcastEvent("remuser", user.serializeRemove());
       
-      _sandbox.removeFromSandbox(user);
       _user.remove(user);
-      
-      try {
-        user.save();
-      } catch(SQLException e) {
-        e.printStackTrace();
-      }
     }
   }
   
@@ -134,7 +117,7 @@ public class Server {
     while(_running) {
       time = System.nanoTime();
       
-      tick(timeDelta / interval);
+      //tick(timeDelta / interval);
       
       // Track FPS
       if(tickTime <= System.nanoTime()) {
@@ -157,7 +140,7 @@ public class Server {
     }
   }
   
-  private void tick(double deltaT) {
+  /*private void tick(double deltaT) {
     User.Update[] update = new User.Update[_user.size()];
     
     int i = 0;
@@ -174,7 +157,7 @@ public class Server {
     public Update(User.Update[] usersOnScreen) {
       this.usersOnScreen = usersOnScreen;
     }
-  }
+  }*/
 
   public StarSystem system(int index) {
     return _system.get(index);

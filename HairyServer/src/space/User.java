@@ -32,6 +32,10 @@ public class User {
   public final int id;
   public final String name;
   
+  private LoginResponse _serializeLoginResponse = new LoginResponse();
+  
+  public LoginResponse serializeLoginResponse() { return _serializeLoginResponse; }
+  
   private Ship _ship;
   
   private User(SocketIOClient socket, int id, User.Login data) throws SQLException {
@@ -51,5 +55,13 @@ public class User {
   public static class Login {
     public String name;
     public String auth;
+  }
+  
+  public class LoginResponse {
+    public int getId() { return id; }
+    
+    public void send() {
+      socket.sendEvent("lr", this);
+    }
   }
 }
