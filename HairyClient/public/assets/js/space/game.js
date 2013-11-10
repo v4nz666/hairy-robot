@@ -109,7 +109,9 @@ function Game(ctx, socket) {
           lstShip.w = 150;
           
           for(var i = 0; i < stat.ships.length; i++) {
-            lstShip.items().push(stat.ships[i].name);
+            lstShip.items().push(stat.ships[i].name).ondblclick().push(function() {
+              console.log('Ship loading will go here');
+            });
           }
           
           me.guis().push(guiShipList);

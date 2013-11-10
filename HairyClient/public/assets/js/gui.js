@@ -290,6 +290,11 @@ function GUI(ctx, name) {
             
             priv.mousedowncontrol.onmouseup().execute(ev);
             priv.mousedowncontrol.onclick().execute();
+            
+            if(priv.mousedowntime1 - priv.mousedowntime2 <= 250) {
+              priv.mousedowncontrol.ondblclick().execute();
+            }
+            
             priv.mousedowncontrol = null;
             priv.mousedownbutton = 0;
             
@@ -470,6 +475,7 @@ function Control(gui) {
     onmousedown: ExecutionStack(),
     onmouseup:   ExecutionStack(),
     onclick:     ExecutionStack(),
+    ondblclick:  ExecutionStack(),
     onkeydown:   ExecutionStack(),
     onkeyup:     ExecutionStack(),
     onkeypress:  ExecutionStack(),
@@ -504,6 +510,7 @@ function Control(gui) {
         onmousedown: function() { return priv.onmousedown; },
         onmouseup:   function() { return priv.onmouseup;   },
         onclick:     function() { return priv.onclick;     },
+        ondblclick:  function() { return priv.ondblclick;  },
         onkeydown:   function() { return priv.onkeydown;   },
         onkeyup:     function() { return priv.onkeyup;     },
         onkeypress:  function() { return priv.onkeypress;  },
