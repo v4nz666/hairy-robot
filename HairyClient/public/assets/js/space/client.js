@@ -88,6 +88,8 @@ function Client() {
             
             var guiGame = Game(priv.ctx, priv.socket);
             priv.guis.push(guiGame);
+            
+            priv.socket.on('ms', guiGame.gotchat);
           });
         }
       };
