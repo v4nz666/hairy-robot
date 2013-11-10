@@ -41,8 +41,7 @@ function MainMenu(ctx) {
         }, me);
         
         var selectship = function(item) {
-          priv.ship = Ship();
-          priv.ship.deserialize(item.ship);
+          priv.ship = item.ship;
         };
         
         me.refreshships = function() {
