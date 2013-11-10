@@ -787,6 +787,7 @@ function List(gui) {
       var me = Control(gui);
       me.backcolour = 'gray';
       me.bordercolour = 'white';
+      me.h = 40;
       
       var items = {
         clear: function() {
