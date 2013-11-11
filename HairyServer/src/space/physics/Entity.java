@@ -9,6 +9,10 @@ public abstract class Entity {
   public int size;
   public int spawnID;
   
+  private Update _update = new Update();
+  
+  public Update serializeUpdate() { return _update; }
+  
   public Entity(int id, double x, double y, int size) {
     this(id, x, y, size, id);
   }
@@ -64,5 +68,12 @@ public abstract class Entity {
   
   public void stop() {
     vx = vy = acc = 0;
+  }
+  
+  public class Update {
+    public int getI() { return id; }
+    public int getX() { return (int)x; }
+    public int getY() { return (int)y; }
+    public double getA() { return angle; }
   }
 }

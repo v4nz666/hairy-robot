@@ -92,9 +92,9 @@ function Client() {
             priv.guis.push(guiGame);
             
             priv.socket.on('ms', guiGame.gotchat);
-            priv.socket.on('us', function(data) {
-              console.log('Using ship', data);
-              guiGame.useship();
+            priv.socket.on('us', guiGame.useship);
+            priv.socket.on('up', function(data) {
+              console.log(data);
             });
           });
         }

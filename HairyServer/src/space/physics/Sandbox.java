@@ -10,6 +10,8 @@ public class Sandbox implements Runnable {
   private int _ticksPerSecond = 60;
   private int _tps = 60;
   
+  private Entity.Update[] _update;
+  
   private ConcurrentLinkedDeque<Entity> _obj = new ConcurrentLinkedDeque<>();
   private ConcurrentLinkedDeque<CollisionTracker<? extends Entity, ? extends Entity>> _collision = new ConcurrentLinkedDeque<>();
   
@@ -27,6 +29,10 @@ public class Sandbox implements Runnable {
     _collision.add(new CollisionTracker<T, U>(entity, hitBy, callback));
   }
   
+  public Entity.Update[] getUpdates() {
+    return _update;
+  }
+  
   public void run() {
     _interval = 1000000000 / _ticksPerSecond;
     _running = true;
@@ -38,13 +44,20 @@ public class Sandbox implements Runnable {
     while(_running) {
       time = System.nanoTime();
       
+      Entity.Update[] update = new Entity.Update[_obj.size()];
+      
+      int i = 0;
       for(Entity e : _obj) {
         e.update(timeDelta / _interval);
         
         for(CollisionTracker<? extends Entity, ? extends Entity> c : _collision) {
           c.check(e);
         }
+        
+        update[i++] = e.serializeUpdate();
       }
+      
+      _update = update;
       
       if(tickTime <= System.nanoTime()) {
         _tps = ticks;

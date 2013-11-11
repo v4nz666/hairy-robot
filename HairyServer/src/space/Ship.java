@@ -32,12 +32,6 @@ public class Ship extends Entity {
   
   private User _user;
   
-  private Params    _params       = new Params();
-  private SysParams _systemParams = new SysParams();
-  private Update    _update       = new Update();
-  private Add       _add          = new Add();
-  private Remove    _remove       = new Remove();
-  
   public final StarSystem system;
   public final String name;
   
@@ -49,12 +43,6 @@ public class Ship extends Entity {
   private boolean _turnRight;
   private boolean _isFiring;
   
-  public Params    serializeParams() { return _params; }
-  public SysParams serializeSystem() { return _systemParams; }
-  public Update    serializeUpdate() { return _update; }
-  public Add       serializeAdd()    { return _add;    }
-  public Remove    serializeRemove() { return _remove; }
-  
   private Ship(int id, double x, double y, int size, String name, StarSystem system, int user) {
     super(id, x, y, size);
     this.name = name;
@@ -63,6 +51,12 @@ public class Ship extends Entity {
     
     maxVel = 6;
     _turnSpeed = 5;
+  }
+  
+  public void sendUpdate(Entity.Update[] update) {
+    if(_user != null) {
+      _user.sendUpdate(update);
+    }
   }
   
   public void use(User user) {
@@ -152,29 +146,5 @@ public class Ship extends Entity {
     
     public int id;
     public int s;
-  }
-  
-  public class Params {
-    public int getId() { return id; }
-  }
-  
-  public class SysParams {
-    public StarSystem getSystem() { return system; }
-  }
-  
-  public class Update {
-    public int getId() { return id; }
-    public int getX() { return (int)x; }
-    public int getY() { return (int)y; }
-    public double getAngle() { return angle; }
-  }
-  
-  public class Add {
-    public int getId() { return id; }
-    public String getName() { return name; }
-  }
-  
-  public class Remove {
-    public int getId() { return id; }
   }
 }

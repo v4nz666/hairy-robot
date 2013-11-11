@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import space.physics.Entity;
 import sql.SQL;
 
 import com.corundumstudio.socketio.SocketIOClient;
@@ -50,6 +51,10 @@ public class User {
   
   public void sendMessage(String from, String message) {
     socket.sendEvent("ms", new User.Message(from, message));
+  }
+  
+  public void sendUpdate(Entity.Update[] update) {
+    socket.sendEvent("up", update);
   }
   
   public void useShip(Ship.Use data) {

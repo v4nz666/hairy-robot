@@ -6,9 +6,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import space.Ship;
+import space.physics.Sandbox;
 import sql.SQL;
 
-public class StarSystem {
+public class StarSystem implements Runnable {
   private static SQL sql = SQL.getInstance();
   private static PreparedStatement select = sql.prepareStatement("SELECT * FROM `systems`");
   
@@ -23,6 +24,12 @@ public class StarSystem {
       return system;
     }
   }
+  
+  private Thread _thread;
+  private boolean _running;
+  private int _tps = 60;
+  
+  private Sandbox _sandbox = new Sandbox();
   
   public final int id;
   
@@ -42,6 +49,10 @@ public class StarSystem {
     _name = generateName();
     _ship = Ship.load(this);
     
+    for(Ship ship : _ship) {
+      _sandbox.addToSandbox(ship);
+    }
+    
     System.out.println("Generating System[" + _name + "]");
     
     // 290759680 x 32m/coordinate ~= 1/1000 scale our Solar system
@@ -50,6 +61,11 @@ public class StarSystem {
     
     star = Star.generate(this, null, 0);
     initOrbits();
+    
+    _running = true;
+    _thread = new Thread(this);
+    _thread.start();
+    _sandbox.startSandbox();
   }
   
   public Ship findShip(int id) {
@@ -98,5 +114,45 @@ public class StarSystem {
   
   public String generateName() { 
     return "Sol";
+  }
+  
+  public void run() {
+    int interval = 1000000000 / 60;
+    _running = true;
+    
+    long time, timeDelta = interval;
+    int ticks = 0;
+    long tickTime = System.nanoTime() + 1000000000;
+    
+    while(_running) {
+      time = System.nanoTime();
+      
+      tick(timeDelta / interval);
+      
+      // Track FPS
+      if(tickTime <= System.nanoTime()) {
+        _tps = ticks;
+        ticks = 0;
+        tickTime = System.nanoTime() + 1000000000;
+        //System.out.println(_tps + " ticks per second");
+      }
+      
+      ticks++;
+      
+      // Sleep each loop if we have extra time
+      timeDelta = System.nanoTime() - time;
+      long timeSleep = interval - timeDelta;
+      long timeDeltaMS = timeSleep / 1000000;
+      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000);
+      if(timeSleep > 0) {
+        try { Thread.sleep(timeDeltaMS, timeDeltaNS); } catch(InterruptedException e) { }
+      }
+    }
+  }
+  
+  private void tick(double deltaT) {
+    for(Ship ship : _ship) {
+      ship.sendUpdate(_sandbox.getUpdates());
+    }
   }
 }
