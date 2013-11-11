@@ -14,6 +14,6 @@ class User extends Eloquent implements UserInterface {
   }
   
   public function ships() {
-    return $this->hasMany('Ship');
+    return $this->belongsToMany('Ship', 'user_ships');
   }
 }
