@@ -1,6 +1,29 @@
 package space.celestials;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import space.Ship;
+import sql.SQL;
+
 public class StarSystem {
+  private static SQL sql = SQL.getInstance();
+  private static PreparedStatement select = sql.prepareStatement("SELECT * FROM `systems`");
+  
+  public static ArrayList<StarSystem> load() throws SQLException {
+    try(ResultSet r = select.executeQuery()) {
+      ArrayList<StarSystem> system = new ArrayList<>();
+      
+      while(r.next()) {
+        system.add(new StarSystem(r.getInt("id")));
+      }
+      
+      return system;
+    }
+  }
+  
   public final int id;
   
   private String _name;
@@ -11,10 +34,13 @@ public class StarSystem {
   
   public Star star;
   
-  public StarSystem(int id) {
+  private ArrayList<Ship> _ship = new ArrayList<>();
+  
+  private StarSystem(int id) throws SQLException {
     this.id = id;
     
     _name = generateName();
+    _ship = Ship.load(this);
     
     System.out.println("Generating System[" + _name + "]");
     
@@ -24,6 +50,16 @@ public class StarSystem {
     
     star = Star.generate(this, null, 0);
     initOrbits();
+  }
+  
+  public Ship findShip(int id) {
+    for(Ship ship : _ship) {
+      if(ship.id == id) {
+        return ship;
+      }
+    }
+    
+    return null;
   }
   
   /**

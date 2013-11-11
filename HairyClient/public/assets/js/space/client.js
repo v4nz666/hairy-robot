@@ -84,9 +84,18 @@ function Client() {
             msg.pop();
             
             var guiGame = Game(priv.ctx, priv.socket);
+            
+            guiGame.onselectship().push(function(ship) {
+              priv.socket.emit('us', {id: ship.id, s: ship.system_id});
+            });
+            
             priv.guis.push(guiGame);
             
             priv.socket.on('ms', guiGame.gotchat);
+            priv.socket.on('us', function(data) {
+              console.log('Using ship', data);
+              guiGame.useship();
+            });
           });
         }
       };

@@ -12,6 +12,8 @@ public class User {
   private static SQL sql = SQL.getInstance();
   private static PreparedStatement select = sql.prepareStatement("SELECT `id`, `auth` FROM `users` WHERE `username`=?");
   
+  private static Server _server = Server.instance();
+  
   public static User getUserIfAuthed(SocketIOClient socket, User.Login data) throws SQLException {
     select.setString(1, data.name);
     
@@ -44,12 +46,35 @@ public class User {
     this.name = data.name;
   }
   
-  public void useShip(int id) throws SQLException {
-    _ship = Ship.load(id);
+  public Ship ship() { return _ship; }
+  
+  public void sendMessage(String from, String message) {
+    socket.sendEvent("ms", new User.Message(from, message));
   }
   
-  public Ship ship() {
-    return _ship;
+  public void useShip(Ship.Use data) {
+    leaveShip();
+    
+    _ship = _server.findShip(data.s, data.id);
+    
+    //TODO: handle shit
+    if(_ship == null) {
+      System.out.println("Disconnecting user for invalid ship");
+      socket.disconnect();
+      return;
+    }
+    
+    _ship.use(this);
+  }
+  
+  public void leaveShip() {
+    if(_ship != null) {
+      _ship.leave();
+    }
+  }
+  
+  public void sendUseShip(Ship ship) {
+    socket.sendEvent("us", new Ship.Use(ship.id, ship.system.id));
   }
   
   public static class Login {

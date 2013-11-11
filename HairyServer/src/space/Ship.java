@@ -3,6 +3,7 @@ package space;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import space.celestials.StarSystem;
 import space.physics.Entity;
@@ -10,26 +11,26 @@ import sql.SQL;
 
 public class Ship extends Entity {
   private static SQL sql = SQL.getInstance();
-  private static PreparedStatement select = sql.prepareStatement("SELECT * FROM `space_ships` WHERE `user_id`=?");
-  private static PreparedStatement update = sql.prepareStatement("UPDATE `space_ships` SET `system`=?, `x`=?, `y`=? WHERE id=?");
+  private static PreparedStatement select = sql.prepareStatement("SELECT * FROM `ships` WHERE `system_id`=?");
+  private static PreparedStatement update = sql.prepareStatement("UPDATE `ships` SET `system`=?, `x`=?, `y`=? WHERE id=?");
   
   private static Server _server = Server.instance();
   
-  public static Ship load(int id) throws SQLException {
-    select.setInt(1, id);
+  public static ArrayList<Ship> load(StarSystem system) throws SQLException {
+    select.setInt(1, system.id);
     
     try(ResultSet r = select.executeQuery()) {
-      if(r.next()) {
-        int s = r.getInt("system_id");
-        StarSystem system = r.wasNull() ? null : _server.system(s);
-        return new Ship(r.getInt("id"), r.getDouble("x"), r.getDouble("y"), 16, r.getString("name"), system);
+      ArrayList<Ship> ship = new ArrayList<>();
+      
+      while(r.next()) {
+        ship.add(new Ship(r.getInt("id"), r.getDouble("x"), r.getDouble("y"), 16, r.getString("name"), system, r.getInt("user_id")));
       }
+      
+      return ship;
     }
-    
-    return null;
   }
   
-  private StarSystem _system;
+  private User _user;
   
   private Params    _params       = new Params();
   private SysParams _systemParams = new SysParams();
@@ -37,7 +38,10 @@ public class Ship extends Entity {
   private Add       _add          = new Add();
   private Remove    _remove       = new Remove();
   
+  public final StarSystem system;
   public final String name;
+  
+  private int _userID;
   
   private double _turnSpeed;
   
@@ -51,13 +55,29 @@ public class Ship extends Entity {
   public Add       serializeAdd()    { return _add;    }
   public Remove    serializeRemove() { return _remove; }
   
-  private Ship(int id, double x, double y, int size, String name, StarSystem system) {
+  private Ship(int id, double x, double y, int size, String name, StarSystem system, int user) {
     super(id, x, y, size);
     this.name = name;
-    _system = system;
+    _userID = user;
+    this.system = system;
     
     maxVel = 6;
     _turnSpeed = 5;
+  }
+  
+  public void use(User user) {
+    if(_user != null) {
+      user.sendMessage("Server", "That ship is already in use by " + _user.name + ".");
+      _user.sendMessage("Server", user.name + " tried to use this ship.");
+      return;
+    }
+    
+    _user = user;
+    _user.sendUseShip(this);
+  }
+  
+  public void leave() {
+    _user = null;
   }
   
   public void handleInput(int keys) {
@@ -123,12 +143,23 @@ public class Ship extends Entity {
     public int keys;
   }
   
+  public static class Use {
+    public Use() { }
+    public Use(int id, int s) {
+      this.id = id;
+      this.s = s;
+    }
+    
+    public int id;
+    public int s;
+  }
+  
   public class Params {
     public int getId() { return id; }
   }
   
   public class SysParams {
-    public StarSystem getSystem() { return _system; }
+    public StarSystem getSystem() { return system; }
   }
   
   public class Update {

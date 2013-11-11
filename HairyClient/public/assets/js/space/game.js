@@ -2,6 +2,11 @@ function Game(ctx, socket) {
   return {
     socket: socket,
     
+    onselectship: ExecutionStack(),
+    
+    guiShipList: null,
+    lstShip: null,
+    
     txtChat: null,
     fraChat: null,
     
@@ -13,7 +18,17 @@ function Game(ctx, socket) {
       
       var me = GUI(ctx, 'game');
       
+      me.onselectship = function() {
+        return priv.onselectship;
+      };
+      
       me.init = function() {
+        priv.guiShipList = Message(ctx, 'Please choose your ship:');
+        priv.lstShip = List(priv.guiShipList);
+        priv.lstShip.y = 20;
+        priv.lstShip.w = 150;
+        priv.guiShipList.addcontrol(priv.lstShip);
+        
         priv.txtChat = new Textbox(this);
         priv.txtChat.visible(false);
         priv.txtChat.w = 200;
@@ -64,7 +79,7 @@ function Game(ctx, socket) {
         this.controls().add(priv.fraChat);
         
         me.showshiplist();
-      }
+      };
       
       me.onresize().push(function(w, h) {
         priv.txtChat.y = ctx.canvas.height - priv.txtChat.h;
@@ -86,7 +101,7 @@ function Game(ctx, socket) {
         priv.fraChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
         priv.txtChat.visible(true);
         priv.txtChat.setfocus();
-      }
+      };
       
       me.gotchat = function(msg) {
         while(priv.messages.length >= priv.maxMessages) {
@@ -94,7 +109,7 @@ function Game(ctx, socket) {
         }
         
         priv.messages.push(msg);
-      }
+      };
       
       me.showshiplist = function() {
         var loadingShips = Message(ctx, 'Loading ships...');
@@ -103,20 +118,19 @@ function Game(ctx, socket) {
         stat.load([{type: 'ships', cb: function() {
           loadingShips.pop();
           
-          var guiShipList = Message(ctx, 'Please choose your ship:');
-          var lstShip = List(guiShipList);
-          lstShip.y = 20;
-          lstShip.w = 150;
-          
+          priv.lstShip.items().clear();
           for(var i = 0; i < stat.ships.length; i++) {
-            lstShip.items().push(stat.ships[i].name).ondblclick().push(function() {
-              console.log('Ship loading will go here');
-            });
+            priv.lstShip.items().push(stat.ships[i].name).ondblclick().push($.proxy(function() {
+              priv.onselectship.execute(this);
+            }, stat.ships[i]));
           }
           
-          me.guis().push(guiShipList);
-          guiShipList.addcontrol(lstShip);
+          me.guis().push(priv.guiShipList);
         }}]);
+      };
+      
+      me.useship = function() {
+        priv.guiShipList.pop();
       };
       
       return me;

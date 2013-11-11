@@ -25,7 +25,7 @@ public class Message implements DataListener<User.Message> {
             ship.x = Double.parseDouble(msg[1]);
             ship.y = Double.parseDouble(msg[2]);
           } catch(Exception ex) {
-            client.sendEvent("ms", new User.Message("Server", "Usage: warp x y"));
+            user.sendMessage("Server", "Usage: warp x y");
           }
           
           return;
@@ -41,7 +41,7 @@ public class Message implements DataListener<User.Message> {
               public double zoom = Double.parseDouble(msg[1]);
             });
           } catch(Exception ex) {
-            client.sendEvent("ms", new User.Message("Server", "Usage: zoom n"));
+            user.sendMessage("Server", "Usage: zoom n");
           }
           return;
           
@@ -49,12 +49,12 @@ public class Message implements DataListener<User.Message> {
           try {
             ship.angle = Integer.parseInt(msg[1]);
           } catch(Exception ex) {
-            client.sendEvent("ms", new User.Message("Server", "Usage: angle n"));
+            user.sendMessage("Server", "Usage: angle n");
           }
           return;
       }
     }
     
-    _server.broadcastEvent("ms", new User.Message(user.name, data.msg));
+    _server.broadcastMessage(user.name, data.msg);
   }
 }

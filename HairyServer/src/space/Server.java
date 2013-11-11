@@ -10,6 +10,7 @@ import space.events.Disconnect;
 import space.events.Keys;
 import space.events.Login;
 import space.events.Message;
+import space.events.UseShip;
 import sql.MySQL;
 import sql.SQL;
 
@@ -21,7 +22,7 @@ public class Server {
   private static Server _instance = new Server();
   public static Server instance() { return _instance; }
   
-  private ArrayList<StarSystem> _system = new ArrayList<>();
+  private ArrayList<StarSystem> _system;
   
   public final double acc = 1 * 0.0625;
   public final double dec = 0.75 * 0.0625;
@@ -43,13 +44,13 @@ public class Server {
   
   public int tps() { return _tps; }
   
-  public void start() throws InterruptedException, InstantiationException, IllegalAccessException {
+  public void start() throws InterruptedException, InstantiationException, IllegalAccessException, SQLException {
     System.out.println("Initialising...");
     
     _sql = SQL.create(MySQL.class);
     _sql.connect("project1.monoxidedesign.com", "hairydata", "hairydata", "WaRcebYmnz4eSnGs");
     
-    _system.add(new StarSystem(0));
+    _system = StarSystem.load();
     
     Configuration config = new Configuration();
     config.setPort(9092);
@@ -58,6 +59,7 @@ public class Server {
     _server.addDisconnectListener(new Disconnect());
     _server.addEventListener("lo", User.Login.class, new Login());
     _server.addEventListener("ms", User.Message.class, new Message());
+    _server.addEventListener("us", Ship.Use.class, new UseShip());
     _server.addEventListener("keys", Ship.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
@@ -76,8 +78,22 @@ public class Server {
     _server.getBroadcastOperations().sendEvent(name, packet);
   }
   
+  public void broadcastMessage(String from, String message) {
+    broadcastEvent("ms", new User.Message(from, message));
+  }
+  
   public User userFromSocket(SocketIOClient socket) {
     return _userMap.get(socket);
+  }
+  
+  public Ship findShip(int systemID, int shipID) {
+    for(StarSystem system : _system) {
+      if(system.id == systemID) {
+        return system.findShip(shipID);
+      }
+    }
+    
+    return null;
   }
   
   public void addUser(SocketIOClient socket, User.Login data) {
@@ -103,6 +119,7 @@ public class Server {
     if(user != null) {
       System.out.println("Disconnecting " + user.id);
       
+      user.leaveShip();
       _user.remove(user);
     }
   }
@@ -158,8 +175,4 @@ public class Server {
       this.usersOnScreen = usersOnScreen;
     }
   }*/
-
-  public StarSystem system(int index) {
-    return _system.get(index);
-  }
 }
