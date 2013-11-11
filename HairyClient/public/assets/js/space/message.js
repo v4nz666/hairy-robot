@@ -3,11 +3,11 @@ function Message(ctx, text) {
     create: function() {
       var priv = this;
       
-      var me = GUI(ctx);
-      me.name = 'message';
+      var me = GUI(ctx, 'message');
+      var l = Label(me);
+      var f = Frame(me);
       
       me.init = function() {
-        var l = Label(me);
         l.textAlign = 'center';
         l.textBaseline = 'middle';
         l.autosize = false;
@@ -16,16 +16,11 @@ function Message(ctx, text) {
         
         me.text = l.text;
         
-        var f = Frame(me);
         f.w = l.w;
         f.h = 50;
         f.controls().add(l);
         
         me.controls().add(f);
-        
-        me.addcontrol = function(control) {
-          f.controls().add(control);
-        };
         
         me.onmousemove().push(function(ev, ret) { return true; });
         me.onmousedown().push(function(ev, ret) { return true; });
@@ -39,6 +34,10 @@ function Message(ctx, text) {
           f.x = (ctx.canvas.width  - f.w) / 2;
           f.y = (ctx.canvas.height - f.h) / 2;
         });
+      };
+      
+      me.addcontrol = function(control) {
+        f.controls().add(control);
       };
       
       return me;
