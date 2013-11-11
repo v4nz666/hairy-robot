@@ -1,8 +1,9 @@
 package space;
 
+import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import space.celestials.StarSystem;
@@ -28,7 +29,7 @@ public class Server {
   public final double dec = 0.75 * 0.0625;
   
   private ConcurrentLinkedDeque<User> _user = new ConcurrentLinkedDeque<>();
-  private HashMap<SocketIOClient, User> _userMap = new HashMap<>();
+  private ConcurrentHashMapV8<SocketIOClient, User> _userMap = new ConcurrentHashMapV8<>();
   
   private SocketIOServer _server;
   
