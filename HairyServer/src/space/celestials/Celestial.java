@@ -24,7 +24,7 @@ public abstract class Celestial extends Entity {
   protected double _theta;
   
   public Celestial(StarSystem system, Celestial parent, double distance, int size, double mass, double temp) {
-    super(-1, 0, 0, size);
+    super(-1, null, 0, 0, size);
     _system = system;
     _parent = parent;
     _distance = distance;

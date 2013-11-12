@@ -8,10 +8,12 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import space.celestials.StarSystem;
 import space.events.Disconnect;
+import space.events.EntityRequest;
 import space.events.Keys;
 import space.events.Login;
 import space.events.Message;
 import space.events.UseShip;
+import space.physics.Entity;
 import sql.MySQL;
 import sql.SQL;
 
@@ -61,7 +63,8 @@ public class Server {
     _server.addEventListener("lo", User.Login.class, new Login());
     _server.addEventListener("ms", User.Message.class, new Message());
     _server.addEventListener("us", Ship.Use.class, new UseShip());
-    _server.addEventListener("keys", Ship.Keys.class, new Keys());
+    _server.addEventListener("er", Entity.Request.class, new EntityRequest());
+    _server.addEventListener("ke", Ship.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
     

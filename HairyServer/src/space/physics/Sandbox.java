@@ -29,6 +29,16 @@ public class Sandbox implements Runnable {
     _collision.add(new CollisionTracker<T, U>(entity, hitBy, callback));
   }
   
+  public Entity getEntity(int id) {
+    for(Entity e : _obj) {
+      if(e.id == id) {
+        return e;
+      }
+    }
+    
+    return null;
+  }
+  
   public Entity.Update[] getUpdates() {
     return _update;
   }

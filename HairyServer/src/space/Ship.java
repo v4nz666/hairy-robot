@@ -23,7 +23,7 @@ public class Ship extends Entity {
       ArrayList<Ship> ship = new ArrayList<>();
       
       while(r.next()) {
-        ship.add(new Ship(r.getInt("id"), r.getDouble("x"), r.getDouble("y"), 16, r.getString("name"), system, r.getInt("user_id")));
+        ship.add(new Ship(r.getInt("id"), r.getString("name"), r.getDouble("x"), r.getDouble("y"), 16, system, r.getInt("user_id")));
       }
       
       return ship;
@@ -33,7 +33,6 @@ public class Ship extends Entity {
   private User _user;
   
   public final StarSystem system;
-  public final String name;
   
   private int _userID;
   
@@ -43,14 +42,19 @@ public class Ship extends Entity {
   private boolean _turnRight;
   private boolean _isFiring;
   
-  private Ship(int id, double x, double y, int size, String name, StarSystem system, int user) {
-    super(id, x, y, size);
-    this.name = name;
+  private Ship(int id, String name, double x, double y, int size, StarSystem system, int user) {
+    super(id, name, x, y, size);
     _userID = user;
     this.system = system;
     
     maxVel = 6;
     _turnSpeed = 5;
+  }
+  
+  public void sendEntity(Entity.Add add) {
+    if(_user != null) {
+      _user.sendEntity(add);
+    }
   }
   
   public void sendUpdate(Entity.Update[] update) {
@@ -74,15 +78,15 @@ public class Ship extends Entity {
     _user = null;
   }
   
-  public void handleInput(int keys) {
-    if(keys != 0) {
+  public void handleInput(Keys data) {
+    if(data.k != 0) {
       boolean thrust = false;
-      _turnLeft  = (keys & 0x01) != 0;
-      _turnRight = (keys & 0x04) != 0;
-      _isFiring  = (keys & 0x10) != 0;
+      _turnLeft  = (data.k & 0x01) != 0;
+      _turnRight = (data.k & 0x04) != 0;
+      _isFiring  = (data.k & 0x10) != 0;
       
-      if((keys & 0x02) != 0) { thruster(); thrust = true; }
-      if((keys & 0x08) != 0) { reverse(); thrust = true; }
+      if((data.k & 0x02) != 0) { thruster(); thrust = true; }
+      if((data.k & 0x08) != 0) { reverse(); thrust = true; }
       if(thrust) { return; }
     } else {
       _turnLeft  = false;
@@ -134,17 +138,19 @@ public class Ship extends Entity {
   }
   
   public static class Keys {
-    public int keys;
+    public int k;
   }
   
   public static class Use {
     public Use() { }
-    public Use(int id, int s) {
-      this.id = id;
-      this.s = s;
+    public Use(Ship ship) {
+      this.i = ship.id;
+      this.s = ship.system.id;
+      this.n = ship.name;
     }
     
-    public int id;
+    public int i;
     public int s;
+    public String n;
   }
 }

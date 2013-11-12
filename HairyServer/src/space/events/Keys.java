@@ -12,6 +12,6 @@ public class Keys implements DataListener<Ship.Keys> {
   
   @Override
   public void onData(SocketIOClient client, Ship.Keys data, AckRequest ackSender) {
-    _server.userFromSocket(client).ship().handleInput(data.keys);
+    _server.userFromSocket(client).ship().handleInput(data);
   }
 }

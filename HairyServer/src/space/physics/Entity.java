@@ -2,6 +2,7 @@ package space.physics;
 
 public abstract class Entity {
   public final int id;
+  public final String name;
   public double x, y;
   public double vx, vy;
   public double acc, angle;
@@ -9,16 +10,19 @@ public abstract class Entity {
   public int size;
   public int spawnID;
   
+  private Add    _add    = new Add();
   private Update _update = new Update();
   
+  public Add    serializeAdd()    { return _add; }
   public Update serializeUpdate() { return _update; }
   
-  public Entity(int id, double x, double y, int size) {
-    this(id, x, y, size, id);
+  public Entity(int id, String name, double x, double y, int size) {
+    this(id, name, x, y, size, id);
   }
   
-  public Entity(int id, double x, double y, int size, int spawnID) {
+  public Entity(int id, String name, double x, double y, int size, int spawnID) {
     this.id = id;
+    this.name = name;
     this.x = x;
     this.y = y;
     this.size = size;
@@ -70,10 +74,19 @@ public abstract class Entity {
     vx = vy = acc = 0;
   }
   
+  public class Add {
+    public int getI() { return id; }
+    public String getN() { return name; }
+  }
+  
   public class Update {
     public int getI() { return id; }
     public int getX() { return (int)x; }
     public int getY() { return (int)y; }
     public double getA() { return angle; }
+  }
+  
+  public static class Request {
+    public int[] i;
   }
 }

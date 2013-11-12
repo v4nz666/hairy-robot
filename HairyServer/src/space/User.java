@@ -53,6 +53,10 @@ public class User {
     socket.sendEvent("ms", new User.Message(from, message));
   }
   
+  public void sendEntity(Entity.Add add) {
+    socket.sendEvent("ea", add);
+  }
+  
   public void sendUpdate(Entity.Update[] update) {
     socket.sendEvent("up", update);
   }
@@ -60,7 +64,7 @@ public class User {
   public void useShip(Ship.Use data) {
     leaveShip();
     
-    _ship = _server.findShip(data.s, data.id);
+    _ship = _server.findShip(data.s, data.i);
     
     //TODO: handle shit
     if(_ship == null) {
@@ -79,7 +83,7 @@ public class User {
   }
   
   public void sendUseShip(Ship ship) {
-    socket.sendEvent("us", new Ship.Use(ship.id, ship.system.id));
+    socket.sendEvent("us", new Ship.Use(ship));
   }
   
   public static class Login {

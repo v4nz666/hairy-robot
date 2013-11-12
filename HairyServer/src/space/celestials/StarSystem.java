@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import space.Ship;
+import space.physics.Entity;
 import space.physics.Sandbox;
 import sql.SQL;
 
@@ -66,6 +67,15 @@ public class StarSystem implements Runnable {
     _thread = new Thread(this);
     _thread.start();
     _sandbox.startSandbox();
+  }
+  
+  public void sendEntities(Ship ship, Entity.Request request) {
+    for(int i = 0; i < request.i.length; i++) {
+      Entity e = _sandbox.getEntity(request.i[i]);
+      if(e != null) {
+        ship.sendEntity(e.serializeAdd());
+      }
+    }
   }
   
   public Ship findShip(int id) {
