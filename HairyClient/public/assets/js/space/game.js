@@ -29,12 +29,12 @@ function Game(ctx, socket) {
         priv.lstShip.w = 150;
         priv.guiShipList.addcontrol(priv.lstShip);
         
-        priv.txtChat = new Textbox(this);
+        priv.txtChat = Textbox(this);
         priv.txtChat.visible(false);
         priv.txtChat.w = 200;
         priv.txtChat.backcolour = 'rgba(127, 127, 127, 0.5)';
         priv.txtChat.bordercolour = 'rgba(255, 255, 255, 0.5)';
-        priv.txtChat.onkeypress = $.proxy(function(ev) {
+        priv.txtChat.onkeypress().push(function(ev) {
           if(ev.which === 13) {
             if(priv.txtChat.text().length !== 0) {
               priv.socket.emit('ms', {msg: priv.txtChat.text()});
@@ -45,14 +45,14 @@ function Game(ctx, socket) {
             priv.fraChat.backcolour = null;
             priv.fraChat.bordercolour = null;
           }
-        }, this);
+        });
         
         priv.fraChat = Frame(this);
         priv.fraChat.acceptinput = false;
         priv.fraChat.w = 200;
         priv.fraChat.backcolour = null;
         priv.fraChat.bordercolour = null;
-        priv.fraChat.onrender = $.proxy(function() {
+        priv.fraChat.onrender().push(function() {
           var max = Math.min(priv.maxMessages, priv.messages.length);
           var min = priv.txtChat.visible() ? 0 : Math.max(max - 6, 0);
           
@@ -73,10 +73,10 @@ function Game(ctx, socket) {
           }
           
           ctx.restore();
-        }, this);
+        });
         
-        this.controls().add(priv.txtChat);
-        this.controls().add(priv.fraChat);
+        me.controls().add(priv.txtChat);
+        me.controls().add(priv.fraChat);
         
         me.showshiplist();
       };
