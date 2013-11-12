@@ -38,6 +38,7 @@ public class Planet extends Celestial {
   private Planet(StarSystem system, Celestial parent, double distance, int size, float mass, int temp) {
     super(system, parent, distance, size, mass, temp);
     generateMoons();
+    _add = new Add();
   }
   
   private void generateMoons() {
@@ -49,7 +50,7 @@ public class Planet extends Celestial {
     }
   }
   
-  public String getFill() {
-    return "blue";
+  public class Add extends Celestial.Add {
+    public String getFill() { return "blue"; }
   }
 }

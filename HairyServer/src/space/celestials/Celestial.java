@@ -58,4 +58,9 @@ public abstract class Celestial extends Entity {
       c.addToSandbox(s);
     }
   }
+  
+  public class Add extends Entity.Add {
+    public String getT() { return "c"; }
+    public int getS() { return size; }
+  }
 }

@@ -63,7 +63,7 @@ function Client() {
             priv.entity[e.i].a = e.a;
           } else {
             updates.push(e.i);
-            e.name = 'Loading...';
+            e.n = 'Loading...';
             priv.entity[e.i] = e;
           }
         }
@@ -75,13 +75,14 @@ function Client() {
       };
       
       priv.addentity = function(data) {
-        priv.entity[data.i].name = data.n;
+        $.extend(priv.entity[data.i], data);
         console.log('Got entity', data.i, priv.entity[data.i]);
       };
       
       priv.rendergame = function() {
         priv.calculateoffsets();
         priv.renderentities();
+        priv.rendergui();
       };
       
       priv.calculateoffsets = function() {
@@ -117,22 +118,76 @@ function Client() {
           
           priv.ctx.save();
           
-          var size = 16 / priv.zoomLevel;
-          priv.ctx.textAlign = 'center';
-          priv.ctx.fillStyle = 'white';
-          priv.ctx.fillText(e.name, screenX, screenY - size);
+          if(typeof e.t === 'undefined') {
+            var size = 16 / priv.zoomLevel;
+            priv.ctx.textAlign = 'center';
+            priv.ctx.fillStyle = 'white';
+            priv.ctx.fillText(e.n, screenX, screenY - size);
+            
+            priv.ctx.translate(screenX, screenY);
+            priv.ctx.rotate(e.a * priv.toRads);
+            
+            priv.ctx.beginPath();
+            priv.ctx.moveTo( size, 0);
+            priv.ctx.lineTo(-size, size / 2);
+            priv.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
+            priv.ctx.lineTo(size, 0);
+            priv.ctx.fillStyle = 'rgb(255, 0, 255)';
+            priv.ctx.fill();
+          } else {
+            priv.ctx.save();
+            priv.ctx.beginPath();
+            
+            if(!e.p) {
+              priv.ctx.arc(screenX, screenY, e.s / priv.zoomLevel, 0, priv.PIx2);
+            } else {
+              for(i = 0; i < e.p.length; i++) {
+                var point = e.p[i];
+                if(i === 0) {
+                  priv.ctx.moveTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
+                } else {
+                  priv.ctx.lineTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
+                }
+              }
+            }
+            
+            priv.ctx.closePath();
+            
+            if(e.t === 'a') {
+              priv.ctx.strokeStyle = '#444444';
+              priv.ctx.stroke();
+              priv.ctx.fillStyle = '#333333';
+              priv.ctx.fill();
+            } else {
+              if(e.stroke) {
+                priv.ctx.strokeStyle = e.stroke;
+                priv.ctx.stroke();
+              }
+              
+              if(e.fill) {
+                priv.ctx.fillStyle = e.fill;
+                priv.ctx.fill();
+              }
+            }
+          }
           
-          priv.ctx.translate(screenX, screenY);
-          priv.ctx.rotate(e.a * priv.toRads);
-          
-          priv.ctx.beginPath();
-          priv.ctx.moveTo( size, 0);
-          priv.ctx.lineTo(-size, size / 2);
-          priv.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
-          priv.ctx.lineTo(size, 0);
-          priv.ctx.fillStyle = 'rgb(255, 0, 255)';
-          priv.ctx.fill();
-          
+          priv.ctx.restore();
+        }
+      };
+      
+      priv.rendergui = function() {
+        priv.ctx.save();
+        priv.ctx.fillStyle = 'white';
+        priv.ctx.fillText(priv.fps + ' FPS', 4, 12);
+        
+        if(typeof priv.me !== 'undefined') {
+          priv.ctx.fillText('X:        ' + priv.me.x         + ' Y:        ' + priv.me.y, 4, 24);
+          priv.ctx.fillText('Angle:    ' + priv.me.a, 4, 36);
+          priv.ctx.fillText('X-Offset: ' + priv.offsetX      + ' Y-Offset: ' + priv.offsetY, 4, 48);
+          priv.ctx.fillText('Grid-X:   ' + priv.gridOffsetX  + ' Grid-Y:   ' + priv.gridOffsetY, 4, 60);
+          priv.ctx.fillText('X-Scr:    ' + priv.me.onscreenX + ' Y-Scr:    ' + priv.me.onscreenY, 4, 72);
+          priv.ctx.fillText('Zoom:     ' + priv.zoomLevel, 4, 84);
+          priv.ctx.fillText('CPF:      ' + priv.cpf, 4, 96);
           priv.ctx.restore();
         }
       };
@@ -238,7 +293,7 @@ function Client() {
           priv.guis.push(guiGame);
           
           var useship = function(data) {
-            priv.me = {i: data.i, x: 0, y: 0, a: 0, name: data.n};
+            priv.me = {i: data.i, x: 0, y: 0, a: 0, n: data.n};
             priv.entity[data.i] = priv.me;
             guiGame.useship(data);
             console.log('Got Me', data.i, priv.me);

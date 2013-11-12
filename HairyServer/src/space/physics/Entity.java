@@ -14,8 +14,8 @@ public abstract class Entity {
   
   public ConcurrentLinkedDeque<Update> updateList = new ConcurrentLinkedDeque<>();
   
-  private Add    _add    = new Add();
-  private Update _update = new Update();
+  protected Add    _add    = new Add();
+  protected Update _update = new Update();
   
   public Add    serializeAdd()    { return _add; }
   public Update serializeUpdate() { return _update; }
@@ -79,7 +79,7 @@ public abstract class Entity {
   }
   
   public boolean isNear(Entity e) {
-    return Math.sqrt(Math.pow(x - e.x, 2) + Math.pow(y - e.y, 2)) + e.size / 2 <= 2000;
+    return Math.sqrt(Math.pow(x - e.x, 2) + Math.pow(y - e.y, 2)) - e.size / 2 <= 2000;
   }
   
   public class Add {
