@@ -1,5 +1,7 @@
 package space.physics;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 public abstract class Entity {
   public final int id;
   public final String name;
@@ -9,6 +11,8 @@ public abstract class Entity {
   public double maxVel;
   public int size;
   public int spawnID;
+  
+  public ConcurrentLinkedDeque<Update> updateList = new ConcurrentLinkedDeque<>();
   
   private Add    _add    = new Add();
   private Update _update = new Update();
@@ -72,6 +76,10 @@ public abstract class Entity {
   
   public void stop() {
     vx = vy = acc = 0;
+  }
+  
+  public boolean isNear(Entity e) {
+    return Math.sqrt(Math.pow(x - e.x, 2) + Math.pow(y - e.y, 2)) <= 2000;
   }
   
   public class Add {

@@ -34,21 +34,22 @@ function Client() {
       priv.update = function(data) {
         var updates = [];
         
-        for(key in priv.entity) {
+        for(var key in priv.entity) {
           if(key === 'length') { continue; }
           
-          var id = priv.entity[key].id;
+          var id = priv.entity[key].i;
           var exists = false;
           
           for(var i = 0; i < data.length; i++) {
-            if(id === data[i].id) {
+            if(id === data[i].i) {
               exists = true;
               break;
             }
           }
           
           if(!exists) {
-            console.log('Removing entity', priv.entity[key]);
+            console.log(data);
+            console.log('Removing entity', key, priv.entity[key]);
             delete priv.entity[key];
           }
         }

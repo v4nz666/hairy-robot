@@ -162,7 +162,7 @@ public class StarSystem implements Runnable {
   
   private void tick(double deltaT) {
     for(Ship ship : _ship) {
-      ship.sendUpdate(_sandbox.getUpdates());
+      ship.sendUpdate(ship.updateList.toArray(new Entity.Update[0]));
     }
   }
 }
