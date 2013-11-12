@@ -79,7 +79,7 @@ public abstract class Entity {
   }
   
   public boolean isNear(Entity e) {
-    return Math.sqrt(Math.pow(x - e.x, 2) + Math.pow(y - e.y, 2)) <= 2000;
+    return Math.sqrt(Math.pow(x - e.x, 2) + Math.pow(y - e.y, 2)) + e.size / 2 <= 2000;
   }
   
   public class Add {
