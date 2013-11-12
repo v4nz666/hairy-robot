@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import space.physics.Entity;
+import space.physics.Sandbox;
 
 public abstract class Celestial extends Entity {
   @Override
@@ -48,5 +49,13 @@ public abstract class Celestial extends Entity {
   
   public boolean addCelestial(Celestial c) {
     return _celestial.add(c);
+  }
+  
+  public void addToSandbox(Sandbox s) {
+    s.addToSandbox(this);
+    
+    for(Celestial c : _celestial) {
+      c.addToSandbox(s);
+    }
   }
 }
