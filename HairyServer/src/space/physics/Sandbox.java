@@ -1,8 +1,9 @@
 package space.physics;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class Sandbox implements Runnable {
+public class Sandbox implements Runnable, Iterable<Entity> {
   private Thread _thread;
   private boolean _running;
   
@@ -54,23 +55,13 @@ public class Sandbox implements Runnable {
         for(CollisionTracker<? extends Entity, ? extends Entity> c : _collision) {
           c.check(e);
         }
-        
-        ConcurrentLinkedDeque<Entity.Update> update = new ConcurrentLinkedDeque<>();
-        
-        for(Entity e2 : _obj) {
-          if(e.isNear(e2)) {
-            update.add(e2.serializeUpdate());
-          }
-        }
-        
-        e.updateList = update;
       }
       
       if(tickTime <= System.nanoTime()) {
         _tps = ticks;
         ticks = 0;
         tickTime = System.nanoTime() + 1000000000;
-        //System.out.println(_tps + " ticks per second");
+        System.out.println(_tps + " ticks per second");
       }
       
       ticks++;
@@ -145,5 +136,10 @@ public class Sandbox implements Runnable {
   
   public static interface CollisionCallback<T extends Entity, U extends Entity> {
     public void hit(T entity, U hitBy);
+  }
+  
+  @Override
+  public Iterator<Entity> iterator() {
+    return _obj.iterator();
   }
 }

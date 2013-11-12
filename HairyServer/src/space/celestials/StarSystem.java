@@ -63,6 +63,8 @@ public class StarSystem implements Runnable {
     star = Star.generate(this, null, 0);
     initOrbits();
     
+    star.addToSandbox(_sandbox);
+    
     _running = true;
     _thread = new Thread(this);
     _thread.start();
@@ -162,6 +164,14 @@ public class StarSystem implements Runnable {
   
   private void tick(double deltaT) {
     for(Ship ship : _ship) {
+      ship.updateList.clear();
+      
+      for(Entity e : _sandbox) {
+        if(ship.isNear(e)) {
+          ship.updateList.add(e.serializeUpdate());
+        }
+      }
+      
       ship.sendUpdate(ship.updateList.toArray(new Entity.Update[0]));
     }
   }
