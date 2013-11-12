@@ -175,12 +175,12 @@ function Client() {
         
         var scale = Math.round(c.celestial.length / 360);
         
-        start = Math.floor(start * scale - 50);
+        start = Math.floor(start * scale - 150);
         if(start < 0) {
           start += c.celestial.length;
         }
         
-        var end = (start + 100);
+        var end = (start + 300);
         
         for(var i = start; i < end; i++) {
           if(i < c.celestial.length) {

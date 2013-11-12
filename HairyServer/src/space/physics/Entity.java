@@ -1,6 +1,7 @@
 package space.physics;
 
 public abstract class Entity {
+  
   public final int id;
   public double x, y;
   public double vx, vy;

@@ -2,6 +2,7 @@ package space.physics;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import space.celestials.Celestial;
 public class Sandbox implements Runnable {
   private Thread _thread;
   private boolean _running;
@@ -16,7 +17,19 @@ public class Sandbox implements Runnable {
   public int tps() { return _tps; }
   
   public void addToSandbox(Entity m) {
-    _obj.add(m);
+    Celestial p = (Celestial)m;
+    if ( p instanceof Celestial ) {
+      Celestial[] children = p.getCelestial();
+      if ( children.length > 0 ) {
+        for (int i = 0; i < children.length; i++) {
+          this.addToSandbox(children[i]);
+        }
+      } else {
+        _obj.add(p);
+      }
+    } else {
+      _obj.add(m);
+    }
   }
   
   public void removeFromSandbox(Entity m) {
@@ -50,7 +63,7 @@ public class Sandbox implements Runnable {
         _tps = ticks;
         ticks = 0;
         tickTime = System.nanoTime() + 1000000000;
-        //System.out.println(_tps + " ticks per second");
+        System.out.println("Sandbox: " + _tps + " ticks per second.");
       }
       
       ticks++;
