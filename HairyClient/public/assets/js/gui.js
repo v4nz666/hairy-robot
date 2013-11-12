@@ -697,29 +697,29 @@ function Textbox(gui) {
       me.textSuper = me.text;
       me.text = function(text) {
         if(typeof text === 'undefined') {
-          return this.textSuper(text);
+          return me.textSuper(text);
         } else {
-          this.textSuper(text);
-          this.textW = me.ctx.measureText(text).width;
-          this.textH = getTextHeight(me.ctx.font).ascent;
-          this.selstart(text.length);
+          me.textSuper(text);
+          me.textW = me.ctx.measureText(text).width;
+          me.textH = getTextHeight(me.ctx.font).ascent;
+          me.selstart(text.length);
         }
       }
       
       me.selstart = function(selstart) {
-        _selstart = constrain(selstart, 0, this.text().length);
-        this.selx = me.ctx.measureText(this.text().substr(0, selstart)).width;
+        _selstart = constrain(selstart, 0, me.text().length);
+        me.selx = me.ctx.measureText(me.text().substr(0, selstart)).width;
       }
       
       me.renderControlSuper = me.renderControl;
       me.renderControl = function() {
         me.ctx.save();
         me.ctx.translate(2, 0);
-        this.renderControlSuper();
+        me.renderControlSuper();
         
-        if(this.focus) {
-          me.ctx.fillStyle = this.forecolour;
-          me.ctx.fillRect(this.selx, (this.h - this.textH) / 2, 1, this.textH);
+        if(me.focus) {
+          me.ctx.fillStyle = me.forecolour;
+          me.ctx.fillRect(me.selx, (me.h - me.textH) / 2, 1, me.textH);
         }
         
         me.ctx.restore();
@@ -728,8 +728,8 @@ function Textbox(gui) {
       me.onkeypress().push(function(ev) {
         if(ev.which !== 13) {
           var s = _selstart;
-          this.text(this.text().substr(0, _selstart) + String.fromCharCode(ev.which) + this.text().substr(_selstart, this.text().length));
-          this.selstart(s + 1);
+          me.text(me.text().substr(0, _selstart) + String.fromCharCode(ev.which) + me.text().substr(_selstart,  me.text().length));
+          me.selstart(s + 1);
         }
       });
       
@@ -738,8 +738,8 @@ function Textbox(gui) {
           case 8:
             if(_selstart > 0) {
               var s = _selstart;
-              this.text(this.text().substr(0, _selstart - 1) + this.text().substr(_selstart, this.text().length));
-              this.selstart(s - 1);
+              me.text(me.text().substr(0, _selstart - 1) + me.text().substr(_selstart, me.text().length));
+              me.selstart(s - 1);
             }
             
             break;
@@ -747,22 +747,20 @@ function Textbox(gui) {
           case 46:
             if(_selstart < this.text().length) {
               var s = _selstart;
-              this.text(this.text().substr(0, _selstart) + this.text().substr(_selstart + 1, this.text().length));
-              this.selstart(s);
+              me.text(me.text().substr(0, _selstart) + me.text().substr(_selstart + 1, me.text().length));
+              me.selstart(s);
             }
             
             break;
           
           case 37:
-            this.selstart(_selstart - 1);
+            me.selstart(_selstart - 1);
             break;
           
           case 39:
-            this.selstart(_selstart + 1);
+            me.selstart(_selstart + 1);
             break;
         }
-        
-        this.keydownSuper(ev);
       });
       
       return me;
