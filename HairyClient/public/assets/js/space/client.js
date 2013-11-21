@@ -107,7 +107,6 @@ function Client() {
             priv.celestial[e.i].a = e.a;
           } else {
             updates.push(e.i);
-            e.n = 'Loading...';
             priv.celestial[e.i] = e;
           }
         }
