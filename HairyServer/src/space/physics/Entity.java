@@ -1,7 +1,5 @@
 package space.physics;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 public abstract class Entity {
   public final int id;
   public final String name;
@@ -11,8 +9,6 @@ public abstract class Entity {
   public double maxVel;
   public int size;
   public int spawnID;
-  
-  public ConcurrentLinkedDeque<Update> updateList = new ConcurrentLinkedDeque<>();
   
   protected Add    _add    = new Add();
   protected Update _update = new Update();

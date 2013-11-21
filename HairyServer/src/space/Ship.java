@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import space.celestials.StarSystem;
 import space.physics.Entity;
@@ -29,6 +30,8 @@ public class Ship extends Entity {
       return ship;
     }
   }
+
+  public final ConcurrentLinkedDeque<Update> updateList = new ConcurrentLinkedDeque<>();
   
   private User _user;
   
