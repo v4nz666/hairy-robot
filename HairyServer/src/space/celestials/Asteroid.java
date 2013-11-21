@@ -20,13 +20,11 @@ public class Asteroid  extends Celestial{
   
   private Asteroid(StarSystem system, double distance, int size) {
     super(system, system.star, distance, size, 0, 0);
+    _add = new Add();
   }
   
-  public String getType() {
-    return "a";
-  }
-  
-  public Coord[] getPoints() {
-    return _points;
+  public class Add extends Celestial.Add {
+    public String getT() { return "a"; }
+    public Coord[] getP() { return _points; }
   }
 }

@@ -76,9 +76,10 @@ public class AsteroidBelt extends Celestial {
 
   private AsteroidBelt(StarSystem system, Celestial parent, double distance, int size, float mass, int temp) {
     super(system, parent, distance, size, mass, temp);
+    _add = new Add();
   }
   
-  public String getType() {
-    return "b";
+  public class Add extends Celestial.Add {
+    public String getT() { return "b"; }
   }
 }

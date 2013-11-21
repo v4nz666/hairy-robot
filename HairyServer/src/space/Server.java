@@ -1,15 +1,20 @@
 package space;
 
+import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
+
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import space.celestials.StarSystem;
+import space.events.CelestialRequest;
 import space.events.Disconnect;
+import space.events.EntityRequest;
 import space.events.Keys;
 import space.events.Login;
 import space.events.Message;
-import space.physics.Sandbox;
+import space.events.UseShip;
+import space.physics.Entity;
 import sql.MySQL;
 import sql.SQL;
 
@@ -21,16 +26,15 @@ public class Server {
   private static Server _instance = new Server();
   public static Server instance() { return _instance; }
   
-  public static StarSystem star_system = new StarSystem();
+  private ArrayList<StarSystem> _system;
   
   public final double acc = 1 * 0.0625;
   public final double dec = 0.75 * 0.0625;
   
   private ConcurrentLinkedDeque<User> _user = new ConcurrentLinkedDeque<>();
-  private HashMap<SocketIOClient, User> _userMap = new HashMap<>();
+  private ConcurrentHashMapV8<SocketIOClient, User> _userMap = new ConcurrentHashMapV8<>();
   
   private SocketIOServer _server;
-  private Sandbox _sandbox = new Sandbox();
   
   private boolean _running;
   private int _tps = 60;
@@ -39,36 +43,38 @@ public class Server {
   
   private Server() { }
   
-  private static int _id;
-  public static int getID() { return _id++; }
-  
   public int tps() { return _tps; }
   
-  public void start() throws InterruptedException, InstantiationException, IllegalAccessException {
+  public void start() throws InterruptedException, InstantiationException, IllegalAccessException, SQLException {
     System.out.println("Initialising...");
     
     _sql = SQL.create(MySQL.class);
     _sql.connect("project1.monoxidedesign.com", "hairydata", "hairydata", "WaRcebYmnz4eSnGs");
+    
+    _system = StarSystem.load();
     
     Configuration config = new Configuration();
     config.setPort(9092);
     
     _server = new SocketIOServer(config);
     _server.addDisconnectListener(new Disconnect());
-    _server.addEventListener("login", User.Login.class, new Login());
-    _server.addEventListener("msg", User.Message.class, new Message());
-    _server.addEventListener("keys", User.Keys.class, new Keys());
+    _server.addEventListener("lo", User.Login.class, new Login());
+    _server.addEventListener("ms", User.Message.class, new Message());
+    _server.addEventListener("us", Ship.Use.class, new UseShip());
+    _server.addEventListener("er", Entity.Request.class, new EntityRequest());
+    _server.addEventListener("cr", Entity.Request.class, new CelestialRequest());
+    _server.addEventListener("ke", Ship.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");
     
     _server.start();
-    _sandbox.startSandbox();
     
     System.out.println("Server running.");
     
+    _sandbox.addToSandbox(star_system.star);
+    
     gameLoop();
     
-    _sandbox.stopSandbox();
     _server.stop();
     _sql.close();
   }
@@ -77,34 +83,37 @@ public class Server {
     _server.getBroadcastOperations().sendEvent(name, packet);
   }
   
+  public void broadcastMessage(String from, String message) {
+    broadcastEvent("ms", new User.Message(from, message));
+  }
+  
   public User userFromSocket(SocketIOClient socket) {
     return _userMap.get(socket);
   }
   
-  public void addUser(SocketIOClient socket, String name, String auth) {
-    User user = null;
+  public Ship findShip(int systemID, int shipID) {
+    for(StarSystem system : _system) {
+      if(system.id == systemID) {
+        return system.findShip(shipID);
+      }
+    }
     
+    return null;
+  }
+  
+  public void addUser(SocketIOClient socket, User.Login data) {
     try {
-      user = User.getUserIfAuthed(socket, name, auth, star_system);
+      User user = User.getUserIfAuthed(socket, data);
+      
+      _user.add(user);
+      _userMap.put(socket, user);
+      
+      System.out.println("New user added " + user.id);
+      
+      user.serializeLoginResponse().send();
     } catch(SQLException e) {
       e.printStackTrace();
-      return;
     }
-    
-    for(User u : _user) {
-      socket.sendEvent("adduser", u.serializeAdd());
-    }
-    
-    broadcastEvent("adduser", user.serializeAdd());
-    
-    _user.add(user);
-    _userMap.put(socket, user);
-    _sandbox.addToSandbox(user);
-    
-    System.out.println("New user added " + user.id);
-    
-    socket.sendEvent("setParams", user.serializeParams());
-    socket.sendEvent("setSystem", user.serializeSystem());
   }
   
   public void removeUser(SocketIOClient socket) {
@@ -114,16 +123,9 @@ public class Server {
     
     if(user != null) {
       System.out.println("Disconnecting " + user.id);
-      broadcastEvent("remuser", user.serializeRemove());
       
-      _sandbox.removeFromSandbox(user);
+      user.leaveShip();
       _user.remove(user);
-      
-      try {
-        user.save();
-      } catch(SQLException e) {
-        e.printStackTrace();
-      }
     }
   }
   
@@ -137,7 +139,7 @@ public class Server {
     while(_running) {
       time = System.nanoTime();
       
-      tick(timeDelta / interval);
+      //tick(timeDelta / interval);
       
       // Track FPS
       if(tickTime <= System.nanoTime()) {
@@ -160,7 +162,7 @@ public class Server {
     }
   }
   
-  private void tick(double deltaT) {
+  /*private void tick(double deltaT) {
     User.Update[] update = new User.Update[_user.size()];
     
     int i = 0;
@@ -177,9 +179,5 @@ public class Server {
     public Update(User.Update[] usersOnScreen) {
       this.usersOnScreen = usersOnScreen;
     }
-  }
-
-  public static StarSystem getCurrentSystem(User user) {
-    return star_system;
-  }
+  }*/
 }

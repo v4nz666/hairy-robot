@@ -10,36 +10,9 @@ function MainMenu(ctx) {
       
       me.onplay = null;
       me.init = function() {
-        var btnPlay = Button(me);
-        btnPlay.x = 10;
-        btnPlay.y = 10;
-        btnPlay.w = 180;
-        btnPlay.text('Play');
-        btnPlay.onclick = $.proxy(function(ev) {
-          me.refreshships();
-          fraShip.visible(true);
-        }, me);
-        
-        var btnEdit = new Button(me);
-        btnEdit.x = 10;
-        btnEdit.y = 30;
-        btnEdit.w = 180;
-        btnEdit.text('Edit Ships');
-        btnEdit.onclick = $.proxy(function(ev) {
-          btnEdit.gui.pop();
-          me.guis.push(ShipEditor(ctx));
-        }, me);
-        
-        var fraMenu = Frame(me);
-        fraMenu.w = 200;
-        fraMenu.h = 100;
-        fraMenu.controls.add(btnPlay);
-        fraMenu.controls.add(btnEdit);
-        
         var fraShip = Frame(me);
         fraShip.w = 200;
         fraShip.h = 100;
-        fraShip.visible(false);
         
         var btnUse = Button(me);
         btnUse.text('Use');
@@ -61,18 +34,14 @@ function MainMenu(ctx) {
         fraShip.controls.add(lstShip);
         fraShip.controls.add(btnUse);
         
-        me.controls.add(fraMenu);
         me.controls.add(fraShip);
         me.onresize = $.proxy(function() {
-          fraMenu.x = (ctx.canvas.width  - fraMenu.w) / 2;
-          fraMenu.y = (ctx.canvas.height - fraMenu.h) / 2;
           fraShip.x = (ctx.canvas.width  - fraShip.w) / 2;
           fraShip.y = (ctx.canvas.height - fraShip.h) / 2;
         }, me);
         
         var selectship = function(item) {
-          priv.ship = Ship();
-          priv.ship.deserialize(item.ship);
+          priv.ship = item.ship;
         };
         
         me.refreshships = function() {
@@ -101,6 +70,8 @@ function MainMenu(ctx) {
         me.getShip = function() {
           return priv.ship;
         }
+        
+        me.refreshships();
       }
       
       return me;

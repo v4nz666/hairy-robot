@@ -23,8 +23,17 @@ class StorageController extends \Controller {
     }
   }
   
-  public function ships() {
-    return \Auth::user()->spaceUser->ships->toJSON();
+  public function ships($type = null) {
+    switch($type) {
+      case 'mine':
+        return \Auth::user()->ships()->mine()->get()->toJson();
+        
+      case 'shared':
+        return \Auth::user()->ships()->shared()->get()->toJson();
+        
+      default:
+        return \Auth::user()->ships->toJSON();
+    }
   }
   
   public function saveship() {
