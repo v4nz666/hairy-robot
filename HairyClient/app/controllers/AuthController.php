@@ -33,7 +33,7 @@ class AuthController extends Controller {
       
       return Redirect::route('home');
     } else {
-      return Redirect::route('home')->withInput(Input::only('username'))->withErrors($validator);
+      return Redirect::route('register')->withInput(Input::only('username', 'faction'))->withErrors($validator);
     }
   }
   
