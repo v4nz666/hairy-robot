@@ -57,8 +57,16 @@ public class User {
     socket.sendEvent("ea", add);
   }
   
+  public void sendCelestial(Entity.Add add) {
+    socket.sendEvent("ca", add);
+  }
+  
   public void sendUpdate(Entity.Update[] update) {
     socket.sendEvent("up", update);
+  }
+  
+  public void sendCelestials(Entity.Update[] update) {
+    socket.sendEvent("cp", update);
   }
   
   public void useShip(Ship.Use data) {
