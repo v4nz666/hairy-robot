@@ -1,9 +1,9 @@
 package space.physics;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import space.celestials.Celestial;
-public class Sandbox implements Runnable {
+public class Sandbox implements Runnable, Iterable<Entity> {
   private Thread _thread;
   private boolean _running;
   
@@ -40,13 +40,23 @@ public class Sandbox implements Runnable {
     _collision.add(new CollisionTracker<T, U>(entity, hitBy, callback));
   }
   
+  public Entity getEntity(int id) {
+    for(Entity e : _obj) {
+      if(e.id == id) {
+        return e;
+      }
+    }
+    
+    return null;
+  }
+  
   public void run() {
-    _interval = 1000000000 / _ticksPerSecond;
+    _interval = 1000000000l / _ticksPerSecond;
     _running = true;
     
     long time, timeDelta = _interval;
     int ticks = 0;
-    long tickTime = System.nanoTime() + 1000000000;
+    long tickTime = System.nanoTime() + 1000000000l;
     
     while(_running) {
       time = System.nanoTime();
@@ -62,8 +72,8 @@ public class Sandbox implements Runnable {
       if(tickTime <= System.nanoTime()) {
         _tps = ticks;
         ticks = 0;
-        tickTime = System.nanoTime() + 1000000000;
-        System.out.println("Sandbox: " + _tps + " ticks per second.");
+        tickTime = System.nanoTime() + 1000000000l;
+        //System.out.println(_tps + " ticks per second");
       }
       
       ticks++;
@@ -71,8 +81,8 @@ public class Sandbox implements Runnable {
       // Sleep each loop if we have extra time
       timeDelta = System.nanoTime() - time;
       long timeSleep = _interval - timeDelta;
-      long timeDeltaMS = timeSleep / 1000000;
-      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000);
+      long timeDeltaMS = timeSleep / 1000000l;
+      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000l);
       if(timeSleep > 0) {
         try { Thread.sleep(timeDeltaMS, timeDeltaNS); } catch(InterruptedException e) { e.printStackTrace(); }
       }
@@ -138,5 +148,10 @@ public class Sandbox implements Runnable {
   
   public static interface CollisionCallback<T extends Entity, U extends Entity> {
     public void hit(T entity, U hitBy);
+  }
+  
+  @Override
+  public Iterator<Entity> iterator() {
+    return _obj.iterator();
   }
 }

@@ -1,21 +1,17 @@
 function Client() {
   return {
     socket: null,
-    inGame: false,
+    canvas: null,
+    ctx: null,
     
-    user: [],
-    me: null,
+    entity: [],
+    celestial: [],
     
-    guis: new GUIs(),
-    
-    effects: [],
-    
-    keys: 0,
+    guis: GUIs(),
     
     ticks: 0,
     fps: 0,
     fpsTicks: 0,
-    cpf: 0,
     
     toRads: Math.PI / 180,
     toDegs: 180 / Math.PI,
@@ -31,636 +27,358 @@ function Client() {
     zoomSpeed: 1,
     maxZoom: 65536,
     
-    clear: function(clr) {
-      if(typeof clr === 'undefined') {
-        clr = 'rgb(0,0,0)';
-      }
-      
-      this.ctx.save();
-      this.ctx.fillStyle = clr;
-      this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-      this.ctx.restore();
-    },
+    clearColour: '#000000',
     
-    render: function() {
-      this.clear();
-      this.ctx.save();
-      this.guis.render();
-      this.ctx.restore();
-      this.ticks++;
-      this.fpsTicks++;
-      this.cpf = 0;
-    },
-    
-    renderGame: function() {
-      if(!this.system) { return; }
+    create: function() {
+      var priv = this;
       
-      this.calculateOffsets();
-      
-      this.renderBackground();
-      this.renderCelestials();
-      this.renderUsers();
-      this.renderEffects();
-      this.renderGUI();
-    },
-    
-    calculateOffsets: function() {
-      this.offsetX = Math.floor(this.me.x - (this.ctx.canvas.width / 2 * this.zoomLevel));
-      this.offsetY = Math.floor(this.me.y - (this.ctx.canvas.height / 2 * this.zoomLevel));
-      
-      this.me.onscreenX = Math.floor(this.ctx.canvas.width / 2);
-      this.me.onscreenY = Math.floor(this.ctx.canvas.height / 2);
-      
-      this.gridOffsetX = Math.floor((this.offsetX / this.zoomLevel) % this.gridSize);
-      this.gridOffsetY = Math.floor((this.offsetY / this.zoomLevel) % this.gridSize);
-      
-      this.offsetXScaled = this.offsetX / this.zoomLevel;
-      this.offsetYScaled = this.offsetY / this.zoomLevel;
-    },
-    
-    renderBackground: function() {
-      if(this.zoomLevel > 64) { return; }
-      
-      var ctx = this.ctx;
-      
-      ctx.save();
-      
-      var _x = 0;
-      var c = 1;
-      
-      ctx.strokeStyle = this.gridColor;
-      
-      while(c * this.gridSize / this.zoomLevel - this.gridOffsetX < ctx.canvas.width) {
-        _x = (c * this.gridSize / this.zoomLevel) - this.gridOffsetX;
-        ctx.beginPath();
-        ctx.moveTo(_x, 0);
-        ctx.lineTo(_x, ctx.canvas.height);
-        ctx.lineWidth = 1;
+      priv.update = function(data) {
+        var updates = [];
         
-        ctx.stroke();
-        
-        c = c + 1;
-      }
-      
-      var _y = 0;
-      c = 1;
-      
-      while((c * this.gridSize / this.zoomLevel) - this.gridOffsetY < ctx.canvas.height) {
-        _y = (c * this.gridSize / this.zoomLevel) - this.gridOffsetY;
-        ctx.beginPath();
-        ctx.moveTo(0, _y);
-        ctx.lineTo(ctx.canvas.width, _y);
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        
-        c = c + 1;
-      }
-      
-      ctx.restore();
-    },
-    
-    renderCelestials: function() {
-      this.renderCelestial(this.system.star);
-    },
-    
-    renderCelestial: function(c) {
-      if(this.onscreen2(c)) {
-        this.cpf++;
-        
-        var ctx = this.ctx;
-        
-        var screenX = c.xScaled - this.offsetXScaled;
-        var screenY = c.yScaled - this.offsetYScaled;
-        
-        ctx.save();
-        ctx.beginPath();
-        
-        if(!c.points) {
-          ctx.arc(screenX, screenY, c.sizeScaled, 0, this.PIx2);
-        } else {
-          for(i = 0; i < c.points.length; i++) {
-            var point = c.points[i];
-            if(i === 0) {
-              ctx.moveTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
-            } else {
-              ctx.lineTo(screenX + point.x / this.zoomLevel, screenY + point.y / this.zoomLevel);
+        for(var key in priv.entity) {
+          if(key === 'length') { continue; }
+          
+          var id = priv.entity[key].i;
+          var exists = false;
+          
+          for(var i = 0; i < data.length; i++) {
+            if(id === data[i].i) {
+              exists = true;
+              break;
             }
           }
-        }
-        ctx.closePath();
-        
-        if(c.type === 'a') {
-          ctx.strokeStyle = '#444444';
-          ctx.stroke();
-          ctx.fillStyle = '#333333';
-          ctx.fill();
-        } else {
-          if(c.stroke) {
-            ctx.strokeStyle = c.stroke;
-            ctx.stroke();
-          }
           
-          if(c.fill) {
-            ctx.fillStyle = c.fill;
-            ctx.fill();
+          if(!exists) {
+            console.log(data);
+            console.log('Removing entity', key, priv.entity[key]);
+            delete priv.entity[key];
           }
         }
         
-        ctx.restore();
-      }
-      
-      if(c.type === 'b') {
-        var start = Math.atan2(this.me.y - c.y, this.me.x - c.x) * this.toDegs;
-        if(start < 0) start += 360;
-        
-        var scale = Math.round(c.celestial.length / 360);
-        
-        start = Math.floor(start * scale - 150);
-        if(start < 0) {
-          start += c.celestial.length;
-        }
-        
-        var end = (start + 300);
-        
-        for(var i = start; i < end; i++) {
-          if(i < c.celestial.length) {
-            this.renderCelestial(c.celestial[i]);
+        for(var i = 0; i < data.length; i++) {
+          var e = data[i];
+          
+          if(typeof priv.entity[e.i] !== 'undefined') {
+            priv.entity[e.i].x = e.x;
+            priv.entity[e.i].y = e.y;
+            priv.entity[e.i].a = e.a;
           } else {
-            this.renderCelestial(c.celestial[i - start]);
-          }
-        }
-      } else {
-        for(var i = 0; i < c.celestial.length; i++) {
-          this.renderCelestial(c.celestial[i]);
-        }
-      }
-    },
-    
-    renderUsers: function() {
-      var screenX = 0;
-      var screenY = 0;
-      
-      for(key in this.user) {
-        if(key === 'length') { continue; }
-        
-        user = this.user[key];
-        
-        if(user.id == this.me.id) {
-          screenX = this.me.onscreenX;
-          screenY = this.me.onscreenY;
-        } else {
-          screenX = (user.x - this.offsetX) / this.zoomLevel;
-          screenY = (user.y - this.offsetY) / this.zoomLevel;
-          
-          if(!this.onscreen(user, screenX, screenY)) {
-            continue;
+            updates.push(e.i);
+            e.n = 'Loading...';
+            priv.entity[e.i] = e;
           }
         }
         
-        this.ctx.save();
-        
-        var size = 16 / this.zoomLevel;
-        this.ctx.textAlign = 'center';
-        this.ctx.fillStyle = 'white';
-        this.ctx.fillText(user.name, screenX, screenY - size);
-        
-        this.ctx.translate(screenX, screenY);
-        this.ctx.rotate(user.angle * this.toRads);
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo( size, 0);
-        this.ctx.lineTo(-size, size / 2);
-        this.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
-        this.ctx.lineTo(size, 0);
-        this.ctx.fillStyle = 'rgb(255, 0, 255)';
-        this.ctx.fill();
-        
-        this.ctx.restore();
-      }
-    },
-    
-    renderEffects: function() {
-      for(key in this.effects) {
-        effect = this.effects[key];
-        this.renderEffect(effect);
-        
-        if(effect.particles.length === 0) {
-          delete this.effects[key];
+        if(updates.length > 0) {
+          priv.socket.emit('er', {i: updates});
+          console.log('Sending entity request', updates);
         }
-      }
-    },
-    
-    renderEffect: function(expl) {
-      var ctx = this.ctx;
-
-      for(key in expl.particles) {
-        p = expl.particles[key];
-        
-        var theta = p.angle * this.toRads;
-        var vX = Math.cos(theta) * p.v;
-        var vY = Math.sin(theta) * p.v;
-        
-        p.x = p.x + vX;
-        p.y = p.y + vY;
-        
-        if(p.x < -p.size || p.x > this.width  + p.size ||
-           p.y < -p.size || p.y > this.height + p.size) {
-          delete expl.particles[i];
-        }
-        
-        screenX = (p.x - this.offsetX) / this.zoomLevel;
-        screenY = (p.y - this.offsetY) / this.zoomLevel;
-        
-        if(!this.onscreen(p, screenX, screenY)) {
-          continue;
-        }
-        
-        ctx.save();
-        
-        ctx.beginPath();
-        ctx.arc(screenX, screenY, p.size, 0, this.PIx2);
-        ctx.closePath();
-        ctx.fillStyle = 'rgb(' + p.r + ',' + p.g + ',' + p.b + ')';
-        ctx.fill();
-        ctx.restore();
-        
-        p.ttl--;
-        if(p.ttl == 0) {
-          delete expl.particles[key];
-        }
-      }
-    },
-    
-    renderGUI: function() {
-      this.ctx.save();
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillText(this.fps + ' FPS', 4, 12);
-      this.ctx.fillText('X:        ' + this.me.x         + ' Y:        ' + this.me.y, 4, 24);
-      this.ctx.fillText('Angle:    ' + this.me.angle, 4, 36);
-      this.ctx.fillText('X-Offset: ' + this.offsetX      + ' Y-Offset: ' + this.offsetY, 4, 48);
-      this.ctx.fillText('Grid-X:   ' + this.gridOffsetX  + ' Grid-Y:   ' + this.gridOffsetY, 4, 60);
-      this.ctx.fillText('X-Scr:    ' + this.me.onscreenX + ' Y-Scr:    ' + this.me.onscreenY, 4, 72);
-      this.ctx.fillText('Zoom:     ' + this.zoomLevel, 4, 84);
-      this.ctx.fillText('CPF:      ' + this.cpf, 4, 96);
-      this.ctx.restore();
-    },
-    
-    resize: function() {
-      this.canvas.width  = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-      this.guis.resize();
-    },
-    
-    init: function() {
-      stat.load([{type: 'parts', cb: function() {
-        var draw = function(ctx, render) {
-          eval(this.render);
-        }
-        
-        for(var i = 0; i < stat.parts.length; i++) {
-          stat.parts[i].draw = draw;
-        }
-      }}]);
+      };
       
-      this.canvas = $('#canvas')[0];
-      this.ctx = canvas.getContext('2d');
-      
-      var frameRate = 60;
-      var tickRate = 1000 / frameRate;
-      
-      // Hook our events
-      $(document).bind     ('contextmenu', function() { return false; });
-      $(document).keydown  ($.proxy(this.guis.keydown  , this.guis));
-      $(document).keyup    ($.proxy(this.guis.keyup    , this.guis));
-      $(document).keypress ($.proxy(this.guis.keypress , this.guis));
-      $(document).mousemove($.proxy(this.guis.mousemove, this.guis));
-      $(document).mousedown($.proxy(this.guis.mousedown, this.guis));
-      $(document).mouseup  ($.proxy(this.guis.mouseup  , this.guis));
-      $(window)  .resize   ($.proxy(this.resize        , this));
-      
-      setInterval($.proxy(this.render, this), tickRate);
-      setInterval($.proxy(function() {
-        this.fps = this.fpsTicks;
-        this.fpsTicks = 0;
-      }, this), 1000);
-      
-      this.resize();
-      this.initMenu();
-    },
-    
-    gotchat: function(msg) {
-    
-    },
-    
-    initMenu: function() {
-      var menu = MainMenu(this.ctx);
-      
-      menu.onplay = $.proxy(function() {
-        var msg = Message(this.ctx, 'Connecting...');
-        this.guis.push(msg);
+      priv.updatecelestials = function(data) {
+        var updates = [];
         
-        this.socket = io.connect(ip + ':' + port, {'reconnect': false});
-        this.socket.on('connect', $.proxy(function() {
-          msg.text('Logging in...');
+        for(var key in priv.celestial) {
+          if(key === 'length') { continue; }
           
-          this.socket.on('adduser',   $.proxy(this.addUser, this));
-          this.socket.on('setParams', $.proxy(function(data) {
-            msg.pop();
-            menu.pop();
-            this.initGame();
-            this.setParams(data);
-          }, this));
-          this.socket.on('setSystem', $.proxy(this.setSystem, this));
+          var id = priv.celestial[key].i;
+          var exists = false;
           
-          this.socket.emit('login', {name: name, auth: auth});
-        }, this));
-      }, this);
-      
-      this.guis.push(menu);
-      
-      var name = $('input[name=username]').val();
-      var auth = $('input[name=auth]').val();
-      var ip   = $('input[name=ip]').val();
-      var port = $('input[name=port]').val();
-    },
-    
-    addUser: function(data) {
-      console.log('Adding user[', data, ']');
-      var user = User();
-      user.id = data.id;
-      user.name = data.name;
-      this.user[user.id] = user;
-      this.gotchat({id: 'Server', msg: user.name + ' has joined the game!'});
-    },
-    
-    remUser: function(data) {
-      console.log('Removing user [' + data.id + ']');
-      this.gotchat({id: 'Server', msg: this.user[data.id].name + ' has left the game!'});
-      delete this.user[data.id];
-    },
-    
-    initGame: function() {
-      var guiGame = Game(this.ctx, this.socket);
-      guiGame.onkeydown = $.proxy(function(ev, handled) {
-        if(!handled) {
-          switch(ev.which) {
-            case 32: case 37: case 38: case 39: case 40:
-              var code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-              if((this.keys & code) == 0) {
-                this.keys |= code;
-                this.socket.emit('keys', {keys: this.keys});
-              }
+          for(var i = 0; i < data.length; i++) {
+            if(id === data[i].i) {
+              exists = true;
               break;
-            
-            //PGUP
-            case 33:
-              this.zoomIn();
-              break;
-            
-            //PGDN
-            case 34:
-              this.zoomOut();
-              break;
-            
-            case 84:
-              guiGame.showchat();
-              ev.preventDefault();
-              break;
-          }
-        }
-      }, this);
-      
-      guiGame.onkeyup = $.proxy(function(ev, handled) {
-        switch(ev.which) {
-          case 32: case 37: case 38: case 39: case 40:
-            var code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
-            if((this.keys & code) != 0) {
-              this.keys &= ~code;
-              this.socket.emit('keys', {keys: this.keys});
             }
-            break;
+          }
+          
+          if(!exists) {
+            console.log(data);
+            console.log('Removing celestial', key, priv.celestial[key]);
+            delete priv.celestial[key];
+          }
         }
-      }, this);
+        
+        for(var i = 0; i < data.length; i++) {
+          var e = data[i];
+          
+          if(typeof priv.celestial[e.i] !== 'undefined') {
+            priv.celestial[e.i].x = e.x;
+            priv.celestial[e.i].y = e.y;
+            priv.celestial[e.i].a = e.a;
+          } else {
+            updates.push(e.i);
+            priv.celestial[e.i] = e;
+          }
+        }
+        
+        if(updates.length > 0) {
+          priv.socket.emit('cr', {i: updates});
+          console.log('Sending celestial request', updates);
+        }
+      };
       
-      guiGame.onrender = $.proxy(this.renderGame, this);
+      priv.addentity = function(data) {
+        $.extend(priv.entity[data.i], data);
+        console.log('Got entity', data.i, priv.entity[data.i]);
+      };
       
-      this.guis.push(guiGame);
-      this.gotchat = guiGame.gotchat;
+      priv.addcelestial = function(data) {
+        $.extend(priv.celestial[data.i], data);
+        console.log('Got celestial', data.i, priv.celestial[data.i]);
+      };
       
-      // Register event handlers
-      this.socket.on('msg',     $.proxy(this.gotchat, this));
-      this.socket.on('update',  $.proxy(this.update, this));
-      this.socket.on('effect',  $.proxy(this.effect, this));
-      this.socket.on('remuser', $.proxy(this.remUser, this));
-      this.socket.on('zoom',    $.proxy(function(data) {
-        this.setZoom(data.zoom);
-      }, this));
+      priv.rendergame = function() {
+        priv.calculateoffsets();
+        priv.rendercelestials();
+        priv.renderentities();
+        priv.rendergui();
+      };
       
-      this.inGame = true;
-    },
-    
-    setParams: function(data){
-      console.log('setting client [', data, ']');
-      this.me = this.user[data.id];
-      console.log('Set id[', this.me.id, ']');
-    },
-    
-    setSystem: function(data){
-      this.system = data.system;
-      this.setZoom(this.zoomLevel);
-      console.log('Set system [', this.system, ']');
-    },
-    
-    update: function(up) {
-      for(key in up.usersOnScreen) {
-        user = up.usersOnScreen[key];
-        this.user[user.id].x = user.x;
-        this.user[user.id].y = user.y;
-        this.user[user.id].angle = user.angle;
-      }
-    },
-    
-    effect: function(expl) {
-      var expl = Effect(0, expl.x, expl.y, {size: expl.size});
-      this.effects.push(expl);
-    },
-    
-    zoomOut: function() {
-      var newZoom = this.zoomLevel + this.zoomSpeed;
+      priv.calculateoffsets = function() {
+        if(typeof priv.me !== 'undefined') {
+          priv.offsetX = Math.floor(priv.me.x - (priv.canvas.width  / 2 * priv.zoomLevel));
+          priv.offsetY = Math.floor(priv.me.y - (priv.canvas.height / 2 * priv.zoomLevel));
+          
+          priv.me.onscreenX = Math.floor(priv.canvas.width / 2);
+          priv.me.onscreenY = Math.floor(priv.canvas.height / 2);
+          
+          priv.gridOffsetX = Math.floor((priv.offsetX / priv.zoomLevel) % priv.gridSize);
+          priv.gridOffsetY = Math.floor((priv.offsetY / priv.zoomLevel) % priv.gridSize);
+          
+          priv.offsetXScaled = priv.offsetX / priv.zoomLevel;
+          priv.offsetYScaled = priv.offsetY / priv.zoomLevel;
+        }
+      };
       
-      if(newZoom <= this.maxZoom) {
-        this.setZoom(newZoom);
-      }
-    },
-    
-    zoomIn: function() {
-      var newZoom = Math.max(this.zoomLevel - this.zoomSpeed, 1);
+      priv.renderentities = function() {
+        var screenX = 0;
+        var screenY = 0;
+        
+        for(key in priv.entity) {
+          if(key === 'length') { continue; }
+          e = priv.entity[key];
+          
+          screenX = (e.x - priv.offsetX) / priv.zoomLevel;
+          screenY = (e.y - priv.offsetY) / priv.zoomLevel;
+          
+          /*if(!this.onscreen(user, screenX, screenY)) {
+            continue;
+          }*/
+          
+          priv.ctx.save();
+          
+          var size = 16 / priv.zoomLevel;
+          priv.ctx.textAlign = 'center';
+          priv.ctx.fillStyle = 'white';
+          priv.ctx.fillText(e.n, screenX, screenY - size);
+          
+          priv.ctx.translate(screenX, screenY);
+          priv.ctx.rotate(e.a * priv.toRads);
+          
+          priv.ctx.beginPath();
+          priv.ctx.moveTo( size, 0);
+          priv.ctx.lineTo(-size, size / 2);
+          priv.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
+          priv.ctx.lineTo(size, 0);
+          priv.ctx.fillStyle = 'rgb(255, 0, 255)';
+          priv.ctx.fill();
+          
+          priv.ctx.restore();
+        }
+      };
       
-      if(newZoom != this.zoomLevel) {
-        this.setZoom(newZoom);
-      }
-    },
-    
-    setZoom: function(zoomLevel) {
-      this.zoomLevel = zoomLevel;
-      this.scalecelestial(this.system.star);
-    },
-    
-    onscreen: function(entity, screenX, screenY, scaled) {
-      var size = entity.size / this.zoomLevel;
-      var w = this.canvas.width;
-      var h = this.canvas.height;
+      priv.rendercelestials = function() {
+        var screenX = 0;
+        var screenY = 0;
+        
+        for(key in priv.celestial) {
+          if(key === 'length') { continue; }
+          e = priv.celestial[key];
+          
+          screenX = (e.x - priv.offsetX) / priv.zoomLevel;
+          screenY = (e.y - priv.offsetY) / priv.zoomLevel;
+          
+          /*if(!this.onscreen(user, screenX, screenY)) {
+            continue;
+          }*/
+          
+          priv.ctx.save();
+          
+          priv.ctx.save();
+          priv.ctx.beginPath();
+          
+          if(!e.p) {
+            priv.ctx.arc(screenX, screenY, e.s / priv.zoomLevel, 0, priv.PIx2);
+          } else {
+            for(i = 0; i < e.p.length; i++) {
+              var point = e.p[i];
+              if(i === 0) {
+                priv.ctx.moveTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
+              } else {
+                priv.ctx.lineTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
+              }
+            }
+          }
+          
+          priv.ctx.closePath();
+          
+          if(e.t === 'a') {
+            priv.ctx.strokeStyle = '#444444';
+            priv.ctx.stroke();
+            priv.ctx.fillStyle = '#333333';
+            priv.ctx.fill();
+          } else {
+            if(e.stroke) {
+              priv.ctx.strokeStyle = e.stroke;
+              priv.ctx.stroke();
+            }
+            
+            if(e.fill) {
+              priv.ctx.fillStyle = e.fill;
+              priv.ctx.fill();
+            }
+          }
+          
+          priv.ctx.restore();
+        }
+      };
       
-      if(scaled) {
-        screenX /= this.zoomLevel;
-        screenY /= this.zoomLevel;
-      }
+      priv.rendergui = function() {
+        priv.ctx.save();
+        priv.ctx.fillStyle = 'white';
+        priv.ctx.fillText(priv.fps + ' FPS', 4, 12);
+        
+        if(typeof priv.me !== 'undefined') {
+          priv.ctx.fillText('X:        ' + priv.me.x         + ' Y:        ' + priv.me.y, 4, 24);
+          priv.ctx.fillText('Angle:    ' + priv.me.a, 4, 36);
+          priv.ctx.fillText('X-Offset: ' + priv.offsetX      + ' Y-Offset: ' + priv.offsetY, 4, 48);
+          priv.ctx.fillText('Grid-X:   ' + priv.gridOffsetX  + ' Grid-Y:   ' + priv.gridOffsetY, 4, 60);
+          priv.ctx.fillText('X-Scr:    ' + priv.me.onscreenX + ' Y-Scr:    ' + priv.me.onscreenY, 4, 72);
+          priv.ctx.fillText('Zoom:     ' + priv.zoomLevel, 4, 84);
+          priv.ctx.fillText('CPF:      ' + priv.cpf, 4, 96);
+          priv.ctx.restore();
+        }
+      };
       
-      return !(
-        screenX + (size) < 0 || // Right edge is left of canvas
-        screenX - (size) > w || // Left edge is right of canvas
-        screenY + (size) < 0 || // Top edge is below canvas
-        screenY - (size) > h);  // Bottom edge is above canvas
-    },
-    
-    onscreen2: function(entity) {
-      var size = entity.sizeScaled;
-      var w = this.canvas.width;
-      var h = this.canvas.height;
+      var me = {};
       
-      var screenX = entity.xScaled - this.offsetXScaled;
-      var screenY = entity.yScaled - this.offsetYScaled;
+      me.init = function() {
+        var clear = function() {
+          priv.ctx.save();
+          priv.ctx.fillStyle = priv.clearColour;
+          priv.ctx.fillRect(0, 0, priv.canvas.width, priv.canvas.height);
+          priv.ctx.restore();
+        };
+        
+        var render = function() {
+          clear();
+          priv.ctx.save();
+          priv.guis.render();
+          priv.ctx.restore();
+          priv.ticks++;
+          priv.fpsTicks++;
+        };
+        
+        var calcfps = function() {
+          priv.fps = priv.fpsTicks;
+          priv.fpsTicks = 0;
+        };
+        
+        var resize = function() {
+          priv.canvas.width  = window.innerWidth;
+          priv.canvas.height = window.innerHeight;
+          priv.guis.resize();
+        };
+        
+        priv.canvas = $('#canvas')[0];
+        priv.ctx = canvas.getContext('2d');
+        
+        // Hook our events
+        $(document).bind     ('contextmenu', function() { return false; });
+        $(document).keydown  (priv.guis.keydown);
+        $(document).keyup    (priv.guis.keyup);
+        $(document).keypress (priv.guis.keypress);
+        $(document).mousemove(priv.guis.mousemove);
+        $(document).mousedown(priv.guis.mousedown);
+        $(document).mouseup  (priv.guis.mouseup);
+        $(window)  .resize   (resize);
+        
+        setInterval(render , 1000 / 60);
+        setInterval(calcfps, 1000);
+        
+        resize();
+        
+        var name = $('input[name=username]').val();
+        var auth = $('input[name=auth]').val();
+        var ip   = $('input[name=ip]').val();
+        var port = $('input[name=port]').val();
+        
+        var msg = Message(priv.ctx, 'Connecting...');
+        priv.guis.push(msg);
+        
+        priv.socket = io.connect(ip + ':' + port, {'reconnect': false});
+        priv.socket.on('connect', function() {
+          msg.text('Logging in...');
+          priv.socket.emit('lo', {name: name, auth: auth});
+        });
+        
+        priv.socket.on('lr', function() {
+          msg.pop();
+          
+          var guiGame = Game(priv.ctx, priv.socket);
+          
+          guiGame.onrender().push(priv.rendergame);
+          guiGame.onselectship().push(function(ship) {
+            priv.socket.emit('us', {i: ship.id, s: ship.system_id});
+          });
+          
+          guiGame.onkeydown().push(function(ev, handled) {
+            if(!handled) {
+              switch(ev.which) {
+                case 32: case 37: case 38: case 39: case 40:
+                  var code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+                  if((priv.keys & code) == 0) {
+                    priv.keys |= code;
+                    priv.socket.emit('ke', {k: priv.keys});
+                  }
+                  break;
+              }
+            }
+          });
+          
+          guiGame.onkeyup().push(function(ev, handled) {
+            switch(ev.which) {
+              case 32: case 37: case 38: case 39: case 40:
+                var code = (ev.which == 32) ? 0x10 : Math.pow(2, ev.which - 37);
+                if((priv.keys & code) != 0) {
+                  priv.keys &= ~code;
+                  priv.socket.emit('ke', {k: priv.keys});
+                }
+                break;
+            }
+          });
+          
+          priv.guis.push(guiGame);
+          
+          var useship = function(data) {
+            priv.me = {i: data.i, x: 0, y: 0, a: 0, n: data.n};
+            priv.entity[data.i] = priv.me;
+            guiGame.useship(data);
+            console.log('Got Me', data.i, priv.me);
+          };
+          
+          priv.socket.on('ms', guiGame.gotchat);
+          priv.socket.on('us', useship);
+          priv.socket.on('up', priv.update);
+          priv.socket.on('cp', priv.updatecelestials);
+          priv.socket.on('ea', priv.addentity);
+          priv.socket.on('ca', priv.addcelestial);
+        });
+      };
       
-      return !(
-        screenX + size < 0 || // Right edge is left of canvas
-        screenX - size > w || // Left edge is right of canvas
-        screenY + size < 0 || // Top edge is below canvas
-        screenY - size > h);  // Bottom edge is above canvas
-    },
-    
-    scalecelestial: function(c) {
-      c.sizeScaled = c.size / this.zoomLevel;
-      c.xScaled = c.x / this.zoomLevel;
-      c.yScaled = c.y / this.zoomLevel;
-      
-      for(var i = 0; i < c.celestial.length; i++) {
-        this.scalecelestial(c.celestial[i]);
-      }
+      return me;
     }
-  }
-}
-
-function Effect(type, x, y, data) {
-  var particles = [];
-  
-  switch(type) {
-    case 0: // Regular explosion
-      var numParticles = Math.pow(2, data.size + 2);
-      var maxVelocity = data.size * 2;
-      var ttl = data.size * 20;
-      
-      for(var i = 0; i < numParticles; i++) {
-        particles[i] = {
-          v: maxVelocity * Math.random(),
-          angle: 360 * Math.random(),
-          r: Math.floor(0xFF * Math.random()),
-          g: Math.floor(0x40 * Math.random()),
-          b: Math.floor(0x40 * Math.random()),
-          x: x,
-          y: y,
-          size: 1,
-          ttl: ttl
-        }
-      }
-      
-      break;
-    
-    case 'shieldhit':
-      var mult = Math.min(data.charge > 0 ? 1 / data.charge : 10, 10);
-      var numParticles = Math.round(20 * mult);
-      var maxVelocity = 1.5;
-      var ttl = 15;
-      var size = 0.4 * mult;
-      
-      for(var i = 0; i < numParticles; i++) {
-        particles[i] = {
-          v: maxVelocity * Math.random(),
-          angle: data.a + 40 * Math.random() - 20,
-          r: 0,
-          g: Math.floor(0x7F * Math.random()) + 0x80,
-          b: Math.floor(0x7F * Math.random()) + 0x80,
-          x: x,
-          y: y,
-          size: size * Math.random(),
-          ttl: Math.round(ttl * Math.random() + ttl / 2)
-        }
-      }
-      break;
-    
-    case 'armourhit':
-      var smokeCount = 30;
-      var smokeVel = 0.6;
-      var smokeTTL = 30;
-      var smokeSize = 1;
-      var fireCount = 30;
-      var fireVel = 0.6;
-      var fireTTL = 30;
-      var fireSize = 1;
-      
-      for(var i = 0; i < smokeCount; i++) {
-        var c = Math.floor(0x3F * Math.random()) + 0x20;
-        particles[i] = {
-          v: smokeVel * Math.random(),
-          angle: data.a + 60 * Math.random() - 30,
-          r: c,
-          g: c,
-          b: c,
-          x: x,
-          y: y,
-          size: smokeSize * Math.random(),
-          ttl: Math.round(smokeTTL * Math.random() + smokeTTL / 2)
-        }
-      }
-      
-      var n = i;
-      
-      for( ; i < fireCount + n; i++) {
-        var r = Math.floor(0x7F * Math.random()) + 0x60;
-        var g = Math.floor(r * Math.random());
-        particles[i] = {
-          v: fireVel * Math.random(),
-          angle: data.a + 30 * Math.random() - 15,
-          r: r,
-          g: g,
-          b: 0,
-          x: x,
-          y: y,
-          size: fireSize * Math.random(),
-          ttl: Math.round(fireTTL * Math.random() + fireTTL / 2)
-        }
-      }
-      break;
-  }
-  
-  return {
-    x: x,
-    y: y,
-    particles: particles
-  }
-}
-
-function User() {
-  return {
-    id: null,
-    name: null,
-    x: 0,
-    y: 0,
-    onscreenX: 0,
-    onscreenY: 0,
-    color: '#FF00FF',
-    size: 0,
-    lastHit: 0
-  }
+  }.create();
 }
 
 $(document).ready(function() {
