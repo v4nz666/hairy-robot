@@ -26,9 +26,14 @@ public class StarSystem implements Runnable {
     }
   }
   
+  private int _id = -1;
+  public int nextID() { return _id--; }
+  
   private Thread _thread;
   private boolean _running;
   private int _tps = 60;
+  
+  private long _celestialTimer;
   
   private Sandbox _sandbox = new Sandbox();
   
@@ -76,6 +81,15 @@ public class StarSystem implements Runnable {
       Entity e = _sandbox.getEntity(request.i[i]);
       if(e != null) {
         ship.sendEntity(e.serializeAdd());
+      }
+    }
+  }
+  
+  public void sendCelestials(Ship ship, Entity.Request request) {
+    for(int i = 0; i < request.i.length; i++) {
+      Entity e = _sandbox.getEntity(request.i[i]);
+      if(e != null) {
+        ship.sendCelestial(e.serializeAdd());
       }
     }
   }
@@ -134,7 +148,7 @@ public class StarSystem implements Runnable {
     
     long time, timeDelta = interval;
     int ticks = 0;
-    long tickTime = System.nanoTime() + 1000000000;
+    long tickTime = System.nanoTime() + 1000000000l;
     
     while(_running) {
       time = System.nanoTime();
@@ -145,7 +159,7 @@ public class StarSystem implements Runnable {
       if(tickTime <= System.nanoTime()) {
         _tps = ticks;
         ticks = 0;
-        tickTime = System.nanoTime() + 1000000000;
+        tickTime = System.nanoTime() + 1000000000l;
         //System.out.println(_tps + " ticks per second");
       }
       
@@ -154,7 +168,7 @@ public class StarSystem implements Runnable {
       // Sleep each loop if we have extra time
       timeDelta = System.nanoTime() - time;
       long timeSleep = interval - timeDelta;
-      long timeDeltaMS = timeSleep / 1000000;
+      long timeDeltaMS = timeSleep / 1000000l;
       int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000);
       if(timeSleep > 0) {
         try { Thread.sleep(timeDeltaMS, timeDeltaNS); } catch(InterruptedException e) { }
@@ -168,13 +182,35 @@ public class StarSystem implements Runnable {
         ship.updateList.clear();
         
         for(Entity e : _sandbox) {
-          if(ship.isNear(e)) {
-            ship.updateList.add(e.serializeUpdate());
+          if(!(e instanceof Celestial)) {
+            if(ship.isNear(e)) {
+              ship.updateList.add(e.serializeUpdate());
+            }
           }
         }
         
         ship.sendUpdate(ship.updateList.toArray(new Entity.Update[0]));
       }
+    }
+    
+    if(_celestialTimer <= System.nanoTime()) {
+      for(Ship ship : _ship) {
+        if(ship.user() != null) {
+          ship.celestList.clear();
+          
+          for(Entity e : _sandbox) {
+            if(e instanceof Celestial) {
+              if(ship.isNear(e)) {
+                ship.celestList.add(e.serializeUpdate());
+              }
+            }
+          }
+          
+          ship.sendCelestials(ship.celestList.toArray(new Entity.Update[0]));
+        }
+      }
+      
+      _celestialTimer = System.nanoTime() + 1000000000l;
     }
   }
 }

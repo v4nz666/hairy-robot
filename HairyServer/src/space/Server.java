@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import space.celestials.StarSystem;
+import space.events.CelestialRequest;
 import space.events.Disconnect;
 import space.events.EntityRequest;
 import space.events.Keys;
@@ -42,9 +43,6 @@ public class Server {
   
   private Server() { }
   
-  private static int _id;
-  public static int getID() { return _id++; }
-  
   public int tps() { return _tps; }
   
   public void start() throws InterruptedException, InstantiationException, IllegalAccessException, SQLException {
@@ -64,6 +62,7 @@ public class Server {
     _server.addEventListener("ms", User.Message.class, new Message());
     _server.addEventListener("us", Ship.Use.class, new UseShip());
     _server.addEventListener("er", Entity.Request.class, new EntityRequest());
+    _server.addEventListener("cr", Entity.Request.class, new CelestialRequest());
     _server.addEventListener("ke", Ship.Keys.class, new Keys());
     
     System.out.println("Starting listening thread...");

@@ -5,8 +5,9 @@ function Client() {
     ctx: null,
     
     entity: [],
+    celestial: [],
     
-    guis: new GUIs(),
+    guis: GUIs(),
     
     ticks: 0,
     fps: 0,
@@ -74,13 +75,62 @@ function Client() {
         }
       };
       
+      priv.updatecelestials = function(data) {
+        var updates = [];
+        
+        for(var key in priv.celestial) {
+          if(key === 'length') { continue; }
+          
+          var id = priv.celestial[key].i;
+          var exists = false;
+          
+          for(var i = 0; i < data.length; i++) {
+            if(id === data[i].i) {
+              exists = true;
+              break;
+            }
+          }
+          
+          if(!exists) {
+            console.log(data);
+            console.log('Removing celestial', key, priv.celestial[key]);
+            delete priv.celestial[key];
+          }
+        }
+        
+        for(var i = 0; i < data.length; i++) {
+          var e = data[i];
+          
+          if(typeof priv.celestial[e.i] !== 'undefined') {
+            priv.celestial[e.i].x = e.x;
+            priv.celestial[e.i].y = e.y;
+            priv.celestial[e.i].a = e.a;
+          } else {
+            updates.push(e.i);
+            e.n = 'Loading...';
+            priv.celestial[e.i] = e;
+          }
+        }
+        
+        if(updates.length > 0) {
+          priv.socket.emit('cr', {i: updates});
+          console.log('Sending celestial request', updates);
+        }
+      };
+      
       priv.addentity = function(data) {
         $.extend(priv.entity[data.i], data);
         console.log('Got entity', data.i, priv.entity[data.i]);
       };
       
+      priv.addcelestial = function(data) {
+        $.extend(priv.celestial[data.i], data);
+        console.log('Got celestial', data.i, priv.celestial[data.i]);
+      };
+      
       priv.rendergame = function() {
         priv.calculateoffsets();
+        priv.rendercelestials();
         priv.renderentities();
         priv.rendergui();
       };
@@ -99,7 +149,7 @@ function Client() {
           priv.offsetXScaled = priv.offsetX / priv.zoomLevel;
           priv.offsetYScaled = priv.offsetY / priv.zoomLevel;
         }
-      },
+      };
       
       priv.renderentities = function() {
         var screenX = 0;
@@ -118,56 +168,75 @@ function Client() {
           
           priv.ctx.save();
           
-          if(typeof e.t === 'undefined') {
-            var size = 16 / priv.zoomLevel;
-            priv.ctx.textAlign = 'center';
-            priv.ctx.fillStyle = 'white';
-            priv.ctx.fillText(e.n, screenX, screenY - size);
-            
-            priv.ctx.translate(screenX, screenY);
-            priv.ctx.rotate(e.a * priv.toRads);
-            
-            priv.ctx.beginPath();
-            priv.ctx.moveTo( size, 0);
-            priv.ctx.lineTo(-size, size / 2);
-            priv.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
-            priv.ctx.lineTo(size, 0);
-            priv.ctx.fillStyle = 'rgb(255, 0, 255)';
-            priv.ctx.fill();
+          var size = 16 / priv.zoomLevel;
+          priv.ctx.textAlign = 'center';
+          priv.ctx.fillStyle = 'white';
+          priv.ctx.fillText(e.n, screenX, screenY - size);
+          
+          priv.ctx.translate(screenX, screenY);
+          priv.ctx.rotate(e.a * priv.toRads);
+          
+          priv.ctx.beginPath();
+          priv.ctx.moveTo( size, 0);
+          priv.ctx.lineTo(-size, size / 2);
+          priv.ctx.bezierCurveTo(0, 5, 0, -5, -size, -size / 2);
+          priv.ctx.lineTo(size, 0);
+          priv.ctx.fillStyle = 'rgb(255, 0, 255)';
+          priv.ctx.fill();
+          
+          priv.ctx.restore();
+        }
+      };
+      
+      priv.rendercelestials = function() {
+        var screenX = 0;
+        var screenY = 0;
+        
+        for(key in priv.celestial) {
+          if(key === 'length') { continue; }
+          e = priv.celestial[key];
+          
+          screenX = (e.x - priv.offsetX) / priv.zoomLevel;
+          screenY = (e.y - priv.offsetY) / priv.zoomLevel;
+          
+          /*if(!this.onscreen(user, screenX, screenY)) {
+            continue;
+          }*/
+          
+          priv.ctx.save();
+          
+          priv.ctx.save();
+          priv.ctx.beginPath();
+          
+          if(!e.p) {
+            priv.ctx.arc(screenX, screenY, e.s / priv.zoomLevel, 0, priv.PIx2);
           } else {
-            priv.ctx.save();
-            priv.ctx.beginPath();
-            
-            if(!e.p) {
-              priv.ctx.arc(screenX, screenY, e.s / priv.zoomLevel, 0, priv.PIx2);
-            } else {
-              for(i = 0; i < e.p.length; i++) {
-                var point = e.p[i];
-                if(i === 0) {
-                  priv.ctx.moveTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
-                } else {
-                  priv.ctx.lineTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
-                }
+            for(i = 0; i < e.p.length; i++) {
+              var point = e.p[i];
+              if(i === 0) {
+                priv.ctx.moveTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
+              } else {
+                priv.ctx.lineTo(screenX + point.x / priv.zoomLevel, screenY + point.y / priv.zoomLevel);
               }
             }
-            
-            priv.ctx.closePath();
-            
-            if(e.t === 'a') {
-              priv.ctx.strokeStyle = '#444444';
+          }
+          
+          priv.ctx.closePath();
+          
+          if(e.t === 'a') {
+            priv.ctx.strokeStyle = '#444444';
+            priv.ctx.stroke();
+            priv.ctx.fillStyle = '#333333';
+            priv.ctx.fill();
+          } else {
+            if(e.stroke) {
+              priv.ctx.strokeStyle = e.stroke;
               priv.ctx.stroke();
-              priv.ctx.fillStyle = '#333333';
+            }
+            
+            if(e.fill) {
+              priv.ctx.fillStyle = e.fill;
               priv.ctx.fill();
-            } else {
-              if(e.stroke) {
-                priv.ctx.strokeStyle = e.stroke;
-                priv.ctx.stroke();
-              }
-              
-              if(e.fill) {
-                priv.ctx.fillStyle = e.fill;
-                priv.ctx.fill();
-              }
             }
           }
           
@@ -302,7 +371,9 @@ function Client() {
           priv.socket.on('ms', guiGame.gotchat);
           priv.socket.on('us', useship);
           priv.socket.on('up', priv.update);
+          priv.socket.on('cp', priv.updatecelestials);
           priv.socket.on('ea', priv.addentity);
+          priv.socket.on('ca', priv.addcelestial);
         });
       };
       

@@ -9,7 +9,7 @@ import space.physics.Sandbox;
 public abstract class Celestial extends Entity {
   @Override
   public String toString() {
-    return "Celestial @ (" + (int)x + ", " + (int)y + "), size: " + size + ", dist: " + _distance + ", mass: " + _mass + ", temp: " + _temp + " (" + super.toString() + ")";
+    return "Celestial " + id + " @ (" + (int)x + ", " + (int)y + "), size: " + size + ", dist: " + _distance + ", mass: " + _mass + ", temp: " + _temp + " (" + super.toString() + ")";
   }
   
   private static Random _rand = new Random();
@@ -25,7 +25,7 @@ public abstract class Celestial extends Entity {
   protected double _theta;
   
   public Celestial(StarSystem system, Celestial parent, double distance, int size, double mass, double temp) {
-    super(-1, null, 0, 0, size);
+    super(system.nextID(), null, 0, 0, size);
     _system = system;
     _parent = parent;
     _distance = distance;

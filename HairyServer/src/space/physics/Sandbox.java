@@ -39,12 +39,12 @@ public class Sandbox implements Runnable, Iterable<Entity> {
   }
   
   public void run() {
-    _interval = 1000000000 / _ticksPerSecond;
+    _interval = 1000000000l / _ticksPerSecond;
     _running = true;
     
     long time, timeDelta = _interval;
     int ticks = 0;
-    long tickTime = System.nanoTime() + 1000000000;
+    long tickTime = System.nanoTime() + 1000000000l;
     
     while(_running) {
       time = System.nanoTime();
@@ -60,7 +60,7 @@ public class Sandbox implements Runnable, Iterable<Entity> {
       if(tickTime <= System.nanoTime()) {
         _tps = ticks;
         ticks = 0;
-        tickTime = System.nanoTime() + 1000000000;
+        tickTime = System.nanoTime() + 1000000000l;
         //System.out.println(_tps + " ticks per second");
       }
       
@@ -69,8 +69,8 @@ public class Sandbox implements Runnable, Iterable<Entity> {
       // Sleep each loop if we have extra time
       timeDelta = System.nanoTime() - time;
       long timeSleep = _interval - timeDelta;
-      long timeDeltaMS = timeSleep / 1000000;
-      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000);
+      long timeDeltaMS = timeSleep / 1000000l;
+      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000l);
       if(timeSleep > 0) {
         try { Thread.sleep(timeDeltaMS, timeDeltaNS); } catch(InterruptedException e) { e.printStackTrace(); }
       }
