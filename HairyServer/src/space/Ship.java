@@ -51,6 +51,10 @@ public class Ship extends Entity {
     _turnSpeed = 5;
   }
   
+  public User user() {
+    return _user;
+  }
+  
   public void sendEntity(Entity.Add add) {
     if(_user != null) {
       _user.sendEntity(add);

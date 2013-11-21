@@ -164,15 +164,17 @@ public class StarSystem implements Runnable {
   
   private void tick(double deltaT) {
     for(Ship ship : _ship) {
-      ship.updateList.clear();
-      
-      for(Entity e : _sandbox) {
-        if(ship.isNear(e)) {
-          ship.updateList.add(e.serializeUpdate());
+      if(ship.user() != null) {
+        ship.updateList.clear();
+        
+        for(Entity e : _sandbox) {
+          if(ship.isNear(e)) {
+            ship.updateList.add(e.serializeUpdate());
+          }
         }
+        
+        ship.sendUpdate(ship.updateList.toArray(new Entity.Update[0]));
       }
-      
-      ship.sendUpdate(ship.updateList.toArray(new Entity.Update[0]));
     }
   }
 }
