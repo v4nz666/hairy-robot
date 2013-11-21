@@ -34,6 +34,8 @@ public abstract class Celestial extends Entity {
     _temp = temp;
     _theta = _rand.nextDouble() * 360;
     
+    update2(1);
+    
     if(!(this instanceof Asteroid)) {
       System.out.println(this);
     }
@@ -47,12 +49,11 @@ public abstract class Celestial extends Entity {
     return _celestial.add(c);
   }
   
-  @Override
-  public void update(double deltaT) {
-    
+  //@Override
+  public void update2(double deltaT) {
     _theta -= _vo;
-    double px = _parent != null ? _parent.x : _system.getSize() / 2;
-    double py = _parent != null ? _parent.y : _system.getSize() / 2;
+    double px = _parent != null ? _parent.x : 0;
+    double py = _parent != null ? _parent.y : 0;
     
     x = px + Math.cos(_theta * Math.PI / 180) * _distance;
     y = py - Math.sin(_theta * Math.PI / 180) * _distance;

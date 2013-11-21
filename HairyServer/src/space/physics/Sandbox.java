@@ -17,19 +17,7 @@ public class Sandbox implements Runnable, Iterable<Entity> {
   public int tps() { return _tps; }
   
   public void addToSandbox(Entity m) {
-    Celestial p = (Celestial)m;
-    if ( p instanceof Celestial ) {
-      Celestial[] children = p.getCelestial();
-      if ( children.length > 0 ) {
-        for (int i = 0; i < children.length; i++) {
-          this.addToSandbox(children[i]);
-        }
-      } else {
-        _obj.add(p);
-      }
-    } else {
-      _obj.add(m);
-    }
+    _obj.add(m);
   }
   
   public void removeFromSandbox(Entity m) {

@@ -71,8 +71,6 @@ public class Server {
     
     System.out.println("Server running.");
     
-    _sandbox.addToSandbox(star_system.star);
-    
     gameLoop();
     
     _server.stop();
