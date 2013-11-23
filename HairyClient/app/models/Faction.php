@@ -6,4 +6,8 @@ class Faction extends Eloquent {
   public function ships() {
     return $this->hasMany('Ship');
   }
+  
+  public function system() {
+    return $this->belongsTo('System');
+  }
 }
