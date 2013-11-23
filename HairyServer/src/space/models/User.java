@@ -12,7 +12,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 
 public class User {
   private static SQL sql = SQL.getInstance();
-  private static PreparedStatement select = sql.prepareStatement("SELECT `id`, `auth` FROM `users` WHERE `username`=?");
+  private static PreparedStatement select = sql.prepareStatement("SELECT `id`, `auth`, `credits` FROM `users` WHERE `username`=?");
   
   private static Server _server = Server.instance();
   
@@ -22,7 +22,7 @@ public class User {
     try(ResultSet r = select.executeQuery()) {
       if(r.next()) {
         if(data.auth.equals(r.getString("auth"))) {
-          return new User(socket, r.getInt("id"), data);
+          return new User(socket, r, data);
         } else {
           //TODO: Log auth error
         }
@@ -35,6 +35,7 @@ public class User {
   public final SocketIOClient socket;
   public final int id;
   public final String name;
+  public final int credits;
   
   private LoginResponse _serializeLoginResponse = new LoginResponse();
   
@@ -42,10 +43,11 @@ public class User {
   
   private Ship _ship;
   
-  private User(SocketIOClient socket, int id, User.Login data) throws SQLException {
+  private User(SocketIOClient socket, ResultSet r, User.Login data) throws SQLException {
     this.socket = socket;
-    this.id = id;
-    this.name = data.name;
+    id = r.getInt("id");
+    name = data.name;
+    credits = r.getInt("credits");
   }
   
   public Ship ship() { return _ship; }
