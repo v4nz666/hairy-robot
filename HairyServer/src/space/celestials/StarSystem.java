@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import space.Ship;
+import space.models.Ship;
 import space.physics.Entity;
 import space.physics.Sandbox;
 import sql.SQL;

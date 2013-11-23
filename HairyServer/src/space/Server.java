@@ -14,6 +14,8 @@ import space.events.Keys;
 import space.events.Login;
 import space.events.Message;
 import space.events.UseShip;
+import space.models.Ship;
+import space.models.User;
 import space.physics.Entity;
 import sql.MySQL;
 import sql.SQL;

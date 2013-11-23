@@ -1,7 +1,7 @@
 package space.events;
 
 import space.Server;
-import space.User;
+import space.models.User;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;

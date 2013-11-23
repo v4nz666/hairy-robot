@@ -1,4 +1,4 @@
-package space;
+package space.models;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import space.Server;
 import space.celestials.StarSystem;
 import space.physics.Entity;
 import sql.SQL;

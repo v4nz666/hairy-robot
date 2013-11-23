@@ -1,9 +1,10 @@
-package space;
+package space.models;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import space.Server;
 import space.physics.Entity;
 import sql.SQL;
 
