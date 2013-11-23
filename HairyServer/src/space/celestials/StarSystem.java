@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import space.models.Faction;
 import space.models.Ship;
 import space.physics.Entity;
 import space.physics.Sandbox;
@@ -46,14 +47,26 @@ public class StarSystem implements Runnable {
   public double getSize() { return _size; }
   
   public Star star;
+
+  private ArrayList<Faction> _faction = new ArrayList<>();
+  private ArrayList<Ship>    _ship = new ArrayList<>();
   
-  private ArrayList<Ship> _ship = new ArrayList<>();
+  public Faction getFaction(int id) {
+    for(Faction faction : _faction) {
+      if(faction.id == id) {
+        return faction;
+      }
+    }
+    
+    return null;
+  }
   
   private StarSystem(int id) throws SQLException {
     this.id = id;
     
     _name = generateName();
-    _ship = Ship.load(this);
+    _faction = Faction.load(this);
+    _ship    = Ship.load(this);
     
     for(Ship ship : _ship) {
       _sandbox.addToSandbox(ship);
