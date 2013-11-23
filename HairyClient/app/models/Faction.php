@@ -3,7 +3,7 @@
 class Faction extends Eloquent {
   protected $hidden = [];
   
-  public function users() {
-    return $this->hasMany('User');
+  public function ships() {
+    return $this->hasMany('Ship');
   }
 }

@@ -7,6 +7,10 @@ class Ship extends Eloquent {
     return $this->belongsToMany('User', 'user_ships');
   }
   
+  public function faction() {
+    return $this->belongsTo('Faction');
+  }
+  
   public function scopeMine($query) {
     return $query->where('ships.user_id', '=', Auth::user()->id);
   }
