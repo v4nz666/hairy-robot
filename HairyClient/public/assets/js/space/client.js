@@ -271,6 +271,8 @@ function Client() {
         };
         
         var render = function() {
+          requestAnimationFrame(render);
+          
           clear();
           priv.ctx.save();
           priv.guis.render();
@@ -303,7 +305,7 @@ function Client() {
         $(document).mouseup  (priv.guis.mouseup);
         $(window)  .resize   (resize);
         
-        setInterval(render , 1000 / 60);
+        requestAnimationFrame(render);
         setInterval(calcfps, 1000);
         
         resize();
