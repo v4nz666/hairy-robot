@@ -103,12 +103,14 @@ public class Server {
     try {
       User user = User.getUserIfAuthed(socket, data);
       
-      _user.add(user);
-      _userMap.put(socket, user);
-      
-      System.out.println("New user added " + user.id);
-      
-      user.serializeLoginResponse().send();
+      if(user != null) {
+        _user.add(user);
+        _userMap.put(socket, user);
+        
+        System.out.println("New user added " + user.id);
+        
+        user.serializeLoginResponse().send();
+      }
     } catch(SQLException e) {
       e.printStackTrace();
     }
