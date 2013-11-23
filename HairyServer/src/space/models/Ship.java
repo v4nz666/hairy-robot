@@ -25,7 +25,7 @@ public class Ship extends Entity {
       ArrayList<Ship> ship = new ArrayList<>();
       
       while(r.next()) {
-        ship.add(new Ship(r.getInt("id"), r.getString("name"), r.getDouble("x"), r.getDouble("y"), 16, system, r.getInt("user_id")));
+        ship.add(new Ship(r.getInt("id"), r.getString("name"), r.getDouble("x"), r.getDouble("y"), 16, system, system.getFaction(r.getInt("faction_id")), r.getInt("user_id")));
       }
       
       return ship;
@@ -38,6 +38,7 @@ public class Ship extends Entity {
   private User _user;
   
   public final StarSystem system;
+  public final Faction faction;
   
   private int _userID;
   
@@ -47,10 +48,11 @@ public class Ship extends Entity {
   private boolean _turnRight;
   private boolean _isFiring;
   
-  private Ship(int id, String name, double x, double y, int size, StarSystem system, int user) {
+  private Ship(int id, String name, double x, double y, int size, StarSystem system, Faction faction, int user) {
     super(id, name, x, y, size);
     _userID = user;
     this.system = system;
+    this.faction = faction;
     
     maxVel = 6;
     _turnSpeed = 5;
