@@ -4,6 +4,9 @@ class DatabaseSeeder extends Seeder {
   public function run() {
     Eloquent::unguard();
     
+    // Get the database name
+    $dbname = DB::connection('mysql')->getDatabaseName();
+    
     // Find the FKs
     $fks = DB::table('INFORMATION_SCHEMA.KEY_COLUMN_USAGE')
             ->select('TABLE_NAME', 'COLUMN_NAME', 'CONSTRAINT_NAME', 'REFERENCED_TABLE_NAME', 'REFERENCED_COLUMN_NAME')
@@ -13,7 +16,7 @@ class DatabaseSeeder extends Seeder {
     // Find the tables
     $tables = DB::table('INFORMATION_SCHEMA.TABLES')
                ->select('TABLE_SCHEMA', 'TABLE_NAME')
-                ->where('TABLE_SCHEMA', '=', 'hairydata')
+                ->where('TABLE_SCHEMA', '=', $dbname)
                 ->where('TABLE_NAME', '<>', 'migrations')
                   ->get();
     
