@@ -4,17 +4,41 @@ class DatabaseSeeder extends Seeder {
   public function run() {
     Eloquent::unguard();
     
-    DB::table('user_ships')->delete();
-    DB::table('ships')->delete();
-    DB::table('users')->delete();
-    DB::table('factions')->delete();
-    DB::table('systems')->delete();
-    DB::statement("ALTER TABLE user_ships AUTO_INCREMENT=1;");
-    DB::statement("ALTER TABLE ships AUTO_INCREMENT=1;");
-    DB::statement("ALTER TABLE users AUTO_INCREMENT=1;");
-    DB::statement("ALTER TABLE factions AUTO_INCREMENT=1;");
-    DB::statement("ALTER TABLE systems AUTO_INCREMENT=1;");
+    // Find the FKs
+    $fks = DB::table('INFORMATION_SCHEMA.KEY_COLUMN_USAGE')
+            ->select('TABLE_NAME', 'COLUMN_NAME', 'CONSTRAINT_NAME', 'REFERENCED_TABLE_NAME', 'REFERENCED_COLUMN_NAME')
+      ->whereNotNull('REFERENCED_TABLE_NAME')
+               ->get();
     
+    // Find the tables
+    $tables = DB::table('INFORMATION_SCHEMA.TABLES')
+               ->select('TABLE_SCHEMA', 'TABLE_NAME')
+                ->where('TABLE_SCHEMA', '=', 'hairydata')
+                ->where('TABLE_NAME', '<>', 'migrations')
+                  ->get();
+    
+    // Kill all FKs
+    foreach($fks as $fk) {
+      Schema::table($fk->TABLE_NAME, function($table) use($fk) {
+        $table->dropForeign($fk->CONSTRAINT_NAME);
+      });
+    }
+    
+    // Truncate all tables
+    foreach($tables as $table) {
+      DB::table($table->TABLE_NAME)->truncate();
+    }
+    
+    // Add all the FKs back
+    foreach($fks as $fk) {
+      Schema::table($fk->TABLE_NAME, function($table) use($fk) {
+        $table->foreign($fk->COLUMN_NAME)
+              ->references($fk->REFERENCED_COLUMN_NAME)
+              ->on($fk->REFERENCED_TABLE_NAME);
+      });
+    }
+    
+    // Seed everything
     $this->call('TableSeeder');
   }
 }
