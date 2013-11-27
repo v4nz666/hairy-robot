@@ -2,6 +2,7 @@ package space;
 
 import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
 
+import java.net.BindException;
 import java.net.ConnectException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -99,7 +100,18 @@ public class Server {
     
     System.out.println("Starting listening thread...");
     
-    _server.start();
+    try {
+      _server.start();
+    } catch(Exception e) {
+      if(e instanceof BindException && e.getMessage().contains("Address already in use")) {
+        System.err.println("Sorry, we can't open the server because there is already a server running on the selected port.  " +
+        		               "You'll have to either close that program or change the port this server runs on.");
+      } else {
+        e.printStackTrace();
+      }
+      
+      return;
+    }
     
     System.out.println("Server running.");
     
