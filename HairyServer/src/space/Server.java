@@ -2,6 +2,7 @@ package space;
 
 import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
 
+import java.net.ConnectException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -47,13 +48,28 @@ public class Server {
   
   public int tps() { return _tps; }
   
-  public void start() throws InterruptedException, InstantiationException, IllegalAccessException, SQLException {
+  public void start() throws InterruptedException, InstantiationException, IllegalAccessException {
     System.out.println("Initialising...");
     
     _sql = SQL.create(MySQL.class);
-    _sql.connect("project1.monoxidedesign.com", "hairydata", "hairydata", "WaRcebYmnz4eSnGs");
     
-    _system = StarSystem.load();
+    try {
+      _sql.connect("project1.monoxidedesign.com", "hairydata", "hairydata", "WaRcebYmnz4eSnGs");
+    } catch(SQLException e) {
+      if(e.getCause() instanceof ConnectException) {
+        System.err.println("We couldn't connect to the server you specified.  Sorry about that.");
+        return;
+      }
+    } catch(ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    
+    try {
+      _system = StarSystem.load();
+    } catch(SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
     
     Configuration config = new Configuration();
     config.setPort(9092);
