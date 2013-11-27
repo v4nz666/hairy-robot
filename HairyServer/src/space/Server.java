@@ -42,14 +42,9 @@ public class Server {
   
   private SocketIOServer _server;
   
-  private boolean _running;
-  private int _tps = 60;
-  
   private SQL _sql;
   
   private Server() { }
-  
-  public int tps() { return _tps; }
   
   public void start() throws InterruptedException {
     System.out.println("Initialising...");
@@ -202,56 +197,4 @@ public class Server {
       _user.remove(user);
     }
   }
-  
-  private void gameLoop() throws InterruptedException {
-    int interval = 1000000000 / 60;
-    _running = true;
-    
-    long time, timeDelta = interval;
-    int ticks = 0;
-    long tickTime = System.nanoTime() + 1000000000;
-    while(_running) {
-      time = System.nanoTime();
-      
-      //tick(timeDelta / interval);
-      
-      // Track FPS
-      if(tickTime <= System.nanoTime()) {
-        _tps = ticks;
-        ticks = 0;
-        tickTime = System.nanoTime() + 1000000000;
-        //System.out.println(_tps + " ticks per second");
-      }
-      
-      ticks++;
-      
-      // Sleep each loop if we have extra time
-      timeDelta = System.nanoTime() - time;
-      long timeSleep = interval - timeDelta;
-      long timeDeltaMS = timeSleep / 1000000;
-      int timeDeltaNS = (int)(timeSleep - timeDeltaMS * 1000000);
-      if(timeSleep > 0) {
-        Thread.sleep(timeDeltaMS, timeDeltaNS);
-      }
-    }
-  }
-  
-  /*private void tick(double deltaT) {
-    User.Update[] update = new User.Update[_user.size()];
-    
-    int i = 0;
-    for(User user : _user) {
-      update[i++] = user.serializeUpdate();
-    }
-    
-    broadcastEvent("update", new Update(update));
-  }
-  
-  public static class Update {
-    public final User.Update[] usersOnScreen;
-    
-    public Update(User.Update[] usersOnScreen) {
-      this.usersOnScreen = usersOnScreen;
-    }
-  }*/
 }
