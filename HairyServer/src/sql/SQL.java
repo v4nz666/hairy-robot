@@ -18,20 +18,8 @@ public abstract class SQL {
   private ArrayList<PreparedStatement> _statement = new ArrayList<>();
   
   protected abstract Connection create(String url, String db, String name, String pass) throws SQLException, ClassNotFoundException;
-  public boolean connect(String url, String db, String name, String pass) {
-    try {
-      _connection = create(url, db, name, pass);
-      return true;
-    } catch(SQLException e) {
-      System.out.println("Exception: "   + e.getMessage());
-      System.out.println("State: "       + e.getSQLState());
-      System.out.println("VendorError: " + e.getErrorCode());
-      e.printStackTrace();
-    } catch(ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-    
-    return false;
+  public void connect(String url, String db, String name, String pass) throws ClassNotFoundException, SQLException  {
+    _connection = create(url, db, name, pass);
   }
   
   public void close() {
