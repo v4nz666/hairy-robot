@@ -24,6 +24,7 @@ import sql.SQL;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 
 public class Server {
   private static Server _instance = new Server();
@@ -71,8 +72,17 @@ public class Server {
     try {
       _system = StarSystem.load();
     } catch(SQLException e) {
-      e.getClass().getName();
-      e.printStackTrace();
+      if(e instanceof MySQLSyntaxErrorException) {
+        System.err.println(e.getLocalizedMessage());
+        
+        if(e.getMessage().contains("doesn't exist")) {
+          System.err.println("Make sure you're up to date on your migrations.");
+        }
+      } else {
+        e.printStackTrace();
+      }
+      
+      return;
     }
     
     Configuration config = new Configuration();
