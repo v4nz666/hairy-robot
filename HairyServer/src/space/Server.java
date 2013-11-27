@@ -48,26 +48,30 @@ public class Server {
   
   public int tps() { return _tps; }
   
-  public void start() throws InterruptedException, InstantiationException, IllegalAccessException {
+  public void start() throws InterruptedException {
     System.out.println("Initialising...");
     
-    _sql = SQL.create(MySQL.class);
-    
     try {
+      _sql = SQL.create(MySQL.class);
       _sql.connect("project1.monoxidedesign.com", "hairydata", "hairydata", "WaRcebYmnz4eSnGs");
+    } catch(InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+      System.err.println("We couldn't load Connector/J.  Make sure the library is there and the build path is configured properly.");
+      return;
     } catch(SQLException e) {
       if(e.getCause() instanceof ConnectException) {
         System.err.println("We couldn't connect to the server you specified.  Sorry about that.");
         return;
+      } else {
+        e.printStackTrace();
       }
-    } catch(ClassNotFoundException e) {
-      e.printStackTrace();
+      
+      return;
     }
     
     try {
       _system = StarSystem.load();
     } catch(SQLException e) {
-      // TODO Auto-generated catch block
+      e.getClass().getName();
       e.printStackTrace();
     }
     
