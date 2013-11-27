@@ -93,7 +93,11 @@ public class StarSystem implements Runnable {
     _sandbox.stopSandbox();
     
     while(_sandbox.isAlive()) {
-      try { _sandbox.join(); } catch(InterruptedException e) { }
+      try {
+        _sandbox.join();
+      } catch(InterruptedException e) {
+        e.printStackTrace();
+      }
     }
     
     _running = false;
@@ -104,7 +108,7 @@ public class StarSystem implements Runnable {
   }
   
   public boolean isAlive() {
-    return _thread.isAlive();
+    return _thread != null && _thread.isAlive();
   }
   
   public void sendEntities(Ship ship, Entity.Request request) {
