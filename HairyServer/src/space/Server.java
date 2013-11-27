@@ -2,6 +2,7 @@ package space;
 
 import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
 
+import java.io.IOException;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.sql.SQLException;
@@ -52,6 +53,32 @@ public class Server {
   
   public void start() throws InterruptedException {
     System.out.println("Initialising...");
+    
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        System.out.println("Shutting down...");
+        System.out.println("Shutting down listening threads...");
+        if(_server != null) { _server.stop(); }
+        
+        System.out.println("Unloading star systems...");
+        for(StarSystem system : _system) {
+          system.stop();
+          
+          while(system.isAlive()) {
+            try {
+              system.join();
+            } catch(InterruptedException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+        
+        System.out.println("Disconnecting from SQL server...");
+        if(_sql != null) { _sql.close(); }
+        
+        System.out.println("Goodbye.");
+      }
+    });
     
     try {
       _sql = SQL.create(MySQL.class);
@@ -115,10 +142,13 @@ public class Server {
     
     System.out.println("Server running.");
     
-    gameLoop();
+    try {
+      System.in.read();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
     
-    _server.stop();
-    _sql.close();
+    System.exit(0);
   }
   
   public void broadcastEvent(String name, Object packet) {
