@@ -11,8 +11,6 @@ class HomeController extends Controller {
   }
   
   public function register() {
-    $factions = Faction::where('can_join', '=', 1)->lists('name', 'id');
-    array_unshift($factions, Lang::get('home.selectFaction'));
-    return View::make('register')->with('factions', $factions);
+    return View::make('register');
   }
 }

@@ -20,8 +20,7 @@ class AuthController extends Controller {
   public function register() {
     $validator = Validator::make(Input::all(), [
       'username' => ['required', 'min:5', 'max:20', 'unique:users'],
-      'password' => ['required', 'min:8', 'max:256'],
-      'faction'  => ['required', 'exists:factions,id,can_join,1']
+      'password' => ['required', 'min:8', 'max:256']
     ]);
     
     if($validator->passes()) {
@@ -29,13 +28,12 @@ class AuthController extends Controller {
       $user->username = Input::get('username');
       $user->password = Hash::make(Input::get('password'));
       $user->auth = str_random(64);
-      $user->faction_id = Input::get('faction');
       $user->save();
       Auth::login($user);
       
       return Redirect::route('home');
     } else {
-      return Redirect::route('register')->withInput(Input::only('username', 'faction'))->withErrors($validator);
+      return Redirect::route('register')->withInput(Input::only('username'))->withErrors($validator);
     }
   }
   

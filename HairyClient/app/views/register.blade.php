@@ -33,14 +33,6 @@
       @endforeach
     </div>
     
-    <div class="form-block">
-      {{ Form::select('faction', $factions, Form::old('faction')) }}
-      
-      @foreach($errors->get('faction') as $error)
-        {{ $error }}
-      @endforeach
-    </div>
-    
     {{ Form::submit(Lang::get('auth.register')) }}
     {{ Form::close() }}
   </body>
