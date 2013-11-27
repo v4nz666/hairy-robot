@@ -113,6 +113,10 @@ public class Sandbox implements Runnable, Iterable<Entity> {
     _thread.join();
   }
   
+  public boolean isAlive() {
+    return _thread.isAlive();
+  }
+  
   private class CollisionTracker<T extends Entity, U extends Entity> {
     public Class<T> e1;
     public Class<U> e2;
