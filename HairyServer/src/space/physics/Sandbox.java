@@ -109,6 +109,10 @@ public class Sandbox implements Runnable, Iterable<Entity> {
     _running = false;
   }
   
+  public void join() throws InterruptedException {
+    _thread.join();
+  }
+  
   private class CollisionTracker<T extends Entity, U extends Entity> {
     public Class<T> e1;
     public Class<U> e2;
