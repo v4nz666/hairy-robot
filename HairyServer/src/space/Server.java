@@ -83,7 +83,7 @@ public class Server {
       return;
     } catch(SQLException e) {
       if(e.getCause() instanceof ConnectException) {
-        System.err.println("We couldn't connect to the server you specified.  Sorry about that.");
+        System.err.println("We couldn't find the SQL server you specified.  Sorry about that.");
         return;
       } else {
         e.printStackTrace();
