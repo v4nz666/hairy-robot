@@ -24,6 +24,7 @@ public class User {
         if(data.auth.equals(r.getString("auth"))) {
           return new User(socket, r, data);
         } else {
+          System.err.println("Auth error for " + data.name + " (" + socket.getRemoteAddress() + ")");
           //TODO: Log auth error
         }
       }
