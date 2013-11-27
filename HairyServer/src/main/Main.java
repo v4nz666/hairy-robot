@@ -1,11 +1,9 @@
 package main;
 
-import java.sql.SQLException;
-
 import space.Server;
 
 public class Main {
-  public static void main(String[] args) throws InterruptedException, InstantiationException, IllegalAccessException, SQLException {
+  public static void main(String[] args) {
     Server.instance().start();
   }
 }

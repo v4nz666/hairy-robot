@@ -46,7 +46,7 @@ public class Server {
   
   private Server() { }
   
-  public void start() throws InterruptedException {
+  public void start() {
     System.out.println("Initialising...");
     
     Runtime.getRuntime().addShutdownHook(new Thread() {
