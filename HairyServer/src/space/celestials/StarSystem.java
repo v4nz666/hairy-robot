@@ -89,6 +89,24 @@ public class StarSystem implements Runnable {
     _sandbox.startSandbox();
   }
   
+  public void stop() {
+    _sandbox.stopSandbox();
+    
+    while(_sandbox.isAlive()) {
+      try { _sandbox.join(); } catch(InterruptedException e) { }
+    }
+    
+    _running = false;
+  }
+  
+  public void join() throws InterruptedException {
+    _thread.join();
+  }
+  
+  public boolean isAlive() {
+    return _thread.isAlive();
+  }
+  
   public void sendEntities(Ship ship, Entity.Request request) {
     for(int i = 0; i < request.i.length; i++) {
       Entity e = _sandbox.getEntity(request.i[i]);
