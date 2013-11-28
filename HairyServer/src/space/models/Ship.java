@@ -63,19 +63,19 @@ public class Ship extends Entity {
   }
   
   public void sendEntity(Entity.Add add) {
-    _user.sendEntity(add);
+    if(_user != null) _user.sendEntity(add);
   }
   
   public void sendCelestial(Entity.Add add) {
-    _user.sendCelestial(add);
+    if(_user != null) _user.sendCelestial(add);
   }
   
   public void sendUpdate(Entity.Update[] update) {
-    _user.sendUpdate(update);
+    if(_user != null) _user.sendUpdate(update);
   }
   
   public void sendCelestials(Entity.Update[] update) {
-    _user.sendCelestials(update);
+    if(_user != null) _user.sendCelestials(update);
   }
   
   public void use(User user) {
