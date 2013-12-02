@@ -16,6 +16,11 @@ Route::group(['prefix' => 'games'], function() {
       Route::put('/saveship',      ['as' => 'games_space_store_saveship', 'uses' => 'games\space\StorageController@saveship']);
     });
     
+    Route::group(['prefix' => 'gen'], function() {
+      Route::get('/ships',   ['as' => 'games_space_gen_ships',   'uses' => 'games\space\GeneratorController@ships']);
+      Route::get('/planets', ['as' => 'games_space_gen_planets', 'uses' => 'games\space\GeneratorController@planets']);
+    });
+    
     Route::get('/{ip?}/{port?}', ['as' => 'games_space', 'uses' => 'games\space\GameController@home']);
   });
 });
