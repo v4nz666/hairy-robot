@@ -13,6 +13,10 @@ public class Star extends Celestial {
   public double getMass() { return _mass; }
   public double getTemp() { return _temp; }
   
+  public static final Star load(StarSystem system, Celestial parent) {
+    
+  }
+  
   public static final Star generate(StarSystem system, Celestial parent, double distance) {
     // Radius ~= .5 - 5 solar radii (at 1/1000 scale)
     int radius = 12000 + _rand.nextInt(100000);
