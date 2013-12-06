@@ -5,6 +5,7 @@ class DatabaseSeeder extends Seeder {
     Eloquent::unguard();
     
     $this->command->info('Getting foreign keys...');
+    $t1 = microtime(true);
     
     // Get the database name
     $dbname = DB::connection('mysql')->getDatabaseName();
@@ -49,7 +50,7 @@ class DatabaseSeeder extends Seeder {
       });
     }
     
-    $this->command->info('Truncation complete.');
+    $this->command->info('Truncation complete in ' . (microtime(true) - $t1) . ' seconds.');
     
     // Seed everything
     $this->call('TableSeeder');
