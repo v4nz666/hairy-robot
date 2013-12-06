@@ -284,7 +284,7 @@ class TableSeeder extends Seeder {
       $c0 = new Coord;
       $totalSize = 0;
       
-      $minRadius = mt_rand(0, 100) / 100 * 200;
+      $minRadius =  mt_rand(2, 100) / 100 * 200;
       $smoothness = $minRadius / 5;
       
       $numPoints = 10 + mt_rand(0, 15);
