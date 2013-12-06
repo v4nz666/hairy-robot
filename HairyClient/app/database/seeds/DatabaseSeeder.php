@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder {
       });
     }
     
-    $this->command->info('Truncation complete in ' . (microtime(true) - $t1) . ' seconds.');
+    $this->command->info('Truncation completed in ' . (microtime(true) - $t1) . ' seconds.');
     
     // Seed everything
     $this->call('TableSeeder');
@@ -60,6 +60,8 @@ class DatabaseSeeder extends Seeder {
 class TableSeeder extends Seeder {
   public function run() {
     DB::transaction(function() {
+      $t1 = microtime(true);
+      
       $this->command->info('Generating system...');
       
       $sy[0] = $this->generateSystem();
@@ -103,6 +105,8 @@ class TableSeeder extends Seeder {
       UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[1]->id]);
       UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[0]->id]);
       UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[1]->id]);
+      
+      $this->command->info('Seeding completed in ' . (microtime(true) - $t1) . ' seconds.');
     });
   }
   
