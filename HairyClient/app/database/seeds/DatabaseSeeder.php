@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder {
 
 class TableSeeder extends Seeder {
   public function run() {
-    $sy[0] = System::create(['name' => 'Sol']);
+    $sy[0] = $this->generateSystem();
     
     $fc[0] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 1',     'can_join' => 1]);
     $fc[1] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 2',     'can_join' => 1]);
@@ -81,5 +81,65 @@ class TableSeeder extends Seeder {
     UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[1]->id]);
     UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[0]->id]);
     UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[1]->id]);
+  }
+  
+  public function generateSystem() {
+    $size = 512 * 567890;
+    
+    $sy = System::create(['name' => 'Sol', 'size' => $size]);
+    $star = $this->generateStar($sy, null, 0);
+    
+    $count = 12;
+    
+    $fib = 1;
+    $i = 0;
+    
+    // Distance of the outermost orbit (1000000km from the outer edge)
+    $maxD = ($size / 2) - 1000000;
+    
+    // Our Fibonacci sequence
+    $seq = [];
+    
+    for($i = 0; $i < $count; $i++) {
+      $seq[$i] = $fib;
+      $fib = ($i > 0) ? $fib + $seq[$i - 1] : $fib + 1;
+    }
+    
+    // Divide the total System size into the number of divisions
+    // defined by the largest(last) number in the sequence
+    $div = $maxD / $seq[$count - 1];
+    for($i = 0; $i < $count; $i++) {
+      $d = $div * $seq[$i];
+      if($i != 3) {
+        //star.addCelestial(Planet.generate(this, star, d));
+      } else {
+        //star.addCelestial(AsteroidBelt.generate(this, star, 0, (int)d));
+      }
+    }
+    
+    return $sy;
+  }
+  
+  public function generateStar($system, $parent, $distance) {
+    // Radius ~= .5 - 5 solar radii (at 1/1000 scale)
+    $radius = 12000 + mt_rand(0, 100000);
+    
+    // Mass ~= 0.05 - 50 Solar masses;
+    $mass = 0.05 + 50 * (mt_rand(0, 100) / 100);
+    
+    // Temperatures range from 300K to 30000K
+    $temp = 3000 + 1000 * mt_rand(0, 27);
+    
+    return Celestial::create([
+      'system_id' => $system->id,
+      'parent_id' => $parent != null ? $parent->id : null,
+      'type'      => 'star',
+      'name'      => 'Sol',
+      'distance'  => $distance,
+      'size'      => $radius,
+      'mass'      => $mass,
+      'temp'      => $temp,
+      'theta'     => mt_rand(0, 359)
+    ]);
   }
 }
