@@ -7,8 +7,8 @@ class CreateTableAsteroids extends Migration {
     Schema::create('asteroids', function($table) {
       $table->increments('id');
       $table->integer('celestial_id')->unsigned();
-      $table->integer('x');
-      $table->integer('y');
+      $table->double('x');
+      $table->double('y');
       $table->string('coords', 256);
       
       $table->foreign('celestial_id')
