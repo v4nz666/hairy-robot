@@ -21,6 +21,7 @@ Route::group(['prefix' => 'games'], function() {
       Route::get('/planets', ['as' => 'games_space_gen_planets', 'uses' => 'games\space\GeneratorController@planets']);
     });
     
-    Route::get('/{ip?}/{port?}', ['as' => 'games_space', 'uses' => 'games\space\GameController@home']);
+    Route::get('/system',        ['as' => 'games_space_system', 'uses' => 'games\space\GameController@system']);
+    Route::get('/{ip?}/{port?}', ['as' => 'games_space',        'uses' => 'games\space\GameController@home']);
   });
 });
