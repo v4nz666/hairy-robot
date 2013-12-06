@@ -111,7 +111,7 @@ class TableSeeder extends Seeder {
     for($i = 0; $i < $count; $i++) {
       $d = $div * $seq[$i];
       if($i != 3) {
-        //star.addCelestial(Planet.generate(this, star, d));
+        $this->generatePlanet($star, $d);
       } else {
         //star.addCelestial(AsteroidBelt.generate(this, star, 0, (int)d));
       }
@@ -139,6 +139,70 @@ class TableSeeder extends Seeder {
       'size'      => $radius,
       'mass'      => $mass,
       'temp'      => $temp,
+      'theta'     => mt_rand(0, 359)
+    ]);
+  }
+  
+  public function generatePlanet($parent, $distance) {
+    $system = $parent->system;
+    
+    $scale = mt_rand(0, 9);
+    $div = 0;
+    $d = $distance;
+    $sSize = $system->size;
+    
+    // Constrain d so that inner/outer planets stay a reasonable size
+    $d = max(min($d, $sSize / 15), $sSize / 100);
+    
+    // Small planets
+    if($scale <= 2) {
+      $div = 1000;
+    // Large Planets
+    } else if($scale >= 9) {
+      $div = 250;
+    } else {
+      $div = 750;
+    }
+    
+    $size = ($d / $div) + ($d / ($div * 3) * (mt_rand(0, 100) / 100) - $d / ($div * 6));
+    
+    //TODO: Mass/temp
+    $planet = Celestial::create([
+      'system_id' => $system->id,
+      'parent_id' => $parent->id,
+      'type'      => 'planet',
+      'name'      => 'Earth',
+      'distance'  => $distance,
+      'size'      => $size,
+      'mass'      => 0,
+      'temp'      => 0,
+      'theta'     => mt_rand(0, 359)
+    ]);
+    
+    $n = 1 + mt_rand(0, max(1, ($size / 3000)));
+    for($i = 0; $i < $n; $i++) {
+      $d = max($size * 3, $size * $i) + ($size * $i / 2);
+      $this->generateMoon($planet, $d);
+    }
+    
+    return $planet;
+  }
+  
+  public function generateMoon($parent, $distance) {
+    $system = $parent->system;
+    
+    $minSize = 512 + mt_rand(0, 100) - 50; 
+    $size = max($minSize, mt_rand(0, $parent->size / 8));
+    
+    return Celestial::create([
+      'system_id' => $system->id,
+      'parent_id' => $parent->id,
+      'type'      => 'moon',
+      'name'      => 'Luna',
+      'distance'  => $distance,
+      'size'      => $size,
+      'mass'      => 0,
+      'temp'      => 0,
       'theta'     => mt_rand(0, 359)
     ]);
   }
