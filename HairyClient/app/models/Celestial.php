@@ -8,10 +8,10 @@ class Celestial extends Eloquent {
   }
   
   public function parent() {
-    return $this->belongsTo('Celestial');
+    return $this->belongsTo('Celestial', 'parent_id');
   }
   
   public function children() {
-    return $this->hasMany('Celestial');
+    return $this->hasMany('Celestial', 'parent_id');
   }
 }
