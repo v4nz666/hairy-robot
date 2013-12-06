@@ -298,7 +298,7 @@ class TableSeeder extends Seeder {
         $y = sin($_th) * $rad;
         $totalSize = $totalSize + $rad;
         
-        $c = new Coord($x, $y);
+        $c = new Coord(floor($x), floor($y));
         
         // Store the first Coord so we can close the circle properly
         if($j === 0) { $c0 = $c; }
@@ -326,12 +326,10 @@ class TableSeeder extends Seeder {
     }
   }
   
-  public function generateAsteroid($parent, $distance, $size, $x, $y, $coord) {
+  public function generateAsteroid($parent, $distance, $size, $x, $y, $coords) {
     $system = $parent->system;
     
-    //TODO: Need to do something with $x, $y, $coord
-    
-    return Celestial::create([
+    $asteroid = Celestial::create([
       'system_id' => $system->id,
       'parent_id' => $parent->id,
       'type'      => 'asteroid',
@@ -341,6 +339,22 @@ class TableSeeder extends Seeder {
       'mass'      => 0,
       'temp'      => 0,
       'theta'     => mt_rand(0, 359)
+    ]);
+    
+    $c = '';
+    $i = 0;
+    
+    foreach($coords as $coord) {
+      if($i !== 0) $c .= ',';
+      $c .= $coord->x . ',' . $coord->y;
+      $i++;
+    }
+    
+    return Asteroid::create([
+      'celestial_id' => $asteroid->id,
+      'x'            => $x,
+      'y'            => $y,
+      'coords'       => $c
     ]);
   }
 }
