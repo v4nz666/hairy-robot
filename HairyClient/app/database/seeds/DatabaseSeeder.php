@@ -4,6 +4,8 @@ class DatabaseSeeder extends Seeder {
   public function run() {
     Eloquent::unguard();
     
+    $this->command->info('Getting foreign keys...');
+    
     // Get the database name
     $dbname = DB::connection('mysql')->getDatabaseName();
     
@@ -20,6 +22,8 @@ class DatabaseSeeder extends Seeder {
                 ->where('TABLE_NAME', '<>', 'migrations')
                   ->get();
     
+    $this->command->info('Killing foreign keys...');
+    
     // Kill all FKs
     foreach($fks as $fk) {
       Schema::table($fk->TABLE_NAME, function($table) use($fk) {
@@ -27,10 +31,14 @@ class DatabaseSeeder extends Seeder {
       });
     }
     
+    $this->command->info('Truncating tables...');
+    
     // Truncate all tables
     foreach($tables as $table) {
       DB::table($table->TABLE_NAME)->truncate();
     }
+    
+    $this->command->info('Reinstating foreign keys...');
     
     // Add all the FKs back
     foreach($fks as $fk) {
@@ -41,6 +49,8 @@ class DatabaseSeeder extends Seeder {
       });
     }
     
+    $this->command->info('Truncation complete.');
+    
     // Seed everything
     $this->call('TableSeeder');
   }
@@ -48,12 +58,18 @@ class DatabaseSeeder extends Seeder {
 
 class TableSeeder extends Seeder {
   public function run() {
+    $this->command->info('Generating system...');
+    
     $sy[0] = $this->generateSystem();
+    
+    $this->command->info('Creating factions...');
     
     $fc[0] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 1',     'can_join' => 1]);
     $fc[1] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 2',     'can_join' => 1]);
     $fc[2] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 3',     'can_join' => 1]);
     $fc[3] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Space Pirates', 'can_join' => 0]);
+    
+    $this->command->info('Creating users...');
     
     $us[0] = User::create([
       'username'   => 'Corey',
@@ -63,6 +79,8 @@ class TableSeeder extends Seeder {
       'username'   => 'v4nz666',
       'password'   => '$2y$08$5s2X1dTgs8GoyhqSSWZ4EehyexHDICUQxpjvMPj7EbRa9JwO4UztC'
     ]);
+    
+    $this->command->info('Creating ships...');
     
     $sh[0] = Ship::create([
       'name'      => 'Forward Unto Dawn',
@@ -76,6 +94,8 @@ class TableSeeder extends Seeder {
       'user_id'   => $us[1]->id,
       'faction_id' => $fc[0]->id
     ]);
+    
+    $this->command->info('Creating shared ship associations...');
     
     UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[0]->id]);
     UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[1]->id]);
@@ -121,6 +141,8 @@ class TableSeeder extends Seeder {
   }
   
   public function generateStar($system, $parent, $distance) {
+    $name = 'Sol';
+    
     // Radius ~= .5 - 5 solar radii (at 1/1000 scale)
     $radius = 12000 + mt_rand(0, 100000);
     
@@ -130,21 +152,30 @@ class TableSeeder extends Seeder {
     // Temperatures range from 300K to 30000K
     $temp = 3000 + 1000 * mt_rand(0, 27);
     
-    return Celestial::create([
+    $star = Celestial::create([
       'system_id' => $system->id,
       'parent_id' => $parent != null ? $parent->id : null,
       'type'      => 'star',
-      'name'      => 'Sol',
+      'name'      => $name,
       'distance'  => $distance,
       'size'      => $radius,
       'mass'      => $mass,
       'temp'      => $temp,
       'theta'     => mt_rand(0, 359)
     ]);
+    
+    $this->command->info('Generated star ' . $name . ' [distance: ' . $distance . ', radius: ' . $radius . ', mass: ' . $mass . ', temp: ' . $temp . ']');
+    
+    return $star;
   }
   
   public function generatePlanet($parent, $distance) {
     $system = $parent->system;
+    
+    //TODO: Mass/temp
+    $name = 'Earth';
+    $mass = 0;
+    $temp = 0;
     
     $scale = mt_rand(0, 9);
     $div = 0;
@@ -166,16 +197,15 @@ class TableSeeder extends Seeder {
     
     $size = ($d / $div) + ($d / ($div * 3) * (mt_rand(0, 100) / 100) - $d / ($div * 6));
     
-    //TODO: Mass/temp
     $planet = Celestial::create([
       'system_id' => $system->id,
       'parent_id' => $parent->id,
       'type'      => 'planet',
-      'name'      => 'Earth',
+      'name'      => $name,
       'distance'  => $distance,
       'size'      => $size,
-      'mass'      => 0,
-      'temp'      => 0,
+      'mass'      => $mass,
+      'temp'      => $temp,
       'theta'     => mt_rand(0, 359)
     ]);
     
@@ -185,30 +215,42 @@ class TableSeeder extends Seeder {
       $this->generateMoon($planet, $d);
     }
     
+    $this->command->info('Generated planet ' . $name . ' [distance: ' . $distance . ', radius: ' . $size . ', mass: ' . $mass . ', temp: ' . $temp . ']');
+    
     return $planet;
   }
   
   public function generateMoon($parent, $distance) {
     $system = $parent->system;
     
+    $name = 'Luna';
+    $mass = 0;
+    $temp = 0;
+    
     $minSize = 512 + mt_rand(0, 100) - 50; 
     $size = max($minSize, mt_rand(0, $parent->size / 8));
     
-    return Celestial::create([
+    $moon = Celestial::create([
       'system_id' => $system->id,
       'parent_id' => $parent->id,
       'type'      => 'moon',
-      'name'      => 'Luna',
+      'name'      => $name,
       'distance'  => $distance,
       'size'      => $size,
-      'mass'      => 0,
-      'temp'      => 0,
+      'mass'      => $mass,
+      'temp'      => $temp,
       'theta'     => mt_rand(0, 359)
     ]);
+    
+    $this->command->info('Generated moon ' . $name . ' [distance: ' . $distance . ', radius: ' . $size . ', mass: ' . $mass . ', temp: ' . $temp . ']');
+    
+    return $moon;
   }
   
   public function generateBelt($parent, $distance, $size) {
     $system = $parent->system;
+    
+    $name = 'Belt';
     
     $belt = Celestial::create([
       'system_id' => $system->id,
@@ -222,12 +264,17 @@ class TableSeeder extends Seeder {
       'theta'     => mt_rand(0, 359)
     ]);
     
-    $asteroidCount = $size / 250;
+    $this->command->info('Generated belt ' . $name . ' [distance: ' . $distance . ', radius: ' . $size . ']');
+    
+    $asteroidCount = floor($size / 250);
     $freq = 10000;
     $amp = $size / 100;
     
     $th = 0;
     $asteroidSpacing = M_PI * 2 / $asteroidCount;
+    
+    $this->command->info('Generating ' . $asteroidCount . ' asteroids...');
+    
     for($i = 0; $i < $asteroidCount; $i++) {
       $th = $asteroidSpacing * $i;
       
