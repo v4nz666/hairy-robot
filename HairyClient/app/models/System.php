@@ -8,4 +8,8 @@ class System extends Eloquent {
   public function factions() {
     return $this->hasMany('Faction');
   }
+  
+  public function celestials() {
+    return $this->hasMany('Celestial');
+  }
 }
