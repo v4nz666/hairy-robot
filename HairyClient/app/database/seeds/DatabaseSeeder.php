@@ -113,7 +113,7 @@ class TableSeeder extends Seeder {
       if($i != 3) {
         $this->generatePlanet($star, $d);
       } else {
-        //star.addCelestial(AsteroidBelt.generate(this, star, 0, (int)d));
+        $this->generateBelt($star, 0, $d);
       }
     }
     
@@ -206,4 +206,109 @@ class TableSeeder extends Seeder {
       'theta'     => mt_rand(0, 359)
     ]);
   }
+  
+  public function generateBelt($parent, $distance, $size) {
+    $system = $parent->system;
+    
+    $belt = Celestial::create([
+      'system_id' => $system->id,
+      'parent_id' => $parent->id,
+      'type'      => 'belt',
+      'name'      => 'Belt',
+      'distance'  => $distance,
+      'size'      => $size,
+      'mass'      => 0,
+      'temp'      => 0,
+      'theta'     => mt_rand(0, 359)
+    ]);
+    
+    $asteroidCount = $size / 250;
+    $freq = 10000;
+    $amp = $size / 100;
+    
+    $th = 0;
+    $asteroidSpacing = M_PI * 2 / $asteroidCount;
+    for($i = 0; $i < $asteroidCount; $i++) {
+      $th = $asteroidSpacing * $i;
+      
+      $c0 = new Coord;
+      $totalSize = 0;
+      
+      $minRadius = mt_rand(0, 100) / 100 * 200;
+      $smoothness = $minRadius / 5;
+      
+      $numPoints = 10 + mt_rand(0, 15);
+      $pointSpacing = M_PI * 2 / $numPoints;
+      $points = [];
+      
+      for($j = 0; $j < $numPoints; $j++) {
+        $_th =  $pointSpacing * $j;
+        $rad = $minRadius + mt_rand(0, 100) / 100 * $smoothness - $smoothness / 2; // Couldn't this just be * $smoothness / 2?
+        $x = cos($_th) * $rad;
+        $y = sin($_th) * $rad;
+        $totalSize = $totalSize + $rad;
+        
+        $c = new Coord($x, $y);
+        
+        // Store the first Coord so we can close the circle properly
+        if($j === 0) { $c0 = $c; }
+        if($j === $numPoints - 1) {
+          $c = $c0;
+          $_th = M_PI * 2;
+        }
+        
+        $points[$j] = $c;
+      }
+      
+      $asize = $totalSize / $numPoints;
+      
+      $d = $size + $amp * sin($freq * $th); 
+      
+      $jitterX = mt_rand(0, 100) / 100 * 0.05 - 0.025;
+      $jitterY = mt_rand(0, 100) / 100 * 0.05 - 0.025;
+      
+      $aX = cos($th + $jitterX) * $d; 
+      $aY = sin($th + $jitterY) * $d; 
+      
+      //System.out.println("Th[" + th + "]aX[" + aX + "]aY[" + aY + "]"); 
+      
+      $this->generateAsteroid($belt, $d, $asize, $aX, $aY, $points);
+    }
+  }
+  
+  public function generateAsteroid($parent, $distance, $size, $x, $y, $coord) {
+    $system = $parent->system;
+    
+    //TODO: Need to do something with $x, $y, $coord
+    
+    return Celestial::create([
+      'system_id' => $system->id,
+      'parent_id' => $parent->id,
+      'type'      => 'asteroid',
+      'name'      => '',
+      'distance'  => $distance,
+      'size'      => $size,
+      'mass'      => 0,
+      'temp'      => 0,
+      'theta'     => mt_rand(0, 359)
+    ]);
+  }
+}
+
+class Coord {
+  public function __construct() {
+    $a = func_get_args();
+    $i = func_num_args();
+    
+    if($i === 1) {
+      $this->x = $a[0]->x;
+      $this->y = $a[0]->y;
+    } elseif($i === 2) {
+      $this->x = $a[0];
+      $this->y = $a[1];
+    }
+  }
+  
+  public $x = 0;
+  public $y = 0;
 }
