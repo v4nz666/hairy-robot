@@ -59,49 +59,51 @@ class DatabaseSeeder extends Seeder {
 
 class TableSeeder extends Seeder {
   public function run() {
-    $this->command->info('Generating system...');
-    
-    $sy[0] = $this->generateSystem();
-    
-    $this->command->info('Creating factions...');
-    
-    $fc[0] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 1',     'can_join' => 1]);
-    $fc[1] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 2',     'can_join' => 1]);
-    $fc[2] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 3',     'can_join' => 1]);
-    $fc[3] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Space Pirates', 'can_join' => 0]);
-    
-    $this->command->info('Creating users...');
-    
-    $us[0] = User::create([
-      'username'   => 'Corey',
-      'password'   => '$2y$08$uR2/fYV7UhBR/0aHckwbxe3lxVUk6XysFOFXQ.iNm93WNXZh4rSfO'
-    ]);
-    $us[1] = User::create([
-      'username'   => 'v4nz666',
-      'password'   => '$2y$08$5s2X1dTgs8GoyhqSSWZ4EehyexHDICUQxpjvMPj7EbRa9JwO4UztC'
-    ]);
-    
-    $this->command->info('Creating ships...');
-    
-    $sh[0] = Ship::create([
-      'name'      => 'Forward Unto Dawn',
-      'system_id' => $sy[0]->id,
-      'user_id'   => $us[0]->id,
-      'faction_id' => $fc[0]->id
-    ]);
-    $sh[1] = Ship::create([
-      'name'      => 'Jeff\'s Pretty Badass Ship',
-      'system_id' => $sy[0]->id,
-      'user_id'   => $us[1]->id,
-      'faction_id' => $fc[0]->id
-    ]);
-    
-    $this->command->info('Creating shared ship associations...');
-    
-    UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[0]->id]);
-    UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[1]->id]);
-    UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[0]->id]);
-    UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[1]->id]);
+    DB::transaction(function() {
+      $this->command->info('Generating system...');
+      
+      $sy[0] = $this->generateSystem();
+      
+      $this->command->info('Creating factions...');
+      
+      $fc[0] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 1',     'can_join' => 1]);
+      $fc[1] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 2',     'can_join' => 1]);
+      $fc[2] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Faction 3',     'can_join' => 1]);
+      $fc[3] = Faction::create(['system_id' => $sy[0]->id, 'name' => 'Space Pirates', 'can_join' => 0]);
+      
+      $this->command->info('Creating users...');
+      
+      $us[0] = User::create([
+        'username'   => 'Corey',
+        'password'   => '$2y$08$uR2/fYV7UhBR/0aHckwbxe3lxVUk6XysFOFXQ.iNm93WNXZh4rSfO'
+      ]);
+      $us[1] = User::create([
+        'username'   => 'v4nz666',
+        'password'   => '$2y$08$5s2X1dTgs8GoyhqSSWZ4EehyexHDICUQxpjvMPj7EbRa9JwO4UztC'
+      ]);
+      
+      $this->command->info('Creating ships...');
+      
+      $sh[0] = Ship::create([
+        'name'      => 'Forward Unto Dawn',
+        'system_id' => $sy[0]->id,
+        'user_id'   => $us[0]->id,
+        'faction_id' => $fc[0]->id
+      ]);
+      $sh[1] = Ship::create([
+        'name'      => 'Jeff\'s Pretty Badass Ship',
+        'system_id' => $sy[0]->id,
+        'user_id'   => $us[1]->id,
+        'faction_id' => $fc[0]->id
+      ]);
+      
+      $this->command->info('Creating shared ship associations...');
+      
+      UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[0]->id]);
+      UserShip::create(['user_id' => $us[0]->id, 'ship_id' => $sh[1]->id]);
+      UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[0]->id]);
+      UserShip::create(['user_id' => $us[1]->id, 'ship_id' => $sh[1]->id]);
+    });
   }
   
   public function generateSystem() {
