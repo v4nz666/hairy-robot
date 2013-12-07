@@ -79,10 +79,10 @@ class Gen {
   }
   
   public static function generateMoon() {
-    return generatePlanet();
+    return Gen::generatePlanet();
   }
   
   public static function generateBelt() {
-    return generatePlanet();
+    return Gen::generatePlanet() . ' Belt';
   }
 }
