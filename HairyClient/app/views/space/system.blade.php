@@ -139,6 +139,7 @@
       
       <?php $i = 0; ?>
       @foreach($planets as $planet)
+        <?php if($planet->type !== 'planet') continue; ?>
         <a class="planet{{ $i }}" title="planet{{ $i }}" href="#planet{{ $i }}speed">{{ $planet->name }}</a>
         <?php $i++; ?>
       @endforeach
@@ -168,6 +169,7 @@
         <div id="solar-system" class="planet1">
           <?php $i = 0; ?>
           @foreach($planets as $planet)
+            <?php if($planet->type !== 'planet') continue; ?>
             <div id="planet{{ $i }}" class="orbit">
               <div class="pos">
                 <div class="planet">
