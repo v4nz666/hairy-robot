@@ -59,6 +59,10 @@ class Gen {
     return 'Not implemented';
   }
   
+  public static function generateStar() {
+    return generatePlanet();
+  }
+  
   public static function generatePlanet() {
     $name = [
       'Ceres', 'Pallas', 'Juno', 'Vesta', 'Astraea', 'Hebe', 'Iris', 'Flora', 'Metis',
