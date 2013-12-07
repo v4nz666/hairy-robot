@@ -1,0 +1,637 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300);
+/*
+  Copyright (c) 2013 Corey Frenette
+  Copyright (c) 2012 Julian Garnier
+  Licensed under the MIT license
+*/
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  margin: 0;
+  padding: 0; }
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+* {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  box-sizing: border-box; }
+
+body {
+  font-size: 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  background-color: #08090A; }
+
+#universe {
+  z-index: 1;
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+  background-size: cover; }
+
+#galaxy {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /*perspective: 4000;*/ }
+
+#solar-system {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d; }
+
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  animation-name: orbit;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
+
+.orbit .orbit {
+  animation-name: suborbit; }
+
+.pos {
+  position: absolute;
+  top: 50%;
+  width: 2em;
+  height: 2em;
+  margin-top: -1em;
+  margin-left: -1em;
+  transform-style: preserve-3d;
+  animation-name: invert;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
+
+#star, .planet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  margin-top: -0.5em;
+  margin-left: -0.5em;
+  border-radius: 50%;
+  transform-style: preserve-3d; }
+
+#star {
+  background-color: #FB7209;
+  background-repeat: no-repeat;
+  background-size: cover;
+  box-shadow: 0 0 60px rgba(255, 160, 60, 0.4); }
+
+.planet {
+  background-color: #202020;
+  background-repeat: no-repeat;
+  background-size: cover;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
+  
+  /* --------------------------------------------------------------------------- animations */
+@keyframes orbit {
+  0% {
+    transform: rotateZ(0deg); }
+
+  100% {
+    transform: rotateZ(-360deg); } }
+
+@keyframes suborbit {
+  0% {
+    transform: rotateX(90deg) rotateZ(0deg); }
+
+  100% {
+    transform: rotateX(90deg) rotateZ(-360deg); } }
+
+@keyframes invert {
+  0% {
+    transform: rotateX(-90deg) rotateY(360deg) rotateZ(0deg); }
+
+  100% {
+    transform: rotateX(-90deg) rotateY(0deg) rotateZ(0deg); } }
+
+/* --------------------------------------------------------------------------- opening */
+.view-3D .opening #star,
+.view-3D .opening .orbit,
+.view-3D .opening .pos,
+.view-3D .opening .planet,
+.view-3D .opening .satelite,
+.view-3D .opening .ring {
+  transition-duration: 4s; }
+
+#universe.opening #star {
+  box-shadow: 0 0 0 rgba(255, 160, 60, 0); }
+
+/* --------------------------------------------------------------------------- 2D view */
+.view-2D.zoom-large #star {
+  transform-style: flat; }
+
+.view-2D.zoom-large .orbit {
+  transform-style: flat; }
+
+.view-2D #star,
+.view-2D .ring {
+  transform: rotateX(0deg); }
+
+.view-2D .planet,
+.view-2D .moon {
+  transform: rotateX(90deg); }
+
+/* --------------------------------------------------------------------------- 3D view */
+.view-3D.zoom-large #star {
+  transform-style: preserve-3d; }
+
+.view-3D.zoom-large .orbit {
+  transform-style: preserve-3d; }
+
+.view-3D #solar-system {
+  transform: rotateX(75deg); }
+
+.view-3D #star {
+  transform: rotateX(-90deg); }
+
+.view-3D .ring {
+  transform: rotateX(90deg); }
+
+.view-3D .planet,
+.view-3D .moon {
+  transform: rotateX(0deg); }
+
+/* --------------------------------------------------------------------------- large zoom */
+.zoom-large #solar-system {
+  width: 100%; }
+
+.zoom-large.view-2D .scale-stretched #solar-system {
+  font-size: 26%; }
+
+.zoom-large.view-3D .scale-stretched #solar-system {
+  font-size: 62%; }
+
+.zoom-large.view-2D .scale-d #solar-system {
+  font-size: 22%; }
+
+.zoom-large.view-3D .scale-d #solar-system {
+  font-size: 48%; }
+
+.zoom-large.view-2D .scale-s #solar-system {
+  font-size: 7%; }
+
+.zoom-large.view-3D .scale-s #solar-system {
+  font-size: 14%; }
+
+/* --------------------------------------------------------------------------- close zoom */
+.zoom-close #solar-system {
+  width: 200%;
+  font-size: 100%; }
+
+.zoom-close .scale-stretched #solar-system {
+  margin-left: -100%; }
+
+.zoom-close .scale-d #solar-system {
+  margin-left: -106%; }
+
+.zoom-close.view-2D .scale-d #solar-system {
+  font-size: 84%; }
+
+.zoom-close.view-3D .scale-d #solar-system {
+  font-size: 84%; }
+
+.zoom-close .scale-s #solar-system {
+  margin-left: -145%; }
+
+.zoom-close.view-2D .scale-s #solar-system {
+  font-size: 40%; }
+
+.zoom-close.view-3D .scale-s #solar-system {
+  font-size: 40%; }
+
+.zoom-close .orbit,
+.zoom-close .pos,
+.zoom-close .planet,
+.zoom-close .satelite,
+.zoom-close .ring {
+  animation-play-state: paused!important;
+  animation-duration: 0s!important;
+  animation: none!important; }
+
+.zoom-close.view-2D .planet,
+.zoom-close.view-2D .moon {
+  transform: rotateX(0deg); }
+
+.zoom-close.view-3D .planet {
+  transform: rotateX(-90deg); }
+
+.zoom-close.view-3D .moon {
+  transform: rotateX(90deg); }
+
+.zoom-close .pos {
+  left: 100%!important;
+  top: 50%!important; }
+
+/* --------------------------------------------------------------------------- navigation styles */
+dl.infos {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin-top: -90%;
+  margin-left: 90%;
+  padding-left: 100%;
+  transform-origin: 100% 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(90deg); }
+
+dl.infos:before {
+  position: absolute;
+  content: '';
+  width: 15px;
+  height: 30px;
+  left: 15px;
+  bottom: 0;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  transform-style: preserve-3d;
+  transform: skew(-45deg, 0deg);
+  box-shadow: inset 1px 1px black; }
+
+dl.infos dt {
+  position: absolute;
+  left: 50px;
+  margin-bottom: 26px;
+  bottom: 30px;
+  color: #FFF;
+  font-size: 14px;
+  text-shadow: 1px 1px 2px black; }
+
+dl.infos dd:after {
+  position: absolute;
+  left: 50px;
+  bottom: 30px;
+  width: 300px;
+  color: #FFF;
+  font-size: 22px;
+  text-shadow: 1px 1px 2px black; }
+
+dl.infos dd span:after {
+  position: absolute;
+  left: 50px;
+  bottom: 14px;
+  width: 300px;
+  color: #FFF;
+  font-size: 11px;
+  text-shadow: 1px 1px 2px black; }
+
+.hide-UI h1,
+.hide-UI #data,
+.hide-UI dl.infos,
+.hide-UI #controls {
+  opacity: 0!important;
+  margin-top: -30px; }
+
+.hide-UI #data {
+  margin-bottom: -30px; }
+
+.hide-UI .orbit {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; }
+
+h1 {
+  width: 100%;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8); }
+
+h1 span, #navbar h1 a {
+  display: inline;
+  position: relative;
+  padding: 0;
+  font-weight: 300;
+  font-size: 14px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5); }
+}
+
+#navbar, #controls, #data {
+  background: rgba(0, 0, 0, 0.4); }
+
+#navbar {
+  z-index: 99;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 16px;
+  width: 100%;
+  height: 48px; }
+
+#navbar a, #data a, #controls label {
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  position: relative;
+  text-decoration: none; }
+
+#navbar a:hover, #data a:hover, #controls label:hover {
+  color: #FFF; }
+
+#data a.active {
+  color: #0CF; }
+
+#navbar a {
+  position: absolute;
+  top: 0;
+  height: 48px;
+  padding: 16px;
+  font-size: 14px; }
+
+#toggle-data {
+  left: 0; }
+
+#toggle-controls {
+  right: 0; }
+
+#data, #controls {
+  z-index: 99;
+  position: fixed;
+  opacity: 1;
+  top: 49px;
+  padding: 16px; }
+
+.data-close #data {
+  left: -100%; }
+
+.data-open #data {
+  left: 0px; }
+
+.controls-close #controls {
+  right: -100%; }
+
+.controls-open #controls {
+  right: 0px; }
+
+#data a {
+  margin-bottom: 1px;
+  padding: 6px 10px;
+  font-size: 18px; }
+
+#controls label {
+  opacity: .6;
+  height: 24px;
+  margin-bottom: 28px; }
+
+#controls label:hover {
+  opacity: 1; }
+
+#controls label:before {
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  text-align: center;
+  color: #FFF;
+  z-index: 99; }
+
+#controls label span {
+  display: block;
+  margin-left: 36px;
+  padding-top: 4px;
+  font-size: 18px;
+  color: #FFF; }
+
+#controls input {
+  display: block;
+  appearance: none; }
+
+#controls input[type="radio"]:before {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #FFF;
+  border-radius: 16px; }
+
+#controls input:checked[type="radio"]:after {
+  content: '';
+  display: block;
+  top: 3px;
+  margin-left: 3px;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: #FFF;
+  z-index: 99; }
+
+#controls input[type="checkbox"]:before {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 100px;
+  height: 22px;
+  border: 2px solid #FFF;
+  border-radius: 16px; }
+
+#controls input[type="checkbox"]:after {
+  content: '';
+  display: block;
+  top: 3px;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: #FFF;
+  z-index: 99; }
+
+#controls label.set-view:before {
+  font: bold small-caps 11px/20px sans-serif; }
+
+.view-3D #controls label.set-view:before {
+  content: '2D';
+  margin-left: 82px; }
+
+.view-2D #controls label.set-view:before {
+  content: '3D';
+  margin-left: 7px; }
+
+.view-3D #controls .set-view input:after {
+  margin-left: 3px; }
+
+.view-2D #controls .set-view input:after {
+  margin-left: 81px; }
+
+#controls label.set-zoom:before {
+  font: normal small-caps 18px/14px sans-serif; }
+
+.zoom-large #controls label.set-zoom:before {
+  content: '+';
+  margin-left: 82px; }
+
+.zoom-close #controls label.set-zoom:before {
+  content: '-';
+  margin-left: 7px; }
+
+.zoom-large #controls .set-zoom input:after {
+  margin-left: 3px; }
+
+.zoom-close #controls .set-zoom input:after {
+  margin-left: 81px; }
+
+/* --------------------------------------------------------------------------- transitions */
+.pos {
+  transition-property: top, left; }
+
+#solar-system, .orbit,
+.planet,
+.satelite,
+.ring {
+  transition-property: width, height, top, left, margin-left, margin-top, webkit-transform; }
+
+#star, .icon {
+  transition-property: width, height, webkit-transform; }
+
+#solar-system,
+#star,
+.orbit,
+.pos,
+.planet,
+.satelite,
+.ring,
+.infos,
+.icon {
+  transition-duration: .8s;
+  transition-timing-function: ease-in-out; }
+
+#solar-system,
+#star,
+.planet,
+.satelite,
+.ring {
+  transition-delay: 0s; }
+
+.pos {
+  transition-delay: 1s; }
+
+.opening #solar-system,
+.opening #star,
+.opening .orbit,
+.opening .pos,
+.opening .planet,
+.opening .satelite,
+.opening .ring,
+.opening .infos,
+.opening h1,
+.opening #data,
+.opening dl.infos,
+.opening #controls {
+  transition-duration: 0s;
+  transition-delay: 0s; }
+
+.opening .pos {
+  transition-delay: 0s; }
+
+h1, #data, #controls {
+  transition-property: opacity, margin;
+  transition-duration: .8s;
+  transition-timing-function: ease-in-out; }
+
+h1 {
+  transition-delay: .35s; }
+
+#data {
+  transition-delay: .7s; }
+
+#controls {
+  transition-delay: 1s; }
+
+/* --------------------------------------------------------------------------- responsive styles */
+@media screen and (max-width: 299px) {
+  #universe {
+    font-size: 20%; } }
+@media screen and (min-width: 300px) {
+  #universe {
+    font-size: 24%; } }
+@media screen and (min-width: 500px) {
+  #universe {
+    font-size: 36%; } }
+@media screen and (min-width: 600px) {
+  #universe {
+    font-size: 44%; } }
+@media screen and (min-width: 760px) {
+  #universe {
+    font-size: 58%; } }
+@media screen and (min-width: 1000px) {
+  #universe {
+    font-size: 73%; }
+
+  #navbar, #controls, #data {
+    background: transparent; }
+
+  #navbar a {
+    display: none; }
+
+  h1 {
+    font-size: 22px;
+    margin-top: 8px; }
+                    
+  #navbar h1 span {
+    line-height: 32px;
+  }
+
+  #controls {
+    padding-right: 32px;
+    top: 12px; }
+
+  #data {
+    position: fixed;
+    top: inherit;
+    bottom: 0;
+    width: 100%;
+    text-align: center; }
+
+  #data a {
+    display: inline-block;
+    text-align: center;
+    font-size: 20px;
+    padding: 15px 15px; }
+
+  .data-open #data, .data-close #data {
+    left: 0px;
+  }
+
+  .controls-open #controls, .controls-close #controls {
+    right: 0px;
+  }
+}
+
+@media screen and (min-width: 1300px) {
+  #universe {
+    font-size: 100%;
+  }
+}
