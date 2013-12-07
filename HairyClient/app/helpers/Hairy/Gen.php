@@ -77,4 +77,12 @@ class Gen {
     
     return $n;
   }
+  
+  public static function generateMoon() {
+    return generatePlanet();
+  }
+  
+  public static function generateBelt() {
+    return generatePlanet();
+  }
 }
