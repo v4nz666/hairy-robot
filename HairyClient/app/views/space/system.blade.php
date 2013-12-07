@@ -82,7 +82,7 @@
       @for($i = 0; $i < count($planets); $i++)
       <?php if($planets[$i]->type !== 'planet') continue; ?>
       .set-size #planet{{ $i }} dl.infos dd:after {
-        content: '40,030 km'; } /***** TODO *****/
+        content: '{{ number_format($planets[$i]->size * 2 * M_PI, 2) }} km'; }
       @endfor
       
       /* --------------------------------------------------------------------------- distance */
