@@ -104,7 +104,9 @@
       .star #star .infos,
       @for($i = 0; $i < count($planets); $i++)
       <?php if($planets[$i]->type !== 'planet') continue; ?>
-      .planet{{ $i }} #planet{{ $i }} .infos,
+      .planet{{ $i }} #planet{{ $i }} .infos
+      @if($i < count($planets) - 1) ,
+      @endif
       @endfor
       {
         display: block;
@@ -114,7 +116,9 @@
 
       @for($i = 0; $i < count($planets); $i++)
       <?php if($planets[$i]->type !== 'planet') continue; ?>
-      .planet{{ $i }} #planet{{ $i }}.orbit,
+      .planet{{ $i }} #planet{{ $i }}.orbit
+      @if($i < count($planets) - 1) ,
+      @endif
       @endfor
       {
         border: 1px solid rgba(255, 255, 255, 0.8);
