@@ -60,7 +60,7 @@ class Gen {
   }
   
   public static function generateStar() {
-    return generatePlanet();
+    return Gen::generatePlanet();
   }
   
   public static function generatePlanet() {
