@@ -1,5 +1,7 @@
 <?php
 
+use Hairy\Gen;
+
 class DatabaseSeeder extends Seeder {
   public function run() {
     Eloquent::unguard();
@@ -148,7 +150,7 @@ class TableSeeder extends Seeder {
   }
   
   public function generateStar($system, $parent, $distance) {
-    $name = 'Sol';
+    $name = Gen::generateStar();
     
     // Radius ~= .5 - 5 solar radii (at 1/1000 scale)
     $radius = 12000 + mt_rand(0, 100000);
@@ -180,7 +182,7 @@ class TableSeeder extends Seeder {
     $system = $parent->system;
     
     //TODO: Mass/temp
-    $name = 'Earth';
+    $name = Gen::generatePlanet();
     $mass = 0;
     $temp = 0;
     
@@ -230,7 +232,7 @@ class TableSeeder extends Seeder {
   public function generateMoon($parent, $distance) {
     $system = $parent->system;
     
-    $name = 'Luna';
+    $name = Gen::generateMoon();
     $mass = 0;
     $temp = 0;
     
@@ -257,7 +259,7 @@ class TableSeeder extends Seeder {
   public function generateBelt($parent, $distance, $size) {
     $system = $parent->system;
     
-    $name = 'Belt';
+    $name = Gen::generateBelt();
     
     $belt = Celestial::create([
       'system_id' => $system->id,
